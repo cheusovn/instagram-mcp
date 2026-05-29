@@ -1,6 +1,7 @@
 # Environment variables and secrets
 .env
 .env.local
+.env.social_mcp_tool_disabled
 .env.production
 .env.staging
 *.key

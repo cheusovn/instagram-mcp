@@ -9,6 +9,14 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
 
 
+def parse_meta_datetime(value: str) -> datetime:
+    """Parse Meta Graph API timestamps across common timezone formats."""
+    normalized = value.replace("Z", "+00:00")
+    if len(normalized) >= 5 and normalized[-5] in "+-" and normalized[-3] != ":":
+        normalized = f"{normalized[:-2]}:{normalized[-2:]}"
+    return datetime.fromisoformat(normalized)
+
+
 class MediaType(str, Enum):
     """Instagram media types."""
 
@@ -103,7 +111,7 @@ class InstagramMedia(BaseModel):
     def parse_timestamp(cls, v):
         """Parse timestamp from ISO string."""
         if isinstance(v, str):
-            return datetime.fromisoformat(v.replace("Z", "+00:00"))
+            return parse_meta_datetime(v)
         return v
 
 
@@ -257,7 +265,7 @@ class InstagramMessage(BaseModel):
     def parse_created_time(cls, v):
         """Parse timestamp from ISO string."""
         if isinstance(v, str):
-            return datetime.fromisoformat(v.replace("Z", "+00:00"))
+            return parse_meta_datetime(v)
         return v
 
 
@@ -275,7 +283,7 @@ class InstagramConversation(BaseModel):
     def parse_updated_time(cls, v):
         """Parse timestamp from ISO string."""
         if isinstance(v, str):
-            return datetime.fromisoformat(v.replace("Z", "+00:00"))
+            return parse_meta_datetime(v)
         return v
 
 
@@ -325,7 +333,7 @@ class InstagramComment(BaseModel):
     @classmethod
     def parse_timestamp(cls, v):
         if isinstance(v, str):
-            return datetime.fromisoformat(v.replace("Z", "+00:00"))
+            return parse_meta_datetime(v)
         return v
 
 
@@ -370,7 +378,7 @@ class HashtagMedia(BaseModel):
     @classmethod
     def parse_timestamp(cls, v):
         if isinstance(v, str):
-            return datetime.fromisoformat(v.replace("Z", "+00:00"))
+            return parse_meta_datetime(v)
         return v
 
 
@@ -389,7 +397,7 @@ class InstagramStory(BaseModel):
     @classmethod
     def parse_timestamp(cls, v):
         if isinstance(v, str):
-            return datetime.fromisoformat(v.replace("Z", "+00:00"))
+            return parse_meta_datetime(v)
         return v
 
 
@@ -411,7 +419,7 @@ class InstagramMention(BaseModel):
     @classmethod
     def parse_timestamp(cls, v):
         if isinstance(v, str):
-            return datetime.fromisoformat(v.replace("Z", "+00:00"))
+            return parse_meta_datetime(v)
         return v
 
 

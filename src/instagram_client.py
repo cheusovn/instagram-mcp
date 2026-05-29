@@ -36,6 +36,7 @@ from .models.instagram_models import (
     RateLimitInfo,
     SendDMRequest,
     SendDMResponse,
+    parse_meta_datetime,
 )
 
 logger = structlog.get_logger(__name__)
@@ -377,9 +378,7 @@ class InstagramClient:
             for item in data.get("data", []):
                 # Convert timestamp to datetime
                 if "timestamp" in item:
-                    item["timestamp"] = datetime.fromisoformat(
-                        item["timestamp"].replace("Z", "+00:00")
-                    )
+                    item["timestamp"] = parse_meta_datetime(item["timestamp"])
 
                 media_list.append(InstagramMedia(**item))
 
