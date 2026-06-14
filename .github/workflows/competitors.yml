@@ -6,105 +6,125 @@ on:
 jobs:
   analyze-competitors:
     runs-on: ubuntu-latest
+    env:
+      TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
     steps:
-      - name: Analyze Competitors via Hashtags
+      - name: Analyze Competitors in AI niche
         run: |
-          TOKEN="${{ secrets.INSTAGRAM_ACCESS_TOKEN }}"
+          python3 << 'PYEOF'
+          import json, time, urllib.request, urllib.parse, os
 
-          # Get page token and IG ID
-          PAGES=$(curl -s "https://graph.facebook.com/me/accounts?access_token=$TOKEN")
-          PAGE_TOKEN=$(echo "$PAGES" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['data'][0]['access_token'])")
-          IG_ID=$(curl -s "https://graph.facebook.com/$(echo "$PAGES" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['data'][0]['id'])")?fields=instagram_business_account&access_token=$PAGE_TOKEN" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['instagram_business_account']['id'])")
+          TOKEN = os.environ["TOKEN"]
 
-          echo "════════════════════════════════════════════"
-          echo "     🔍 АНАЛИЗ КОНКУРЕНТОВ В НИШЕ ИИ"
-          echo "════════════════════════════════════════════"
+          def api(path, params={}):
+              params["access_token"] = TOKEN
+              url = f"https://graph.facebook.com/{path}?{urllib.parse.urlencode(params)}"
+              try:
+                  with urllib.request.urlopen(url, timeout=10) as r:
+                      return json.loads(r.read())
+              except Exception as e:
+                  return {"error": {"message": str(e)}}
+
+          # Setup
+          pages = api("me/accounts")
+          page = pages["data"][0]
+          page_token = page["access_token"]
+          page_id = page["id"]
+
+          ig_data = api(page_id, {"fields": "instagram_business_account", "access_token": page_token})
+          IG_ID = ig_data["instagram_business_account"]["id"]
+
+          TOKEN = page_token  # use page token from now on
+
+          def api2(path, params={}):
+              params["access_token"] = TOKEN
+              url = f"https://graph.facebook.com/{path}?{urllib.parse.urlencode(params)}"
+              try:
+                  with urllib.request.urlopen(url, timeout=10) as r:
+                      return json.loads(r.read())
+              except Exception as e:
+                  return {"error": {"message": str(e)}}
+
+          print("═" * 50)
+          print("    🔍 АНАЛИЗ КОНКУРЕНТОВ В НИШЕ ИИ")
+          print("═" * 50)
 
           # Hashtags to analyze
-          HASHTAGS="нейросети ии_видео искусственныйинтеллект aiвидео нейросеть midjourney sora runwayml kling нейросетидляработы"
+          hashtags = [
+              "нейросети", "нейросеть", "искусственныйинтеллект",
+              "ИИвидео", "midjourney", "kling", "runwayml",
+              "sora", "aiart", "нейросетидляработы"
+          ]
 
-          for TAG in $HASHTAGS; do
-            echo ""
-            echo "🏷  #$TAG"
-            echo "──────────────────────────────────────────"
+          print("\n📊 АНАЛИЗ ХЕШТЕГОВ")
+          print("─" * 50)
 
-            # Search hashtag ID
-            HTAG_RESP=$(curl -s "https://graph.facebook.com/ig_hashtag_search?user_id=$IG_ID&q=$TAG&access_token=$PAGE_TOKEN")
-            HTAG_ID=$(echo "$HTAG_RESP" | python3 -c "
-          import json,sys
-          d=json.load(sys.stdin)
-          ids=d.get('data',[])
-          print(ids[0]['id'] if ids else '')
-          " 2>/dev/null)
+          for tag in hashtags:
+              print(f"\n🏷  #{tag}")
+              resp = api2("ig_hashtag_search", {"user_id": IG_ID, "q": tag})
+              ids = resp.get("data", [])
+              if not ids:
+                  err = resp.get("error", {}).get("message", "не найден")
+                  print(f"  ⚠️  {err[:70]}")
+                  time.sleep(0.5)
+                  continue
 
-            if [ -z "$HTAG_ID" ]; then
-              echo "  ⚠️ Хештег не найден"
-              continue
-            fi
+              htag_id = ids[0]["id"]
+              top = api2(f"{htag_id}/top_media", {
+                  "user_id": IG_ID,
+                  "fields": "id,like_count,comments_count,media_type,timestamp,permalink"
+              })
+              posts = top.get("data", [])
+              if not posts:
+                  print("  Нет топ-постов")
+              else:
+                  total_likes = sum(p.get("like_count", 0) for p in posts)
+                  avg_likes = total_likes / len(posts)
+                  print(f"  Постов в топе: {len(posts)}  |  Среднее лайков: {avg_likes:.0f}")
+                  best = max(posts, key=lambda x: x.get("like_count", 0))
+                  icon = {"IMAGE": "🖼", "VIDEO": "🎬", "CAROUSEL_ALBUM": "📑"}.get(best.get("media_type", ""), "?")
+                  print(f"  Лучший: {icon} ❤️ {best.get('like_count', 0):,}  💬 {best.get('comments_count', 0):,}  📅 {best.get('timestamp', '')[:10]}")
+                  print(f"  🔗 {best.get('permalink', '')}")
+              time.sleep(0.5)
 
-            # Get top posts for hashtag
-            TOP=$(curl -s "https://graph.facebook.com/$HTAG_ID/top_media?user_id=$IG_ID&fields=id,caption,like_count,comments_count,media_type,timestamp,permalink,username&access_token=$PAGE_TOKEN")
-            echo "$TOP" | python3 -c "
-          import json,sys
-          d=json.load(sys.stdin)
-          posts=d.get('data',[])
-          if not posts:
-              print('  Нет данных')
-              sys.exit(0)
-          print(f'  Топ {len(posts)} постов:')
-          for p in posts[:5]:
-              username = p.get('username','???')
-              likes = p.get('like_count',0)
-              comments = p.get('comments_count',0)
-              mtype = p.get('media_type','?')
-              date = p.get('timestamp','')[:10]
-              caption = (p.get('caption','') or '')[:60]
-              icon = {'IMAGE':'🖼','VIDEO':'🎬','CAROUSEL_ALBUM':'📑'}.get(mtype,'?')
-              print(f'  {icon} @{username}')
-              print(f'     ❤️ {likes:,}  💬 {comments:,}  📅 {date}')
-              print(f'     {caption}')
-          " 2>/dev/null || echo "  ⚠️ Ошибка получения данных"
+          print("\n")
+          print("═" * 50)
+          print("    👥 АНАЛИЗ КОНКУРЕНТОВ ПО USERNAME")
+          print("═" * 50)
 
-            sleep 1
-          done
+          # Russian AI/video niche competitors — edit this list!
+          competitors = [
+              "ai.neuroscience",
+              "neural_dream_art",
+              "midjourney_russia",
+              "sora_ai_video",
+              "kling_ai_ru",
+              "ai_video_creation",
+              "нейросети_гайды",
+          ]
 
-          echo ""
-          echo "════════════════════════════════════════════"
-          echo "     📊 АНАЛИЗ КОНКРЕТНЫХ КОНКУРЕНТОВ"
-          echo "════════════════════════════════════════════"
+          for username in competitors:
+              print(f"\n👤 @{username}")
+              resp = api2(IG_ID, {
+                  "fields": "business_discovery.fields(username,name,biography,followers_count,media_count,website)",
+                  "business_discovery_username": username
+              })
+              bd = resp.get("business_discovery", {})
+              if not bd or "error" in resp:
+                  err = resp.get("error", {}).get("message", "нет доступа")
+                  print(f"  ⚠️  {err[:80]}")
+              else:
+                  print(f"  Имя:        {bd.get('name', 'N/A')}")
+                  print(f"  Подписчики: {bd.get('followers_count', 0):,}")
+                  print(f"  Постов:     {bd.get('media_count', 0):,}")
+                  bio = (bd.get("biography", "") or "")[:80]
+                  print(f"  Биография:  {bio}")
+                  print(f"  Сайт:       {bd.get('website', 'N/A')}")
+              time.sleep(0.5)
 
-          # Known competitors in Russian AI/neural networks niche
-          COMPETITORS="ai_abyss neuro_style_art neural_style_transfer_art ai_art_gallery midjourney_art_official"
-
-          for USERNAME in $COMPETITORS; do
-            echo ""
-            echo "👤 @$USERNAME"
-            echo "──────────────────────────────────────────"
-
-            RESP=$(curl -s "https://graph.facebook.com/$IG_ID?fields=business_discovery.fields(username,name,biography,followers_count,media_count,website)&business_discovery_username=$USERNAME&access_token=$PAGE_TOKEN" 2>/dev/null || echo "{}")
-
-            echo "$RESP" | python3 -c "
-          import json,sys
-          d=json.load(sys.stdin)
-          bd=d.get('business_discovery',{})
-          if not bd or 'error' in d:
-              err=d.get('error',{}).get('message','Нет доступа (приватный или не бизнес аккаунт)')
-              print(f'  ⚠️ {err[:80]}')
-              sys.exit(0)
-          print(f\"  Имя:         {bd.get('name','N/A')}\")
-          print(f\"  Подписчики:  {bd.get('followers_count',0):,}\")
-          print(f\"  Постов:      {bd.get('media_count',0):,}\")
-          print(f\"  Биография:   {(bd.get('biography','') or '')[:80]}\")
-          print(f\"  Сайт:        {bd.get('website','N/A')}\")
-          " 2>/dev/null
-
-            sleep 1
-          done
-
-          echo ""
-          echo "════════════════════════════════════════════"
-          echo "💡 РЕКОМЕНДАЦИИ:"
-          echo "  1. Добавьте username конкурентов вручную в список COMPETITORS"
-          echo "  2. Хештеги с наибольшим числом лайков = ваши приоритетные теги"
-          echo "  3. Смотрите на тип контента (видео vs карусели) у топ-постов"
-          echo "════════════════════════════════════════════"
+          print("\n")
+          print("═" * 50)
+          print("💡 СОВЕТ: Чтобы добавить своих конкурентов,")
+          print("   отредактируйте список competitors в workflow")
+          print("═" * 50)
+          PYEOF
