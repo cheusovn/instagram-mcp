@@ -22,7 +22,7 @@ const Root: React.FC = () => (
       durationInFrames: props.slides.length * 150 - (props.slides.length - 1) * 10,
       fps: 30,
       width: 1080,
-      height: 1920,
+      height: 1350, // 4:5 — максимум для Instagram Feed + Reels превью
     })}
   />
 );
