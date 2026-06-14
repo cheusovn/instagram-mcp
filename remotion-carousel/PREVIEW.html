@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>7 стилей карусели — @nikolay_cheusov</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Unbounded:wght@400;700;900&family=Oswald:wght@400;600;700&family=Manrope:wght@400;600;800&family=Montserrat:wght@700;900&family=Russo+One&family=Golos+Text:wght@400;600;900&family=Rubik:wght@400;700;900&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; padding: 40px 24px; }
+  h1 { text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+  .subtitle { text-align: center; color: #888; font-size: 16px; margin-bottom: 48px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; max-width: 1200px; margin: 0 auto; }
+  .card { border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform .2s, box-shadow .2s; border: 2px solid transparent; }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.6); border-color: #fff3; }
+  .slide { width: 100%; aspect-ratio: 4/5; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 32px 28px 24px; }
+  .label { text-align: center; padding: 16px; font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+  .tag { display: inline-block; font-size: 11px; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 3px 10px; margin-top: 4px; color: #aaa; letter-spacing: 1px; }
+  .header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; opacity: 0.7; margin-bottom: auto; }
+  .progress { height: 3px; border-radius: 2px; margin-top: auto; }
+  .badge { background: rgba(255,255,255,0.15); border-radius: 6px; padding: 2px 8px; font-size: 11px; }
+  .nano-badge { text-align: center; background: linear-gradient(90deg,#FF5FA2,#FFC93C,#7C4DFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 11px; font-weight: 700; margin-top: 4px; }
+
+  /* ── S01 Bebas 3D ── */
+  .s01 { background: radial-gradient(circle at 30% 20%, #11337a, #08184a 45%, #030a26); }
+  .s01 .headline { font-family: 'Bebas Neue', sans-serif; font-size: 78px; line-height: 1; color: #fff; text-shadow: 1px 1px 0 #0c2060, 2px 2px 0 #0a1850, 3px 3px 0 #081240, 4px 4px 0 #060c30, 5px 5px 0 #040830, 6px 6px 30px rgba(45,127,255,0.5), 0 0 40px rgba(45,127,255,0.3); margin: 16px 0 12px; }
+  .s01 .body { font-family: 'Oswald', sans-serif; font-size: 22px; color: rgba(255,255,255,0.8); line-height: 1.4; }
+  .s01 .kicker { font-family: 'Oswald', sans-serif; font-size: 14px; color: #2D7FFF; letter-spacing: 4px; text-transform: uppercase; }
+  .s01 .particle { position: absolute; border-radius: 50%; background: #2D7FFF; opacity: 0.6; }
+  .s01 .accent { color: #2D7FFF; text-shadow: 1px 1px 0 #0c2060, 2px 2px 0 #0a1850, 3px 3px 0 #081240, 0 0 30px rgba(45,127,255,0.8); }
+  .s01 .progress-bar { background: #2D7FFF; }
+
+  /* ── S02 Candy Pop ── */
+  .s02 { background: linear-gradient(150deg, #FF5FA2, #7C4DFF); }
+  .s02 .headline { font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: 54px; line-height: 1.1; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.3); margin: 12px 0; }
+  .s02 .body { font-family: 'Unbounded', sans-serif; font-size: 18px; color: rgba(255,255,255,0.9); line-height: 1.5; background: rgba(255,255,255,0.15); border-radius: 14px; padding: 14px 18px; backdrop-filter: blur(10px); }
+  .s02 .emoji-big { font-size: 80px; text-align: center; filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3)); }
+  .s02 .confetti { position: absolute; border-radius: 3px; }
+
+  /* ── S03 Brutalist Neon ── */
+  .s03 { background: linear-gradient(135deg, #1a0033, #2d0a4e 50%, #12001f); }
+  .s03 .headline { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 68px; line-height: 1.1; color: #fff; margin: 10px 0; }
+  .s03 .headline .acc { color: #00F0FF; text-shadow: 0 0 20px #00F0FF88; }
+  .s03 .body { font-family: 'Oswald', sans-serif; font-size: 22px; color: rgba(255,255,255,0.85); border-left: 3px solid #FF2BD6; padding-left: 14px; }
+  .s03 .kicker { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #00F0FF; letter-spacing: 3px; border: 1px solid #00F0FF44; padding: 3px 10px; display: inline-block; margin-bottom: 8px; }
+  .s03 .grid-line { position: absolute; background: rgba(0,240,255,0.1); }
+  .s03 .neon-box { border: 2px solid #00F0FF; box-shadow: 0 0 12px #00F0FF44, inset 0 0 12px #00F0FF11; border-radius: 4px; padding: 10px 16px; }
+
+  /* ── S04 Glassmorphism ── */
+  .s04 { background: linear-gradient(160deg, #0a0a1a, #1a0a2e); }
+  .s04 .orb { position: absolute; border-radius: 50%; filter: blur(60px); }
+  .s04 .glass-card { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 20px 24px; }
+  .s04 .headline { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 54px; line-height: 1.1; color: #fff; margin: 12px 0; }
+  .s04 .headline .acc { color: #8B5CFF; }
+  .s04 .body { font-family: 'Manrope', sans-serif; font-size: 20px; color: rgba(255,255,255,0.8); line-height: 1.55; }
+  .s04 .emoji-big { font-size: 72px; text-align: center; filter: drop-shadow(0 0 24px rgba(139,92,255,0.7)); }
+
+  /* ── S05 Liquid Blobs ── */
+  .s05 { background: linear-gradient(140deg, #0A0020, #1A0040, #0D0A30); }
+  .s05 .blob { position: absolute; filter: blur(54px); mix-blend-mode: screen; border-radius: 50%; }
+  .s05 .headline { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 58px; line-height: 1.1; color: #fff; margin: 12px 0; }
+  .s05 .headline .acc { color: #FF4ECD; filter: drop-shadow(0 0 14px rgba(255,78,205,0.8)); }
+  .s05 .body { font-family: 'Rubik', sans-serif; font-size: 22px; color: rgba(255,255,255,0.85); background: rgba(0,0,0,0.35); border-radius: 18px; padding: 16px 20px; backdrop-filter: blur(8px); }
+  .s05 .emoji-big { font-size: 80px; text-align: center; filter: drop-shadow(0 0 28px rgba(255,78,205,0.7)); }
+
+  /* ── S06 Retro VHS ── */
+  .s06 { background: #050505; }
+  .s06 .scanlines { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.7) 3px, rgba(0,0,0,0.7) 4px); opacity: 0.18; pointer-events: none; z-index: 2; }
+  .s06 .headline { font-family: 'Russo One', sans-serif; font-size: 60px; line-height: 1.1; color: #fff; position: relative; margin: 10px 0; z-index: 3; }
+  .s06 .chroma-r { position: absolute; top: 0; left: 3px; color: #FF2020; opacity: 0.65; mix-blend-mode: screen; }
+  .s06 .chroma-b { position: absolute; top: 3px; left: -3px; color: #2060FF; opacity: 0.65; mix-blend-mode: screen; }
+  .s06 .body { font-family: 'JetBrains Mono', monospace; font-size: 22px; color: rgba(255,255,255,0.8); border-left: 3px solid #00FF9F; padding: 14px 18px; background: rgba(0,0,0,0.5); z-index: 3; position: relative; }
+  .s06 .rec { font-family: 'JetBrains Mono', monospace; font-size: 16px; color: rgba(0,255,159,0.7); letter-spacing: 2px; z-index: 3; position: relative; }
+  .s06 .kicker { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #00FF9F; letter-spacing: 4px; border-left: 3px solid #00FF9F; padding-left: 10px; z-index: 3; position: relative; }
+  .s06 .glow { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, rgba(0,255,159,0.05), transparent 70%); z-index: 1; }
+
+  /* ── S07 Swiss Bold ── */
+  .s07 { background: #0A0A0A; }
+  .s07 .accent-bar { height: 12px; margin-bottom: 24px; }
+  .s07 .num-badge { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; font-family: 'Golos Text', sans-serif; font-weight: 900; font-size: 30px; color: #fff; margin-bottom: 20px; }
+  .s07 .headline { font-family: 'Golos Text', sans-serif; font-weight: 900; font-size: 60px; line-height: 1.1; color: #fff; text-transform: uppercase; margin: 8px 0; }
+  .s07 .headline .acc { color: #FF3B00; }
+  .s07 .body { font-family: 'Golos Text', sans-serif; font-size: 22px; color: rgba(255,255,255,0.7); border-top: 2px solid rgba(255,59,0,0.3); padding-top: 16px; }
+
+  .nano-section { max-width: 1200px; margin: 60px auto 0; }
+  .nano-title { font-size: 22px; font-weight: 700; margin-bottom: 24px; color: #fff; }
+  .nano-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .nano-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
+  .nano-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: #FF4ECD; }
+  .nano-card p { font-size: 13px; color: #aaa; line-height: 1.5; }
+
+  .plan-section { max-width: 1200px; margin: 60px auto 0; }
+  .plan-title { font-size: 22px; font-weight: 700; margin-bottom: 24px; color: #fff; }
+  .day { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .day h3 { font-size: 17px; font-weight: 700; margin-bottom: 14px; color: #FFD700; }
+  .post { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
+  .time-badge { background: rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 10px; font-size: 13px; font-weight: 700; white-space: nowrap; color: #fff; }
+  .post-info { font-size: 14px; color: #ccc; line-height: 1.5; }
+  .post-info strong { color: #fff; }
+  .style-rec { display: inline-block; font-size: 11px; background: rgba(255,78,205,0.2); color: #FF4ECD; border-radius: 6px; padding: 2px 8px; margin-top: 4px; }
+
+  select.picker { width: 100%; margin-top: 24px; padding: 14px 18px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; font-size: 16px; font-family: 'Inter', sans-serif; cursor: pointer; }
+  select.picker option { background: #1a1a1a; }
+  .winner { border: 2px solid gold !important; box-shadow: 0 0 40px rgba(255,215,0,0.3); }
+</style>
+</head>
+<body>
+
+<h1>🎨 7 стилей карусели для @nikolay_cheusov</h1>
+<p class="subtitle">Кликни на стиль чтобы выбрать · 4:5 · 4 сек/слайд · 30fps · Remotion + HeyGen</p>
+
+<div class="grid" id="styleGrid">
+
+  <!-- STYLE 01 -->
+  <div class="card" onclick="pick(1, this)" id="c1">
+    <div class="slide s01">
+      <!-- particles -->
+      <div class="particle" style="width:6px;height:6px;top:12%;left:15%;opacity:0.7"></div>
+      <div class="particle" style="width:4px;height:4px;top:28%;left:72%;opacity:0.5"></div>
+      <div class="particle" style="width:8px;height:8px;top:65%;left:85%;opacity:0.4"></div>
+      <div class="particle" style="width:5px;height:5px;top:80%;left:20%;opacity:0.6"></div>
+      <div class="particle" style="width:3px;height:3px;top:45%;left:55%;opacity:0.8"></div>
+      <div class="particle" style="width:10px;height:10px;top:90%;left:60%;opacity:0.3;filter:blur(2px)"></div>
+      <div class="header" style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.6)">
+        <span>@nikolay_cheusov</span>
+        <span class="badge">1/4</span>
+      </div>
+      <div class="kicker s01">ФАКТ</div>
+      <div class="headline s01">Топ-5 нейросетей<br><span class="accent">2026</span></div>
+      <div class="body s01">Sora, Runway, Kling — реальные кейсы с цифрами. Смотри следующий слайд 👇</div>
+      <div class="progress" style="margin-top:20px">
+        <div class="progress-bar" style="width:25%;height:4px;background:#2D7FFF;border-radius:2px;box-shadow:0 0 8px #2D7FFF88"></div>
+      </div>
+    </div>
+    <div class="label" style="background:#0a1628">
+      <div style="font-size:18px">⚡ BEBAS 3D EXTRUDE</div>
+      <div class="tag">Oswald + Bebas Neue · Объёмный 3D текст · Electric Blue</div>
+    </div>
+  </div>
+
+  <!-- STYLE 02 -->
+  <div class="card" onclick="pick(2, this)" id="c2">
+    <div class="slide s02" style="background:linear-gradient(150deg,#FF5FA2,#7C4DFF)">
+      <div class="confetti" style="width:30px;height:30px;top:8%;left:10%;background:#FFC93C;transform:rotate(30deg);opacity:0.8"></div>
+      <div class="confetti" style="width:20px;height:20px;top:15%;left:78%;background:#19D3DA;transform:rotate(60deg);opacity:0.7;border-radius:50%"></div>
+      <div class="confetti" style="width:14px;height:14px;top:70%;left:88%;background:#fff;opacity:0.5;transform:rotate(15deg)"></div>
+      <div class="confetti" style="width:24px;height:24px;top:78%;left:8%;background:#FF8A3D;transform:rotate(45deg);opacity:0.6;border-radius:50%"></div>
+      <div class="confetti" style="width:18px;height:18px;top:55%;left:90%;background:#FFC93C;opacity:0.5;transform:rotate(70deg)"></div>
+      <div class="header" style="font-family:'Unbounded',sans-serif;color:rgba(255,255,255,0.8)">
+        <span>@nikolay_cheusov</span>
+        <span class="badge">1/4</span>
+      </div>
+      <div class="emoji-big s02" style="margin-top:12px">🚀</div>
+      <div class="headline s02">Топ-5 нейросетей <span style="color:#FFC93C">2026</span></div>
+      <div class="body s02">Sora, Runway, Kling — реальные кейсы с цифрами 👇</div>
+      <div class="progress" style="margin-top:16px">
+        <div style="width:25%;height:5px;background:rgba(255,255,255,0.9);border-radius:3px;box-shadow:0 0 10px rgba(255,255,255,0.5)"></div>
+      </div>
+    </div>
+    <div class="label" style="background:#2a0050">
+      <div style="font-size:18px">🍭 CANDY POP</div>
+      <div class="tag">Unbounded 900 · Bounce-анимации · Candy-градиент</div>
+      <div class="nano-badge">✦ Nano Banana: Bento Grid + Motion</div>
+    </div>
+  </div>
+
+  <!-- STYLE 03 -->
+  <div class="card" onclick="pick(3, this)" id="c3">
+    <div class="slide s03">
+      <div class="grid-line" style="left:30px;top:0;bottom:0;width:1px"></div>
+      <div class="grid-line" style="left:0;right:0;top:30%;height:1px"></div>
+      <div class="grid-line" style="left:0;right:0;top:65%;height:1px;background:rgba(255,43,214,0.15)"></div>
+      <div class="header" style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.6)">
+        <span>@nikolay_cheusov</span>
+        <span class="badge" style="border:1px solid #00F0FF44;color:#00F0FF">1/4</span>
+      </div>
+      <div class="kicker s03">SYS://NEURAL</div>
+      <div class="headline s03">Топ-5<br><span class="acc">нейросетей</span><br>2026</div>
+      <div class="neon-box s03" style="margin-top:12px">
+        <div class="body s03">Sora, Runway, Kling — реальные кейсы с цифрами 👇</div>
+      </div>
+      <div class="progress" style="margin-top:16px">
+        <div style="width:25%;height:4px;background:#00F0FF;border-radius:0;box-shadow:0 0 10px #00F0FF88"></div>
+      </div>
+    </div>
+    <div class="label" style="background:#12001f">
+      <div style="font-size:18px">☠️ BRUTALIST NEON</div>
+      <div class="tag">Oswald · Циан/Маджента · Glitch + сетка</div>
+    </div>
+  </div>
+
+  <!-- STYLE 04 -->
+  <div class="card" onclick="pick(4, this)" id="c4">
+    <div class="slide s04">
+      <div class="orb" style="width:300px;height:300px;top:-80px;left:-80px;background:#8B5CFF;opacity:0.5"></div>
+      <div class="orb" style="width:200px;height:200px;bottom:-40px;right:-40px;background:#FF6FAE;opacity:0.4"></div>
+      <div class="orb" style="width:150px;height:150px;top:50%;left:60%;background:#3FC9FF;opacity:0.35"></div>
+      <div class="header" style="font-family:'Manrope',sans-serif;font-weight:600;color:rgba(255,255,255,0.7);position:relative;z-index:2">
+        <span>@nikolay_cheusov</span>
+        <span class="badge">1/4</span>
+      </div>
+      <div class="emoji-big s04" style="margin-top:16px;position:relative;z-index:2">🤖</div>
+      <div class="headline s04" style="position:relative;z-index:2">Топ-5 <span class="acc">нейросетей</span> 2026</div>
+      <div class="glass-card s04" style="position:relative;z-index:2;margin-top:8px">
+        <div class="body s04">Sora, Runway, Kling — реальные кейсы с цифрами 👇</div>
+      </div>
+      <div class="progress" style="margin-top:16px;position:relative;z-index:2">
+        <div style="width:25%;height:4px;background:#8B5CFF;border-radius:2px;box-shadow:0 0 8px #8B5CFF88"></div>
+      </div>
+    </div>
+    <div class="label" style="background:#100020">
+      <div style="font-size:18px">🔮 GLASSMORPHISM</div>
+      <div class="tag">Manrope · Цветные орбы · Backdrop-blur</div>
+      <div class="nano-badge">✦ Nano Banana: Liquid Glass Bento</div>
+    </div>
+  </div>
+
+  <!-- STYLE 05 -->
+  <div class="card" onclick="pick(5, this)" id="c5">
+    <div class="slide s05">
+      <div class="blob" style="width:280px;height:280px;top:-60px;left:-40px;background:#FF4ECD;opacity:0.55;border-radius:58% 42% 66% 38% / 63% 41% 42% 48%"></div>
+      <div class="blob" style="width:220px;height:220px;bottom:-30px;right:-30px;background:#6B5FFF;opacity:0.5;border-radius:42% 58% 38% 66% / 41% 63% 48% 42%"></div>
+      <div class="blob" style="width:160px;height:160px;top:45%;left:55%;background:#FFF03A;opacity:0.35;border-radius:66% 38% 58% 42%"></div>
+      <div class="header" style="font-family:'Montserrat',sans-serif;font-weight:700;color:rgba(255,255,255,0.7);position:relative;z-index:2">
+        <span>@nikolay_cheusov</span>
+        <span class="badge">1/4</span>
+      </div>
+      <div class="emoji-big s05" style="margin-top:16px;position:relative;z-index:2">✨</div>
+      <div class="headline s05" style="position:relative;z-index:2">Топ-5 <span class="acc">нейросетей</span> 2026</div>
+      <div class="body s05" style="position:relative;z-index:2;margin-top:10px">Sora, Runway, Kling — реальные кейсы с цифрами 👇</div>
+      <div class="progress" style="margin-top:16px;position:relative;z-index:2">
+        <div style="width:25%;height:4px;background:#FF4ECD;border-radius:2px;box-shadow:0 0 10px rgba(255,78,205,0.7)"></div>
+      </div>
+    </div>
+    <div class="label" style="background:#0e0030">
+      <div style="font-size:18px">🫧 LIQUID GRADIENT BLOBS</div>
+      <div class="tag">Montserrat Black + Rubik · Морфинг-блобы · Pink/Purple</div>
+    </div>
+  </div>
+
+  <!-- STYLE 06 -->
+  <div class="card" onclick="pick(6, this)" id="c6">
+    <div class="slide s06">
+      <div class="glow s06"></div>
+      <div class="scanlines s06"></div>
+      <div class="header" style="font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.6);position:relative;z-index:3">
+        <span>@nikolay_cheusov</span>
+        <span class="badge" style="color:#00FF9F;border-color:#00FF9F44">1/4</span>
+      </div>
+      <div class="rec s06" style="margin-top:8px">REC ● 00:00:04</div>
+      <div class="kicker s06" style="margin-top:8px">SYS://NEURAL</div>
+      <div class="headline s06" style="margin-top:10px;font-size:58px">
+        <div style="position:relative;display:inline-block">
+          <div class="chroma-r s06" style="font-family:'Russo One';font-size:58px">Топ-5</div>
+          <div class="chroma-b s06" style="font-family:'Russo One';font-size:58px">Топ-5</div>
+          Топ-5
+        </div>
+        <br>нейросетей<br><span style="color:#00FF9F">2026</span>
+      </div>
+      <div class="body s06" style="margin-top:10px"><span style="color:rgba(0,255,159,0.6)">$ </span>Sora, Runway, Kling — кейсы 👇</div>
+      <div class="progress" style="margin-top:16px;position:relative;z-index:3">
+        <div style="width:25%;height:3px;background:#00FF9F;box-shadow:0 0 8px #00FF9F88"></div>
+      </div>
+    </div>
+    <div class="label" style="background:#050505">
+      <div style="font-size:18px">📼 RETRO VHS CHROMATIC</div>
+      <div class="tag">Russo One + JetBrains Mono · RGB-split · Scanlines</div>
+    </div>
+  </div>
+
+  <!-- STYLE 07 -->
+  <div class="card" onclick="pick(7, this)" id="c7">
+    <div class="slide s07">
+      <div class="header" style="font-family:'Golos Text',sans-serif;font-weight:600;color:rgba(255,255,255,0.6)">
+        <span>@nikolay_cheusov</span>
+        <span class="badge">1/4</span>
+      </div>
+      <div class="accent-bar s07" style="margin-top:16px;background:#FF3B00;width:100%"></div>
+      <div class="num-badge s07" style="background:#FF3B00">01</div>
+      <div class="headline s07">ТОП-5<br><span class="acc">НЕЙРО-<br>СЕТЕЙ</span><br>2026</div>
+      <div class="body s07" style="margin-top:12px">Sora, Runway, Kling — реальные кейсы с цифрами 👇</div>
+      <div class="progress" style="margin-top:16px">
+        <div style="width:25%;height:4px;background:#FF3B00;border-radius:0;box-shadow:0 0 6px rgba(255,59,0,0.5)"></div>
+      </div>
+    </div>
+    <div class="label" style="background:#0a0a0a;border-top:3px solid #FF3B00">
+      <div style="font-size:18px">🇨🇭 SWISS BOLD MINIMAL</div>
+      <div class="tag">Golos Text Black · Контраст + сетка · Огонь</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ВЫБОР -->
+<div style="max-width:600px;margin:40px auto;text-align:center">
+  <div id="selectedMsg" style="font-size:22px;font-weight:700;color:#FFD700;min-height:36px"></div>
+  <select class="picker" id="stylePicker" onchange="pickFromSelect(this.value)">
+    <option value="">— Выбери стиль —</option>
+    <option value="1">Style 01 — Bebas 3D Extrude</option>
+    <option value="2">Style 02 — Candy Pop</option>
+    <option value="3">Style 03 — Brutalist Neon</option>
+    <option value="4">Style 04 — Glassmorphism</option>
+    <option value="5">Style 05 — Liquid Gradient Blobs</option>
+    <option value="6">Style 06 — Retro VHS Chromatic</option>
+    <option value="7">Style 07 — Swiss Bold Minimal</option>
+  </select>
+</div>
+
+<!-- NANO BANANA PRO ENHANCEMENT -->
+<div class="nano-section">
+  <div class="nano-title">✦ Nano Banana Pro — что даёт на каждый стиль</div>
+  <div class="nano-grid">
+    <div class="nano-card">
+      <h4>Style 02 + 04 → Liquid Glass Bento</h4>
+      <p>Nano Banana генерирует premium bento-сетки с liquid glass (85-90% прозрачность, subtle motion) — идеально как фон-карточки для Candy Pop и Glassmorphism. Встраиваются через поле <code>image</code> в slides.json.</p>
+    </div>
+    <div class="nano-card">
+      <h4>Style 01 + 06 → Cinematic Cover</h4>
+      <p>Промпт "cinematic color grading, ultra-sharp, photorealistic, volumetric light" генерирует hero-кадры для обложки. Ken Burns + parallax поверх = вау-эффект.</p>
+    </div>
+    <div class="nano-card">
+      <h4>Style 07 → Quote Cards</h4>
+      <p>"Wide quote card, brown background, light-gold serif, large quotation mark, gradient transition" — точно в эстетику Swiss Minimal. Используй на слайде-цитате.</p>
+    </div>
+    <div class="nano-card">
+      <h4>Style 03 + 05 → Sci-Fi / Cyberpunk</h4>
+      <p>Nano Banana имеет категорию Cyberpunk/Sci-Fi с neon-фонами. Генерируй через него AI-арт и вставляй как VideoBackground / KenBurnsImage за текстом.</p>
+    </div>
+    <div class="nano-card">
+      <h4>Все стили → Product Infographic</h4>
+      <p>Bento-промпт создаёт 8-модульную сетку с hero-color деривацией. Встраивай как слайд с данными/сравнениями нейросетей вместо текстового body.</p>
+    </div>
+    <div class="nano-card">
+      <h4>Вердикт по сочности</h4>
+      <p>Nano Banana Pro <strong style="color:#FF4ECD">наиболее сочен</strong> в паре с Style 02 (Candy), Style 04 (Glass), Style 05 (Blobs) — там liquid glass и motion hint прямо в промптах. Style 01 и 06 — кинематограф.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ПЛАН ПУБЛИКАЦИЙ -->
+<div class="plan-section">
+  <div class="plan-title">📅 ПЛАН ПУБЛИКАЦИЙ — 5 дней / 10 постов</div>
+
+  <div class="day">
+    <h3>📍 ДЕНЬ 1 — 15 июня (воскресенье)</h3>
+    <div class="post">
+      <div class="time-badge">19:00 МСК</div>
+      <div class="post-info">
+        <strong>Пост #1 — «Топ-5 нейросетей для видео в 2026»</strong><br>
+        CTA-слово: <strong>ВИДЕО</strong> · Хэштег: #sora #нейросети<br>
+        <span class="style-rec">Стиль: Style 01 Bebas 3D (авторитет + цифры)</span><br>
+        <em>Хук: «5 нейросетей которые убили профессию видеографа»</em>
+      </div>
+    </div>
+    <div class="post">
+      <div class="time-badge">21:00 МСК</div>
+      <div class="post-info">
+        <strong>Пост #2 — «Как я сэкономил 40 часов в месяц с ИИ»</strong><br>
+        CTA-слово: <strong>ВРЕМЯ</strong> · Хэштег: #нейросеть<br>
+        <span class="style-rec">Стиль: Style 07 Swiss Bold (личная история + доверие)</span><br>
+        <em>Хук: «Я работаю 4 часа в день. Вот как»</em>
+      </div>
+    </div>
+    <div style="font-size:13px;color:#888;margin-top:8px">📱 Сторис: Опрос «Какую нейросеть используешь?»</div>
+  </div>
+
+  <div class="day">
+    <h3>📍 ДЕНЬ 2 — 16 июня (понедельник)</h3>
+    <div class="post">
+      <div class="time-badge">19:00 МСК</div>
+      <div class="post-info">
+        <strong>Пост #3 — «7 промптов для Midjourney которые взрывают»</strong><br>
+        CTA-слово: <strong>ПРОМПТ</strong> · Хэштег: #midjourney<br>
+        <span class="style-rec">Стиль: Style 03 Brutalist Neon (технично + провокационно)</span><br>
+        <em>Хук: «Ты до сих пор пишешь промпты неправильно»</em>
+      </div>
+    </div>
+    <div class="post">
+      <div class="time-badge">21:00 МСК</div>
+      <div class="post-info">
+        <strong>Пост #4 — «Нейросеть vs дизайнер: кто победил в 2026?»</strong><br>
+        CTA-слово: <strong>СРАВНЕНИЕ</strong> · Хэштег: #нейросеть<br>
+        <span class="style-rec">Стиль: Style 05 Liquid Blobs (wow-визуал + FOMO)</span><br>
+        <em>Хук: «Я дал одно задание человеку и ИИ. Результат шокировал»</em>
+      </div>
+    </div>
+    <div style="font-size:13px;color:#888;margin-top:8px">📱 Сторис: Behind the scenes — процесс создания поста</div>
+  </div>
+
+  <div class="day">
+    <h3>📍 ДЕНЬ 3 — 17 июня (вторник)</h3>
+    <div class="post">
+      <div class="time-badge">19:00 МСК</div>
+      <div class="post-info">
+        <strong>Пост #5 — «Как сделать видео за 10 минут с Sora»</strong><br>
+        CTA-слово: <strong>SORA</strong> · Хэштег: #sora<br>
+        <span class="style-rec">Стиль: Style 02 Candy Pop (энергия + вирусность)</span><br>
+        <em>Хук: «Видео стоило $3000. Теперь 10 минут и $0.45»</em>
+      </div>
+    </div>
+    <div class="post">
+      <div class="time-badge">21:00 МСК</div>
+      <div class="post-info">
+        <strong>Пост #6 — «5 ошибок с нейросетями (я потерял 3 месяца)»</strong><br>
+        CTA-слово: <strong>ОШИБКИ</strong> · Хэштег: #нейросетидляработы<br>
+        <span class="style-rec">Стиль: Style 06 Retro VHS (нестандартно = стопит скролл)</span><br>
+        <em>Хук: «Я потратил $2000 на ИИ-инструменты. Вот что купить НЕ надо»</em>
+      </div>
+    </div>
+    <div style="font-size:13px;color:#888;margin-top:8px">📱 Сторис: Q&A «Задайте вопрос про ИИ»</div>
+  </div>
+
+  <div class="day">
+    <h3>📍 ДЕНЬ 4 — 18 июня (среда)</h3>
+    <div class="post">
+      <div class="time-badge">19:00 МСК</div>
+      <div class="post-info">
+        <strong>Пост #7 — «Топ-3 нейросети для текста которые реально работают»</strong><br>
+        CTA-слово: <strong>ТЕКСТ</strong> · Хэштег: #искусственныйинтеллект<br>
+        <span class="style-rec">Стиль: Style 04 Glassmorphism (премиум + красота)</span><br>
+        <em>Хук: «ChatGPT уже не #1. Вот что я использую вместо него»</em>
+      </div>
+    </div>
+    <div class="post">
+      <div class="time-badge">21:00 МСК</div>
+      <div class="post-info">
+        <strong>Пост #8 — «Мой стек ИИ-инструментов на 2026 (полный список)»</strong><br>
+        CTA-слово: <strong>СТЕК</strong> · Хэштег: #aitools<br>
+        <span class="style-rec">Стиль: Style 01 Bebas 3D (авторитет + полный список = сохраняют)</span><br>
+        <em>Хук: «12 ИИ-инструментов которые заменяют мне целую команду»</em>
+      </div>
+    </div>
+    <div style="font-size:13px;color:#888;margin-top:8px">📱 Сторис: Опрос «Сколько времени тратишь на рутину?»</div>
+  </div>
+
+  <div class="day">
+    <h3>📍 ДЕНЬ 5 — 19 июня (четверг) — ФИНАЛ</h3>
+    <div class="post">
+      <div class="time-badge">19:00 МСК</div>
+      <div class="post-info">
+        <strong>Пост #9 — «Как за 5 дней я вырастил аккаунт с помощью ИИ»</strong><br>
+        CTA-слово: <strong>ПЛАН</strong> · Хэштег: #нейросеть<br>
+        <span class="style-rec">Стиль: Style 07 Swiss Bold (итоги = доверие + авторитет)</span><br>
+        <em>Хук: «+5000 подписчиков за 5 дней. Вот точный план по дням»</em>
+      </div>
+    </div>
+    <div class="post">
+      <div class="time-badge">21:00 МСК</div>
+      <div class="post-info">
+        <strong>Пост #10 — «Бесплатный гайд: запуск ИИ-контента с нуля»</strong><br>
+        CTA-слово: <strong>ГАЙД</strong> · Хэштег: #нейросети #aitools<br>
+        <span class="style-rec">Стиль: Style 05 Liquid Blobs (максимальный wow для финала)</span><br>
+        <em>Хук: «Напиши ГАЙД — пришлю пошаговый план на 30 дней»</em>
+      </div>
+    </div>
+    <div style="font-size:13px;color:#888;margin-top:8px">📱 Сторис: Итоги — показываю рост статистики</div>
+  </div>
+
+  <div style="background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:12px;padding:20px;margin-top:24px">
+    <div style="font-size:16px;font-weight:700;color:#FFD700;margin-bottom:12px">💡 Почему именно 19:00 и 21:00 МСК</div>
+    <div style="font-size:14px;color:#ccc;line-height:1.6">
+      <strong style="color:#fff">19:00</strong> — пик активности рус. аудитории, вечерний browsing после работы. Алгоритм даёт 2ч на начальный набор охвата до ночной просадки.<br>
+      <strong style="color:#fff">21:00</strong> — второй пик, pre-sleep scroll. Самое высокое время удержания (люди в постели, некуда торопиться).<br>
+      <strong style="color:#fff">Интервал 2 часа</strong> между постами — не cannibalization трафика, оба попадают в разные фазы алгоритмической раздачи.
+    </div>
+  </div>
+</div>
+
+<div style="height:60px"></div>
+
+<script>
+let selected = null;
+const names = {1:'⚡ Bebas 3D Extrude',2:'🍭 Candy Pop',3:'☠️ Brutalist Neon',4:'🔮 Glassmorphism',5:'🫧 Liquid Gradient Blobs',6:'📼 Retro VHS Chromatic',7:'🇨🇭 Swiss Bold Minimal'};
+function pick(n, el) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('winner'));
+  el.classList.add('winner');
+  selected = n;
+  document.getElementById('selectedMsg').textContent = '✅ Выбран стиль ' + n + ' — ' + names[n];
+  document.getElementById('stylePicker').value = n;
+}
+function pickFromSelect(v) {
+  if (!v) return;
+  const el = document.getElementById('c' + v);
+  if (el) pick(parseInt(v), el);
+  el && el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+</script>
+</body>
+</html>
