@@ -11,6 +11,10 @@ on:
         description: 'Количество слайдов (7-10)'
         required: false
         default: '8'
+      telegram_link:
+        description: 'Ссылка на Telegram-канал (https://t.me/...)'
+        required: false
+        default: 'https://t.me/nikolay_cheusov'
       language:
         description: 'Язык контента'
         required: false
@@ -28,6 +32,7 @@ jobs:
       TOPIC: ${{ inputs.topic }}
       SLIDES: ${{ inputs.slides }}
       LANG: ${{ inputs.language }}
+      TG_LINK: ${{ inputs.telegram_link }}
 
     steps:
       - name: "🏭 Content Factory — Multi-Agent Carousel"
@@ -35,11 +40,15 @@ jobs:
           python3 << 'PYEOF'
           import json, urllib.request, os
 
-          API_KEY = os.environ["OPENROUTER_API_KEY"]
-          TOPIC   = os.environ["TOPIC"]
-          SLIDES  = int(os.environ.get("SLIDES", "8"))
-          LANG    = os.environ.get("LANG", "russian")
-          MODEL   = "google/gemini-3.1-flash-image-preview"
+          API_KEY  = os.environ["OPENROUTER_API_KEY"]
+          TOPIC    = os.environ["TOPIC"]
+          SLIDES   = int(os.environ.get("SLIDES", "8"))
+          LANG     = os.environ.get("LANG", "russian")
+          TG_LINK  = os.environ.get("TG_LINK", "https://t.me/nikolay_cheusov")
+          MODEL    = "google/gemini-3.1-flash-image-preview"
+
+          # Ссылка без https:// для упоминания в посте
+          TG_SHORT = TG_LINK.replace("https://", "")
 
           def ask(system, user, temperature=0.85, max_tokens=2500):
               payload = json.dumps({
@@ -66,18 +75,26 @@ jobs:
                       return json.loads(r.read())["choices"][0]["message"]["content"]
               except urllib.error.HTTPError as e:
                   body = e.read().decode()
-                  print(f"  ❌ HTTP {e.code}: {body[:300]}")
+                  print(f"  ❌ HTTP {e.code}: {body[:400]}")
                   raise
 
           LANG_HINT = "на русском языке" if LANG == "russian" else "in English"
 
-          print("═" * 60)
-          print("  🏭 КОНТЕНТ-ЗАВОД: ГЕНЕРАЦИЯ ВИРУСНОЙ КАРУСЕЛИ")
-          print(f"  Модель: {MODEL}")
-          print("═" * 60)
-          print(f"  Тема: {TOPIC}")
-          print(f"  Слайдов: {SLIDES}")
-          print()
+          # Фиксированный CTA-блок для последнего слайда и caption
+          TG_CTA_SLIDE = f"""Последний слайд {SLIDES} является призывом подписаться на закрытый Telegram-канал.
+          Текст этого слайда должен быть:
+          - Заголовок: "Хочешь ещё больше?"
+          - Подзаголовок: "У меня есть закрытый Telegram — там я делюшь ежедневными фишками про ИИ:»
+          - Максимально 2-3 пункта что там есть ("... промпты", "... разборы инструментов", "... кейсы")
+          - Призыв: "Подписывайся — это бесплатно"
+          - Ссылка в био или подпись: {TG_SHORT}
+          """
+
+          TG_CTA_CAPTION = f"""
+          И в конце caption обязательно добавь:
+          "⬇️ Больше такого — в моём закрытом Telegram: {TG_SHORT}
+          Там бесплатно. Ежедневные фишки, промпты и разборы ИИ-инструментов."
+          """
 
           INSIGHTS = """
           Данные о конкурентах (русскоязычная ниша ИИ, июнь 2026):
@@ -85,8 +102,17 @@ jobs:
           - Топ хэштег: #sora (весь топ-10 каруселей)
           - Средний топ: 3041 лайков, 347 комментариев
           - Лучшее время: 19:00-21:00 МСК
-          - Формула: триггерный хук → ценность → CTA написать слово
+          - Формула: триггерный хук → ценность → CTA
           """
+
+          print("═" * 60)
+          print("  🏭 КОНТЕНТ-ЗАВОД: ГЕНЕРАЦИЯ ВИРУСНОЙ КАРУСЕЛИ")
+          print(f"  Модель: {MODEL}")
+          print("═" * 60)
+          print(f"  Тема:    {TOPIC}")
+          print(f"  Слайдов:  {SLIDES}")
+          print(f"  Telegram: {TG_LINK}")
+          print()
 
           # ── АГЕНТ 1: Маркетолог ───────────────────────────────
           print("🎯 [АГЕНТ 1] Маркетинговый стратег...")
@@ -99,87 +125,99 @@ jobs:
 2. ОБЕЩАНИЕ ЦЕННОСТИ (что узнает читатель)
 3. ЦЕЛЕВАЯ АУДИТОРИЯ
 4. ПСИХОЛОГИЧЕСКИЙ ТРИГГЕР
-5. CTA (конкретное слово в комментах + что получат)
-6. 5 ХЭШТЕГОВ"""
+5. CTA СЛОВО (конкретное слово в комментах + что получат)
+6. 5 ХЭШТЕГОВ
+ВАЖНО: последний слайд ВСЕГДА ведёт в Telegram {TG_LINK}"""
           )
           print("  ✅ Стратегия готова")
           print()
 
           # ── АГЕНТ 2: Психолог ──────────────────────────────────
-          print("🧠 [АГЕНТ 2] Психолог создаёт крючки для слайдов...")
+          print("🧠 [АГЕНТ 2] Психолог создаёт крючки...")
           psych = ask(
               f"Ты специалист по поведенческой психологии и вирусному контенту. Пишешь {LANG_HINT}.",
               f"""Тема: "{TOPIC}"
-
-Стратегия от маркетолога:
-{strat}
+Стратегия: {strat}
 
 Создай структуру {SLIDES} слайдов {LANG_HINT}.
-Для каждого слайда:
+Для каждого слайда (1..{SLIDES-1}):
 - СЛАЙД N: [заголовок, ≤10 слов]
 - Психологический механизм: [gap/FOMO/social proof/authority/curiosity]
 - Подзаголовок/тело (2-3 строки)
 - Переходная фраза к следующему слайду
 
+СЛАЙД {SLIDES} = ПОДПИСКА НА TELEGRAM:
+{TG_CTA_SLIDE}
+
 Слайд 1 = взрыв внимания
 Слайды 2-{SLIDES-1} = нарастающая ценность
-Слайд {SLIDES} = мощный CTA (слово в комментах)"""
+Слайд {SLIDES} = Telegram CTA"""
           )
           print("  ✅ Психологические крючки готовы")
           print()
 
           # ── АГЕНТ 3: UX/UI дизайнер ─────────────────────────────
-          print("🎨 [АГЕНТ 3] UX/UI дизайнер прорабатывает визуал...")
+          print("🎨 [АГЕНТ 3] UX/UI дизайнер...")
           design = ask(
-              f"Ты топовый UX/UI дизайнер Instagram каруселей. Тренды 2026: dark+neon, glassmorphism, bold typography. Пишешь {LANG_HINT}.",
+              f"Ты топовый UX/UI дизайнер Instagram каруселей. Тренды 2026: dark+neon, glassmorphism, bold type. Пишешь {LANG_HINT}.",
               f"""Тема: "{TOPIC}"
-Структура слайдов:
-{psych}
+Структура слайдов: {psych}
 
-Создай полный дизайн-бриф {LANG_HINT}:
+Создай дизайн-бриф {LANG_HINT}:
 
 ОБЩИЙ СТИЛЬ:
 - Цветовая палитра (hex)
 - Шрифт (название + вес)
-- Визуальный настрой
+- Визуальный настрой (dark/neon/minimal)
 - Размер: 1080x1350px portrait
 
 ДЛЯ КАЖДОГО СЛАЙДА:
 - Фон
 - Текст (позиция, размер, цвет)
 - Главный элемент
-- Image prompt для Midjourney/DALL-E (English, ultra HD, 1080x1350 portrait):
-  «[prompt]»"""
+- Image prompt для DALL-E/Midjourney (English, 1080x1350 portrait):
+  «[prompt]»
+
+СЛАЙД {SLIDES} (последний) — Telegram CTA:
+- Фон: тёмный с логотипом Telegram (синий цвет #2AABEE)
+- Текст центр: большая ссылка {TG_SHORT}
+- Иконка Telegram сверху + CTA-текст
+- Image prompt: "dark cinematic background, glowing blue Telegram logo centered, bold white text '{TG_SHORT}', call to action, Instagram portrait 1080x1350, professional, premium"""
           )
           print("  ✅ Дизайн-бриф готов")
           print()
 
           # ── АГЕНТ 4: Копирайтер ───────────────────────────────
-          print("✍️  [АГЕНТ 4] Копирайтер пишет финальные тексты...")
+          print("✍️  [АГЕНТ 4] Копирайтер...")
           copy = ask(
-              f"Ты топовый копирайтер Instagram. {LANG_HINT}. Стиль: энергичный, без воды, с эмодзи где уместно.",
+              f"Ты топовый копирайтер Instagram. {LANG_HINT}. Энергичный, без воды, с эмодзи где уместно.",
               f"""Тема: "{TOPIC}"
-Психологическая структура:
-{psych}
+Структура: {psych}
 
-Напиши ФИНАЛЬНЫЕ ТЕКСТЫ для каждого слайда {LANG_HINT}:
+Напиши ФИНАЛЬНЫЕ ТЕКСТЫ {LANG_HINT}:
 
 СЛАЙД 1 (ОБЛОЖКА): [заголовок 1 строка, ≤8 слов, стоп-скролл]
 
 СЛАЙДЫ 2-{SLIDES-1}: [Заголовок] + [Текст 2-3 строки с конкретикой]
 
-СЛАЙД {SLIDES} (CTA): [призыв написать слово] + [что получат]
+СЛАЙД {SLIDES} (TELEGRAM CTA):
+"Хочешь ещё больше?"
+"У меня есть закрытый Telegram — там бесплатно:"
+"• ежедневные фишки и промпты"
+"• разборы ИИ-инструментов"
+"• кейсы + шаблоны"
+"→ Подписывайся — {TG_SHORT}"
 
-CAPTION: [хук 2-3 строки] + [текст] + [CTA] + [хэштеги #sora #нейросеть и др.]
-
-Паттерн CTA: «Напиши [СЛОВО] в комментариях — пришлю [ЦЕННОСТЬ]»."""
+CAPTION ДЛЯ ПОСТА:
+[хук 2-3 строки] + [текст с ценностью] + [CTA написать слово] + [хэштеги] +
+{TG_CTA_CAPTION}"""
           )
           print("  ✅ Тексты готовы")
           print()
 
           # ── ФИНАЛЬНЫЙ ОТЧЁТ ──────────────────────────────────
           print("═" * 60)
-          print("  📋 ИТОГОВЫЙ БРИФ ДЛЯ ПРОДАКШЕНА")
+          print("  📋 ИТОГОВЫЙ БРИФ")
           print("═" * 60)
           print()
           print("━" * 60)
@@ -203,8 +241,9 @@ CAPTION: [хук 2-3 строки] + [текст] + [CTA] + [хэштеги #sor
           print(copy)
           print()
           print("═" * 60)
-          print("  ✅ КАРУСЕЛЬ ГОТОВА К ПРОДАКШЕНУ")
+          print(f"  ✅ КАРУСЕЛЬ ГОТОВА")
           print(f"  Создай {SLIDES} слайдов в Canva/Figma по дизайн-брифу.")
+          print(f"  Последний слайд = Telegram CTA: {TG_LINK}")
           print("  Публикуй в 19:00-21:00 МСК.")
           print("═" * 60)
           PYEOF
