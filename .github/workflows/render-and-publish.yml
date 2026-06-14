@@ -1,0 +1,164 @@
+name: 🚀 Render + Publish Instagram
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_id:
+        description: 'Какой пост публиковать'
+        required: true
+        default: 'post_01'
+        type: choice
+        options:
+          - post_01
+          - post_02
+          - post_03
+          - post_04
+          - post_05
+          - post_06
+          - post_07
+          - post_08
+          - post_09
+      composition:
+        description: 'Remotion composition'
+        required: false
+        default: 'Style03_BrutalistNeon'
+        type: choice
+        options:
+          - Style03_BrutalistNeon
+          - Style01_Bebas3D
+          - Style02_CandyPop
+          - Style04_Glassmorphism
+          - Style05_LiquidBlobs
+          - Style06_RetroVHS
+          - Style07_SwissBold
+
+jobs:
+  render-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # нужно для создания Release
+
+    env:
+      INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
+      INSTAGRAM_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+      COMPOSITION_ID: ${{ inputs.composition }}
+      POST_ID: ${{ inputs.post_id }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: remotion-carousel/package-lock.json
+
+      - name: Install Chrome dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
+            libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 \
+            libxfixes3 libxrandr2 libgbm1 libasound2 \
+            libpango-1.0-0 libcairo2 libpangocairo-1.0-0 \
+            ffmpeg
+
+      - name: Install Remotion dependencies
+        working-directory: remotion-carousel
+        run: npm ci
+
+      - name: Copy slides.json to src (if root version exists)
+        run: |
+          if [ -f slides.json ]; then
+            cp slides.json remotion-carousel/src/slides.json
+            echo "✅ Использую корневой slides.json"
+          else
+            echo "✅ Использую remotion-carousel/src/slides.json"
+          fi
+
+      - name: 🎬 Render slides (CPU, no GPU in CI)
+        working-directory: remotion-carousel
+        run: |
+          echo "═══════════════════════════════════════"
+          echo "  Рендерю ${COMPOSITION_ID} (CPU)"
+          echo "═══════════════════════════════════════"
+          node render-slides.mjs --slides-only
+          echo ""
+          echo "✅ Слайды готовы:"
+          ls -lh ../out/slides/
+
+      - name: 🔗 Assemble carousel with ffmpeg
+        run: |
+          mkdir -p out
+          # Создаём concat list
+          ls remotion-carousel/../out/slides/slide_*.mp4 | sort | \
+            awk '{print "file \x27" $0 "\x27"}' > /tmp/concat_list.txt
+          cat /tmp/concat_list.txt
+          # Собираем
+          ffmpeg -y -f concat -safe 0 -i /tmp/concat_list.txt \
+            -c:v libx264 -preset fast -crf 18 -movflags +faststart \
+            out/carousel_full.mp4
+          echo ""
+          echo "✅ Carousel собран:"
+          ls -lh out/carousel_full.mp4
+
+      - name: 📦 Upload to GitHub Release (публичный URL)
+        id: upload_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          POST_ID="${{ inputs.post_id }}"
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          TAG="content-${POST_ID}-${TIMESTAMP}"
+          FILENAME="${POST_ID}_${TIMESTAMP}.mp4"
+
+          # Копируем с уникальным именем
+          cp out/carousel_full.mp4 "/tmp/${FILENAME}"
+
+          # Создаём Release и загружаем видео
+          gh release create "${TAG}" \
+            --repo cheusovn/instagram-mcp \
+            --title "📱 ${POST_ID} — $(date '+%d.%m.%Y %H:%M') MSK" \
+            --notes "Автоматически сгенерирован: ${COMPOSITION_ID}" \
+            "/tmp/${FILENAME}"
+
+          # Получаем прямой URL файла
+          VIDEO_URL="https://github.com/cheusovn/instagram-mcp/releases/download/${TAG}/${FILENAME}"
+          echo "video_url=${VIDEO_URL}" >> $GITHUB_OUTPUT
+          echo ""
+          echo "✅ Видео загружено: ${VIDEO_URL}"
+
+      - name: ⏳ Ждём 15 сек (GitHub CDN должен индексировать файл)
+        run: sleep 15
+
+      - name: 📱 Publish to Instagram
+        run: |
+          echo "📱 Публикую в Instagram..."
+          VIDEO_URL="${{ steps.upload_release.outputs.video_url }}"
+
+          node publish-instagram.mjs \
+            --post "content/posts/${{ inputs.post_id }}.json" \
+            --video "${VIDEO_URL}"
+
+      - name: 💾 Commit publish log
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "Content Bot 🤖"
+          git config user.email "bot@cheusov.ru"
+          git add content/published.json 2>/dev/null || true
+          git diff --cached --quiet || \
+            git commit -m "📱 published: ${{ inputs.post_id }} → Instagram $(date '+%d.%m.%Y %H:%M')"
+          git push || true
+
+      - name: ✅ Done
+        run: |
+          echo "═══════════════════════════════════════"
+          echo "  ✅ ГОТОВО!"
+          echo "  Пост: ${{ inputs.post_id }}"
+          echo "  Стиль: ${{ inputs.composition }}"
+          echo "  Опубликован: $(date '+%d.%m.%Y %H:%M') UTC"
+          echo "  Instagram: @nikolay_cheusov"
+          echo "═══════════════════════════════════════"
