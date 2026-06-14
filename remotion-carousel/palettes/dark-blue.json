@@ -1,0 +1,47 @@
+{
+  "slides": [
+    {
+      "headline": "ChatGPT заменит 80% рутины",
+      "body": "Технологии — новая нефть. Кто знает ИИ — зарабатывает больше.",
+      "emoji": "🤖",
+      "bgColor": "linear-gradient(160deg, #0a0a1a 0%, #0d1a3a 100%)",
+      "accentColor": "#00d4ff"
+    },
+    {
+      "headline": "Midjourney",
+      "body": "100 000 дизайнеров потеряли работу. Ты следующий — или первый?",
+      "emoji": "🎨",
+      "bgColor": "linear-gradient(160deg, #08081a 0%, #0a1530 100%)",
+      "accentColor": "#00d4ff"
+    },
+    {
+      "headline": "Runway ML",
+      "body": "Видео за 10 минут. Раньше это стоило $10 000.",
+      "emoji": "🎬",
+      "bgColor": "linear-gradient(160deg, #06061a 0%, #08122a 100%)",
+      "accentColor": "#00d4ff"
+    },
+    {
+      "headline": "ElevenLabs",
+      "body": "Твой голос. Любой язык. Любой акцент.",
+      "emoji": "🎙️",
+      "bgColor": "linear-gradient(160deg, #050515 0%, #070f25 100%)",
+      "accentColor": "#00d4ff"
+    },
+    {
+      "headline": "Sora",
+      "body": "Кино-качество из одного промпта. 2026 — это сейчас.",
+      "emoji": "🌐",
+      "bgColor": "linear-gradient(160deg, #040414 0%, #060c22 100%)",
+      "accentColor": "#00d4ff"
+    },
+    {
+      "headline": "Бесплатные гайды",
+      "body": "ChatGPT • Midjourney • Runway • ElevenLabs • Sora",
+      "emoji": "⚡️",
+      "bgColor": "linear-gradient(160deg, #0a0a1a 0%, #0d1a3a 100%)",
+      "accentColor": "#00d4ff",
+      "isLast": true
+    }
+  ]
+}
