@@ -1,38 +1,30 @@
-name: 📱 Auto-Publish Instagram
+name: 🤖 Auto Publish — Schedule
 
 on:
-  # Ручной запуск (выбираешь пост и вставляешь URL видео)
+  # 9:00 MSK = 06:00 UTC | 14:00 MSK = 11:00 UTC | 20:00 MSK = 17:00 UTC
+  schedule:
+    - cron: '0 6 * * *'
+    - cron: '0 11 * * *'
+    - cron: '0 17 * * *'
+
   workflow_dispatch:
     inputs:
       post_id:
-        description: 'Какой пост публиковать'
-        required: true
-        default: 'post_01'
-        type: choice
-        options:
-          - post_01
-          - post_02
-          - post_03
-          - post_04
-          - post_05
-          - post_06
-          - post_07
-          - post_08
-          - post_09
-      video_url:
-        description: 'Публичный HTTPS URL видео (mp4)'
-        required: true
-        type: string
-
-  # Расписание: День 1 — 09:00 / 14:00 / 20:00 MSK (UTC+3)
-  # schedule:
-  #   - cron: '0 6 * * *'   # 09:00 MSK = 06:00 UTC
-  #   - cron: '0 11 * * *'  # 14:00 MSK = 11:00 UTC
-  #   - cron: '0 17 * * *'  # 20:00 MSK = 17:00 UTC
+        description: 'Конкретный пост (оставь пустым для авто)'
+        required: false
+        default: ''
+      composition:
+        description: 'Стиль'
+        required: false
+        default: 'Style03-BrutalistNeon'
 
 jobs:
-  publish:
+  auto-publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+
     env:
       INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
       INSTAGRAM_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
@@ -41,25 +33,108 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Publish to Instagram
-        env:
-          VIDEO_URL: ${{ inputs.video_url }}
+      - name: Determine next post
+        id: schedule
         run: |
-          echo "📱 Публикуем ${{ inputs.post_id }}..."
-          node publish-instagram.mjs \
-            --post content/posts/${{ inputs.post_id }}.json \
-            --video "$VIDEO_URL"
+          if [ -n "${{ inputs.post_id }}" ]; then
+            echo "post_id=${{ inputs.post_id }}" >> $GITHUB_OUTPUT
+            echo "skip=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          node --input-type=module << 'EOF'
+          import fs from 'fs';
+          const schedule = ['post_01','post_02','post_03','post_04','post_05','post_06','post_07','post_08','post_09'];
+          let published = [];
+          try { published = (JSON.parse(fs.readFileSync('content/published.json','utf8')).posts||[]).map(p=>p.post_id); } catch{}
+          const next = schedule.find(p => !published.includes(p));
+          if (!next) { fs.appendFileSync(process.env.GITHUB_OUTPUT,'skip=true\n'); }
+          else { fs.appendFileSync(process.env.GITHUB_OUTPUT,`post_id=${next}\nskip=false\n`); console.log('Next post:',next); }
+          EOF
 
-      - name: Save publish log
-        if: success()
+      - name: Install system deps
+        if: steps.schedule.outputs.skip != 'true'
         run: |
-          git config user.name "Content Bot"
-          git config user.email "bot@nikolay-cheusov.ru"
-          git add content/published.json || true
-          git diff --cached --quiet || git commit -m "log: published ${{ inputs.post_id }} to Instagram"
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
+            libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 \
+            libxfixes3 libxrandr2 libgbm1 libasound2t64 \
+            libpango-1.0-0 libcairo2 libpangocairo-1.0-0 \
+            ffmpeg fonts-liberation
+
+      - name: Install Remotion
+        if: steps.schedule.outputs.skip != 'true'
+        working-directory: remotion-carousel
+        run: npm install
+
+      - name: Prepare slides for post
+        if: steps.schedule.outputs.skip != 'true'
+        run: node prepare-post.mjs ${{ steps.schedule.outputs.post_id }}
+
+      - name: Generate SFX
+        if: steps.schedule.outputs.skip != 'true'
+        working-directory: remotion-carousel
+        run: node generate-sfx.mjs
+
+      - name: Render slides (CPU)
+        if: steps.schedule.outputs.skip != 'true'
+        working-directory: remotion-carousel
+        run: |
+          COMP="${{ inputs.composition || 'Style03-BrutalistNeon' }}"
+          node render-slides.mjs "$COMP" --slides-only
+          ls -lh ../out/slides/
+
+      - name: Assemble carousel
+        if: steps.schedule.outputs.skip != 'true'
+        run: |
+          ls out/slides/slide_*.mp4 | sort | awk '{print "file \x27" $0 "\x27"}' > /tmp/concat.txt
+          ffmpeg -y -f concat -safe 0 -i /tmp/concat.txt \
+            -c:v libx264 -preset medium -crf 20 -movflags +faststart \
+            -vf "scale=1080:1350" out/carousel_full.mp4
+
+      - name: Upload to GitHub Releases
+        if: steps.schedule.outputs.skip != 'true'
+        id: upload
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          POST_ID="${{ steps.schedule.outputs.post_id }}"
+          TAG="content-${POST_ID}-${TIMESTAMP}"
+          FILENAME="${POST_ID}_${TIMESTAMP}.mp4"
+          cp out/carousel_full.mp4 "/tmp/${FILENAME}"
+          gh release create "${TAG}" \
+            --repo cheusovn/instagram-mcp \
+            --title "📱 ${POST_ID} — $(date '+%d.%m.%Y %H:%M') MSK" \
+            --notes "Auto-published | Style03-BrutalistNeon" \
+            "/tmp/${FILENAME}"
+          echo "video_url=https://github.com/cheusovn/instagram-mcp/releases/download/${TAG}/${FILENAME}" >> $GITHUB_OUTPUT
+
+      - name: Wait CDN (30s)
+        if: steps.schedule.outputs.skip != 'true'
+        run: sleep 30
+
+      - name: Publish to Instagram
+        if: steps.schedule.outputs.skip != 'true'
+        run: |
+          POST_ID="${{ steps.schedule.outputs.post_id }}"
+          node publish-instagram.mjs \
+            --post "content/posts/${POST_ID}.json" \
+            --video "${{ steps.upload.outputs.video_url }}"
+
+      - name: Commit publish log
+        if: steps.schedule.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "Content Bot 🤖"
+          git config user.email "bot@cheusov.ru"
+          git add content/published.json 2>/dev/null || true
+          git diff --cached --quiet || \
+            git commit -m "📱 auto: ${{ steps.schedule.outputs.post_id }} → Instagram $(date '+%d.%m.%Y %H:%M')"
           git push || true
