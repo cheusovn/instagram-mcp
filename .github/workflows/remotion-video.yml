@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Тема карусели (например: 5 нейросетей для заработка)'
+        description: 'Тема карусели (например: 5 нейросетей для заработка 2026)'
         required: true
         type: string
       slides:
@@ -55,6 +55,20 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Read content log to avoid duplicates
+        run: |
+          echo "=== EXISTING TOPICS ==="
+          python3 -c "
+import re
+try:
+    with open('../CONTENT_LOG.md', encoding='utf-8') as f:
+        log = f.read()
+    topics = re.findall(r'- \\*\\*Слайды:\\*\\* (.+)', log)
+    print(f'Already used {len(topics)} carousels:')
+    for t in topics[-5:]: print(f'  - {t[:80]}')
+except: print('No log yet')
+"
+
       - name: Generate slides via OpenRouter
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -63,13 +77,25 @@ jobs:
           PALETTE: ${{ inputs.palette }}
         run: |
           python3 << 'PYEOF'
-          import os, json, urllib.request
+          import os, json, urllib.request, re
 
           TOPIC = os.environ['TOPIC']
           N = int(os.environ.get('SLIDES', '8'))
           PALETTE = os.environ.get('PALETTE', 'dark-blue')
           API_KEY = os.environ['OPENROUTER_API_KEY']
           MODEL = 'google/gemini-flash-1.5'
+          YEAR = '2026'
+
+          # Read existing facts to avoid repetition
+          used_facts = ''
+          try:
+              with open('../CONTENT_LOG.md', encoding='utf-8') as f:
+                  log = f.read()
+              facts_section = re.search(r'<!-- FACTS_LOG_START -->(.*?)<!-- FACTS_LOG_END -->', log, re.DOTALL)
+              if facts_section:
+                  used_facts = facts_section.group(1).strip()
+          except:
+              pass
 
           PALETTES = {
               'dark-blue':   {'bg': 'linear-gradient(160deg,#0a0a1a,#0d1a3a)', 'bg2': 'linear-gradient(160deg,#050510,#0a1428)', 'accent': '#00d4ff', 'accent2': '#4488ff'},
@@ -80,7 +106,6 @@ jobs:
               'neon-pink':   {'bg': 'linear-gradient(160deg,#0f0014,#1a0028)', 'bg2': 'linear-gradient(160deg,#0a0010,#12001e)', 'accent': '#ff0080', 'accent2': '#e1005a'},
               'gold-black':  {'bg': 'linear-gradient(160deg,#0a0800,#1a1400)', 'bg2': 'linear-gradient(160deg,#060500,#100e00)', 'accent': '#fbbf24', 'accent2': '#d97706'},
           }
-
           pal = PALETTES.get(PALETTE, PALETTES['dark-blue'])
 
           def call_openrouter(prompt):
@@ -92,14 +117,15 @@ jobs:
               with urllib.request.urlopen(req, timeout=60) as r:
                   return json.loads(r.read())['choices'][0]['message']['content']
 
-          # Agent 0: Facts
-          facts_raw = call_openrouter(f"""Ты эксперт по нейросетям и ИИ-инструментам. Тема: {TOPIC}
-          Дай {N-1} реальных, проверенных, интересных факта/совета с конкретными цифрами, названиями, датами.
-          Формат: JSON массив [{"headline": "...", "body": "...", "emoji": "..."}]
+          avoid_str = f'\n\nИзбегай эти уже использованные факты:\n{used_facts}' if used_facts else ''
+
+          facts_raw = call_openrouter(f"""Ты эксперт по нейросетям и ИИ-инструментам {YEAR} года. Тема: {TOPIC}
+          Дай {N-1} реальных, проверенных фактов с конкретными цифрами, названиями, датами ({YEAR} год).{avoid_str}
+          JSON массив [{"headline": "...", "body": "...", "emoji": "..."}]
           - headline: цепляющий заголовок макс 8 слов (русский)
-          - body: 1-2 предложения с конкретным фактом/цифрой (макс 25 слов)
-          - emoji: 1 подходящий emoji
-          Только JSON, без markdown.""")
+          - body: 1-2 предложения с фактами/цифрами ({YEAR}) макс 25 слов
+          - emoji: 1 emoji
+          Только JSON.""")
 
           raw = facts_raw.strip()
           if raw.startswith('```'):
@@ -115,7 +141,6 @@ jobs:
                   'accentColor': pal['accent'] if i%2==0 else pal['accent2'],
               })
 
-          # Last slide: CTA
           slides.append({
               'headline': 'Хочешь ещё больше?',
               'body': '• ежедневные фишки и промпты\n• разборы ИИ-инструментов\n• кейсы + шаблоны',
@@ -127,15 +152,22 @@ jobs:
 
           with open('src/slides.json', 'w', encoding='utf-8') as f:
               json.dump({'slides': slides}, f, ensure_ascii=False, indent=2)
-          print(f'✅ {len(slides)} slides generated')
+
+          # Save headlines to a file for the monitor to pick up
+          headlines = [s['headline'] for s in slides]
+          with open('/tmp/headlines.txt', 'w', encoding='utf-8') as f:
+              f.write('\n'.join(headlines))
+          print(f'✅ {len(slides)} slides | topic: {TOPIC} | palette: {PALETTE}')
+          for h in headlines:
+              print(f'  • {h}')
 
           # Caption
-          caption = call_openrouter(f"""Напиши цепляющую подпись для Instagram поста о: {TOPIC}
-          - Первая строка — крюк (вопрос или неожиданный факт), макс 15 слов
+          caption = call_openrouter(f"""Напиши цепляющую подпись для Instagram ({YEAR}) о: {TOPIC}
+          - Первая строка: крюк, макс 15 слов
           - 2-3 строки пользы
           - 5-7 хэштегов (#нейросети #ИИ и релевантные)
           - Последняя строка: ⬇️ Больше — в Telegram. Ссылка в шапке профиля.
-          Только текст подписи, без пояснений.""")
+          Только текст.""")
           with open('/tmp/caption.txt', 'w', encoding='utf-8') as f:
               f.write(caption)
           print('📝 Caption ready')
@@ -144,10 +176,15 @@ jobs:
       - name: Render with Remotion
         run: node --experimental-vm-modules render.mjs ../out/carousel.mp4
 
-      - name: Show caption
+      - name: Show slides summary
         run: |
           echo "=========================================="
-          echo "📋 CAPTION FOR INSTAGRAM:"
+          echo "🎥 SLIDES GENERATED:"
+          echo "=========================================="
+          cat /tmp/headlines.txt
+          echo ""
+          echo "=========================================="
+          echo "📋 CAPTION:"
           echo "=========================================="
           cat /tmp/caption.txt
 
@@ -163,4 +200,11 @@ jobs:
         with:
           name: caption-${{ github.run_number }}
           path: /tmp/caption.txt
+          retention-days: 7
+
+      - name: Upload headlines
+        uses: actions/upload-artifact@v4
+        with:
+          name: headlines-${{ github.run_number }}
+          path: /tmp/headlines.txt
           retention-days: 7

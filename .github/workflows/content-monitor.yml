@@ -1,0 +1,182 @@
+name: 👁️ Content Monitor Agent
+
+on:
+  workflow_run:
+    workflows: ["🎬 Remotion Video Carousel"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action'
+        required: true
+        type: choice
+        options:
+          - show-log
+          - suggest-topics
+          - check-duplicates
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download slides artifact from triggered run
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          pattern: 'caption-*'
+          path: /tmp/artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Update Content Log
+        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+        env:
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_NAME: ${{ github.event.workflow_run.name }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          python3 << 'PYEOF'
+          import os, json, re, glob
+          from datetime import datetime
+
+          run_id = os.environ.get('RUN_ID', 'unknown')
+          run_url = os.environ.get('RUN_URL', '')
+          now = datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')
+
+          # Try to read caption from artifact
+          caption_files = glob.glob('/tmp/artifacts/**/*.txt', recursive=True)
+          caption = ''
+          if caption_files:
+              with open(caption_files[0], encoding='utf-8') as f:
+                  caption = f.read().strip()
+
+          # Read slides.json if present
+          slides_info = ''
+          if os.path.exists('remotion-carousel/src/slides.json'):
+              with open('remotion-carousel/src/slides.json', encoding='utf-8') as f:
+                  data = json.load(f)
+              headlines = [s.get('headline','') for s in data.get('slides', [])]
+              slides_info = ' | '.join(headlines)
+
+          with open('CONTENT_LOG.md', encoding='utf-8') as f:
+              content = f.read()
+
+          # Count existing entries
+          count = content.count('### Карусель #')
+          new_num = count + 1
+
+          # New entry
+          entry = f"""### Карусель #{new_num} — {now}
+          - **Run:** [{run_id}]({run_url})
+          - **Слайды:** {slides_info or 'см. артефакт'}
+          - **Caption preview:** {caption[:200] + '...' if len(caption) > 200 else caption}
+
+          """
+
+          # Update stats
+          content = re.sub(
+              r'\| Всего каруселей \| \d+ \|',
+              f'| Всего каруселей | {new_num} |',
+              content
+          )
+          content = re.sub(
+              r'\| Последнее обновление \| .* \|',
+              f'| Последнее обновление | {now} |',
+              content
+          )
+
+          # Insert entry
+          content = content.replace(
+              '<!-- CAROUSEL_LOG_START -->',
+              f'<!-- CAROUSEL_LOG_START -->\n{entry}'
+          )
+
+          with open('CONTENT_LOG.md', 'w', encoding='utf-8') as f:
+              f.write(content)
+
+          print(f'✅ Logged carousel #{new_num}')
+          PYEOF
+
+      - name: Suggest next topics (avoid duplicates)
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'suggest-topics'
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python3 << 'PYEOF'
+          import os, json, urllib.request, re
+
+          API_KEY = os.environ['OPENROUTER_API_KEY']
+          MODEL = 'google/gemini-flash-1.5'
+
+          # Read existing topics from log
+          with open('CONTENT_LOG.md', encoding='utf-8') as f:
+              log = f.read()
+
+          used_topics_match = re.findall(r'- \*\*Слайды:\*\* (.+)', log)
+          used = '\n'.join(used_topics_match[:20]) if used_topics_match else 'нет'
+
+          prompt = f"""Ты SMM-стратег для Instagram аккаунта об ИИ и нейросетях (@nikolay_cheusov).
+          Цель: 5000 подписчиков за 5 дней, аудитория — русскоязычные.
+
+          Уже опубликованные темы:
+          {used}
+
+          Предложи 10 новых вирусных тем для каруселей (2026 год).
+          Требования:
+          - НЕ повторять уже использованные темы
+          - Конкретные, с цифрами в заголовке ("5 нейросетей...", "3 способа...")
+          - Высокий вирусный потенциал
+          - На русском языке
+          - Формат: просто нумерованный список тем"""
+
+          data = json.dumps({'model': MODEL, 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 1000}).encode()
+          req = urllib.request.Request(
+              'https://openrouter.ai/api/v1/chat/completions', data=data,
+              headers={'Authorization': f'Bearer {API_KEY}', 'Content-Type': 'application/json',
+                       'HTTP-Referer': 'https://github.com/cheusovn/instagram-mcp'})
+          with urllib.request.urlopen(req, timeout=60) as r:
+              result = json.loads(r.read())['choices'][0]['message']['content']
+
+          print('='*50)
+          print('🧠 ПРЕДЛОЖЕНИЯ ТЕМ (без повторений):')
+          print('='*50)
+          print(result)
+          PYEOF
+
+      - name: Show current log
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'show-log'
+        run: |
+          echo "=== CONTENT LOG ==="
+          cat CONTENT_LOG.md
+
+      - name: Check for duplicate topics
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'check-duplicates'
+        run: |
+          python3 << 'PYEOF'
+          import re
+          with open('CONTENT_LOG.md', encoding='utf-8') as f:
+              log = f.read()
+          topics = re.findall(r'- \*\*Слайды:\*\* (.+)', log)
+          print(f'Всего тем в логе: {len(topics)}')
+          for i, t in enumerate(topics, 1):
+              print(f'{i}. {t[:100]}')
+          PYEOF
+
+      - name: Commit updated log
+        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+        run: |
+          git config user.name "Content Monitor Bot"
+          git config user.email "bot@github.com"
+          git add CONTENT_LOG.md
+          git diff --staged --quiet || git commit -m "monitor: log carousel run ${{ github.event.workflow_run.id }}"
+          git push
