@@ -1,0 +1,65 @@
+name: 📱 Auto-Publish Instagram
+
+on:
+  # Ручной запуск (выбираешь пост и вставляешь URL видео)
+  workflow_dispatch:
+    inputs:
+      post_id:
+        description: 'Какой пост публиковать'
+        required: true
+        default: 'post_01'
+        type: choice
+        options:
+          - post_01
+          - post_02
+          - post_03
+          - post_04
+          - post_05
+          - post_06
+          - post_07
+          - post_08
+          - post_09
+      video_url:
+        description: 'Публичный HTTPS URL видео (mp4)'
+        required: true
+        type: string
+
+  # Расписание: День 1 — 09:00 / 14:00 / 20:00 MSK (UTC+3)
+  # schedule:
+  #   - cron: '0 6 * * *'   # 09:00 MSK = 06:00 UTC
+  #   - cron: '0 11 * * *'  # 14:00 MSK = 11:00 UTC
+  #   - cron: '0 17 * * *'  # 20:00 MSK = 17:00 UTC
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+      INSTAGRAM_TOKEN: ${{ secrets.INSTAGRAM_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Publish to Instagram
+        env:
+          VIDEO_URL: ${{ inputs.video_url }}
+        run: |
+          echo "📱 Публикуем ${{ inputs.post_id }}..."
+          node publish-instagram.mjs \
+            --post content/posts/${{ inputs.post_id }}.json \
+            --video "$VIDEO_URL"
+
+      - name: Save publish log
+        if: success()
+        run: |
+          git config user.name "Content Bot"
+          git config user.email "bot@nikolay-cheusov.ru"
+          git add content/published.json || true
+          git diff --cached --quiet || git commit -m "log: published ${{ inputs.post_id }} to Instagram"
+          git push || true
