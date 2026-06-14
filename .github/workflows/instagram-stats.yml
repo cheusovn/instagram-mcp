@@ -13,9 +13,22 @@ jobs:
 
           # Get page token and IG ID
           PAGES=$(curl -s "https://graph.facebook.com/me/accounts?access_token=$TOKEN")
+          if ! echo "$PAGES" | python3 -c "import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get('data') else 1)" 2>/dev/null; then
+            echo "❌ Facebook Graph API не вернул список страниц (нет поля 'data')."
+            echo "── Ответ API ──"
+            echo "$PAGES"
+            echo "───────────────"
+            echo "Чаще всего это значит, что INSTAGRAM_ACCESS_TOKEN истёк или потерял права."
+            echo "Обнови секрет репозитория INSTAGRAM_ACCESS_TOKEN — см. AUTHENTICATION_GUIDE.md."
+            exit 1
+          fi
           PAGE_TOKEN=$(echo "$PAGES" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['data'][0]['access_token'])")
           PAGE_ID=$(echo "$PAGES" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['data'][0]['id'])")
-          IG_ID=$(curl -s "https://graph.facebook.com/$PAGE_ID?fields=instagram_business_account&access_token=$PAGE_TOKEN" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['instagram_business_account']['id'])")
+          IG_ID=$(curl -s "https://graph.facebook.com/$PAGE_ID?fields=instagram_business_account&access_token=$PAGE_TOKEN" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('instagram_business_account',{}).get('id',''))")
+          if [ -z "$IG_ID" ]; then
+            echo "❌ У страницы не привязан Instagram Business аккаунт (instagram_business_account пуст)."
+            exit 1
+          fi
 
           echo "════════════════════════════════════════"
           echo "         📱 INSTAGRAM FULL STATS"
