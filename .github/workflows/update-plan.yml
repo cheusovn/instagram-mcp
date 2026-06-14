@@ -1,0 +1,86 @@
+name: Update Plan — Mark Post Published
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_number:
+        description: 'Номер поста (1-10)'
+        required: true
+        default: '1'
+      instagram_link:
+        description: 'Ссылка на пост в Instagram'
+        required: true
+      likes:
+        description: 'Лайков (через 24 часа после публикации)'
+        required: false
+        default: '0'
+      comments:
+        description: 'Комментариев'
+        required: false
+        default: '0'
+      followers_now:
+        description: 'Подписчиков сейчас'
+        required: false
+        default: '0'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update PLAN.md — mark post as published
+        run: |
+          python3 << 'PYEOF'
+          import re, os, datetime
+
+          POST_N    = os.environ["POST_N"]
+          LINK      = os.environ["LINK"]
+          LIKES     = os.environ["LIKES"]
+          COMMENTS  = os.environ["COMMENTS"]
+          FOLLOWERS = os.environ["FOLLOWERS"]
+          TODAY     = datetime.date.today().strftime("%d.%m")
+
+          with open("PLAN.md", "r", encoding="utf-8") as f:
+              content = f.read()
+
+          # Mark post as published: replace ⬜ ПЛАН with ✅ ГОТОВО for this post number
+          # Pattern: "| N | ⬜ ПЛАН |"
+          pattern = rf"(\| {POST_N} \| )⬜ ПЛАН( \|)"
+          replacement = rf"\g<1>✅ ГОТОВО\2"
+          new_content = re.sub(pattern, replacement, content)
+
+          # Add link and stats note after the row
+          stats_note = f"\n> **Пост #{POST_N}** опубликован {TODAY}: {LINK} | ❤️ {LIKES} | 💬 {COMMENTS}"
+          # Insert after the "---" following the last table of the plan day
+          # Simple approach: append to tracker section
+          tracker_pattern = r"(\| День \d+ \| \d+\.\d+ \| \? \| \? \|)"
+
+          if FOLLOWERS != "0":
+              # Update first "?" in followers column
+              new_content = new_content.replace("| ? | — |", f"| {FOLLOWERS} | — |", 1)
+
+          with open("PLAN.md", "w", encoding="utf-8") as f:
+              f.write(new_content)
+              f.write(stats_note + "\n")
+
+          print(f"✅ Пост #{POST_N} отмечен как опубликованный")
+          print(f"   Ссылка: {LINK}")
+          print(f"   Лайки: {LIKES} | Комментарии: {COMMENTS}")
+          PYEOF
+        env:
+          POST_N: ${{ inputs.post_number }}
+          LINK: ${{ inputs.instagram_link }}
+          LIKES: ${{ inputs.likes }}
+          COMMENTS: ${{ inputs.comments }}
+          FOLLOWERS: ${{ inputs.followers_now }}
+
+      - name: Commit updated plan
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add PLAN.md
+          git commit -m "track: post #${{ inputs.post_number }} published" || echo "No changes"
+          git push
