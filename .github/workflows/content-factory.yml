@@ -77,19 +77,19 @@ jobs:
           - Средний топ: 3041 лайков, 347 комментариев
           - Лучшее время: 19:00-21:00 МСК"""
 
-          # CTA-блок: Telegram без ссылки (Telegram указан в шапке профиля)
+          # CTA-блок: единый призыв в Telegram (ссылка в шапке профиля)
           TG_SLIDE_TEXT = """
-          Последний слайд = закрытый Telegram-канал (CTA). Текст:
-          Заголовок: "Хочешь ещё больше?"
-          Подзаголовок: "У меня есть закрытый Telegram — там бесплатно:"
-          • ежедневные фишки и промпты
-          • разборы ИИ-инструментов
-          • кейсы + шаблоны
+          Последний слайд = ЕДИНЫЙ CTA в Telegram-канал. Обязательные элементы:
+          - крупный значок Telegram (логотип #2AABEE, узнаваемый «бумажный самолётик»)
+          - скриншот моего профиля Instagram @nikolay_cheusov (мокап телефона / карточка профиля)
+          Текст слайда:
+          Заголовок: "Больше информации — в моём Telegram-канале"
+          Подзаголовок: "Там подробнее, чем в посте: разборы, промпты, кейсы, шаблоны"
           Призыв: "Ссылка в шапке профиля ↓"
           """
 
           TG_CAPTION_TAIL = """
-          ⬇️ Больше такого — в моём Telegram. Ссылка в шапке профиля.
+          ⬇️ Больше информации — в моём Telegram-канале. Ссылка в шапке профиля.
           """
 
           print("═" * 60)
@@ -187,10 +187,11 @@ jobs:
           - Image prompt для DALL-E/Midjourney (English, ultra HD, 1080x1350 portrait):
             «[detailed prompt]»
 
-          СЛАЙД {SLIDES} (Telegram CTA):
-          - Фон: тёмный, логотип Telegram (#2AABEE), премиально
-          - Текст: CTA подписаться, ссылка в шапке профиля
-          - Image prompt: "dark premium background, glowing Telegram blue logo, bold Russian CTA text, Instagram portrait 1080x1350, professional, minimalist"""
+          СЛАЙД {SLIDES} (Telegram CTA — единый для всех постов):
+          - Фон: тёмный премиальный
+          - ОБЯЗАТЕЛЬНО: крупный логотип Telegram (#2AABEE) + скриншот/мокап профиля Instagram @nikolay_cheusov
+          - Текст: "Больше информации — в моём Telegram-канале", "Ссылка в шапке профиля ↓"
+          - Image prompt: "dark premium background, large glowing Telegram blue logo (#2AABEE paper-plane), realistic smartphone mockup showing an Instagram profile screenshot, bold Russian CTA text, Instagram portrait 1080x1350, professional, minimalist"""
           )
           print("  ✅ Дизайн-бриф готов")
           print()
@@ -213,13 +214,11 @@ jobs:
           [Заголовок, ≤8 слов, используй конкретный факт из базы]
           [Текст: 2-3 строки — что, почему важно, пример использования]
 
-          СЛАЙД {SLIDES} (TELEGRAM CTA):
-          "Хочешь ещё больше?"
-          "У меня есть закрытый Telegram — там бесплатно:"
-          "• ежедневные фишки и промпты"
-          "• разборы ИИ-инструментов"
-          "• кейсы + шаблоны"
+          СЛАЙД {SLIDES} (TELEGRAM CTA — единый для всех постов):
+          "Больше информации — в моём Telegram-канале"
+          "Там подробнее, чем в посте: разборы, промпты, кейсы, шаблоны"
           "→ Ссылка в шапке профиля ↓"
+          (на слайде: значок Telegram + скриншот профиля Instagram @nikolay_cheusov)
 
           CAPTION ДЛЯ ПОСТА ({LANG_HINT}):
           [Хук 2-3 строки — шокирующий факт]

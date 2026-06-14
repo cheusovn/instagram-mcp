@@ -142,12 +142,14 @@ jobs:
               })
 
           slides.append({
-              'headline': 'Хочешь ещё больше?',
-              'body': '• ежедневные фишки и промпты\n• разборы ИИ-инструментов\n• кейсы + шаблоны',
-              'emoji': '🔥',
+              'headline': 'Больше информации — в моём Telegram-канале',
+              'body': 'Подробнее, чем в посте: разборы, промпты, кейсы, шаблоны\n→ Ссылка в шапке профиля ↓',
+              'emoji': '✈️',
               'bgColor': 'linear-gradient(160deg,#0a0a1a,#1a0a2e 50%,#0d1a3a)',
-              'accentColor': pal['accent'],
+              'accentColor': '#2AABEE',
               'isLast': True,
+              'telegram': True,
+              'profileHandle': '@nikolay_cheusov',
           })
 
           with open('src/slides.json', 'w', encoding='utf-8') as f:
@@ -166,7 +168,7 @@ jobs:
           - Первая строка: крюк, макс 15 слов
           - 2-3 строки пользы
           - 5-7 хэштегов (#нейросети #ИИ и релевантные)
-          - Последняя строка: ⬇️ Больше — в Telegram. Ссылка в шапке профиля.
+          - Последняя строка: ⬇️ Больше информации — в моём Telegram-канале. Ссылка в шапке профиля.
           Только текст.""")
           with open('/tmp/caption.txt', 'w', encoding='utf-8') as f:
               f.write(caption)
