@@ -7,16 +7,95 @@ jobs:
   get-stats:
     runs-on: ubuntu-latest
     steps:
-      - name: Check Token & Get Account Info
+      - name: Get Instagram Stats via Facebook Graph API
         run: |
-          echo "🔍 Testing token with Instagram Basic Display API..."
-          RESPONSE=$(curl -s "https://graph.instagram.com/me?fields=id,username,account_type,media_count&access_token=${{ secrets.INSTAGRAM_ACCESS_TOKEN }}")
-          echo "Raw response: $RESPONSE"
+          TOKEN="${{ secrets.INSTAGRAM_ACCESS_TOKEN }}"
+
+          echo "📄 Step 1: Getting Facebook Pages..."
+          PAGES=$(curl -s "https://graph.facebook.com/me/accounts?access_token=$TOKEN")
+          echo "$PAGES" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          pages = data.get('data', [])
+          print(f'Found {len(pages)} page(s):')
+          for p in pages:
+              print(f\"  - {p.get('name')} (ID: {p.get('id')})\")
+          " || echo "Raw: $PAGES"
+
           echo ""
-          echo "🔍 Testing with Facebook Graph API..."
-          RESPONSE2=$(curl -s "https://graph.facebook.com/me?fields=id,name&access_token=${{ secrets.INSTAGRAM_ACCESS_TOKEN }}")
-          echo "Raw response: $RESPONSE2"
+          echo "📸 Step 2: Getting Instagram Business Account..."
+          PAGE_ID=$(echo "$PAGES" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          pages = data.get('data', [])
+          if pages:
+              print(pages[0]['id'])
+          ")
+
+          if [ -z "$PAGE_ID" ]; then
+            echo "❌ No Facebook pages found. Instagram Business must be connected to a Page."
+            exit 1
+          fi
+
+          PAGE_TOKEN=$(echo "$PAGES" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          print(data['data'][0]['access_token'])
+          ")
+
+          IG_ACCOUNT=$(curl -s "https://graph.facebook.com/$PAGE_ID?fields=instagram_business_account&access_token=$PAGE_TOKEN")
+          IG_ID=$(echo "$IG_ACCOUNT" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          ig = data.get('instagram_business_account', {})
+          print(ig.get('id', ''))
+          ")
+
+          if [ -z "$IG_ID" ]; then
+            echo "❌ No Instagram Business Account connected to this page."
+            echo "Raw: $IG_ACCOUNT"
+            exit 1
+          fi
+
+          echo "✅ Instagram Account ID: $IG_ID"
+
           echo ""
-          echo "🔍 Checking token info..."
-          RESPONSE3=$(curl -s "https://graph.facebook.com/debug_token?input_token=${{ secrets.INSTAGRAM_ACCESS_TOKEN }}&access_token=${{ secrets.INSTAGRAM_ACCESS_TOKEN }}")
-          echo "Token debug: $RESPONSE3"
+          echo "📊 Step 3: Getting Instagram Account Info..."
+          IG_INFO=$(curl -s "https://graph.facebook.com/$IG_ID?fields=username,name,biography,followers_count,follows_count,media_count,website,profile_picture_url&access_token=$PAGE_TOKEN")
+          echo "$IG_INFO" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          if 'error' in data:
+              print('Error:', data['error']['message'])
+              sys.exit(1)
+          print('=' * 40)
+          print('📱 INSTAGRAM ACCOUNT STATS')
+          print('=' * 40)
+          print(f\"  @{data.get('username', 'N/A')}\")
+          print(f\"  Name:       {data.get('name', 'N/A')}\")
+          print(f\"  Bio:        {data.get('biography', 'N/A')}\")
+          print(f\"  Website:    {data.get('website', 'N/A')}\")
+          print(f\"  Followers:  {data.get('followers_count', 'N/A'):,}\")
+          print(f\"  Following:  {data.get('follows_count', 'N/A'):,}\")
+          print(f\"  Posts:      {data.get('media_count', 'N/A'):,}\")
+          print('=' * 40)
+          "
+
+          echo ""
+          echo "📸 Step 4: Getting last 5 posts..."
+          MEDIA=$(curl -s "https://graph.facebook.com/$IG_ID/media?fields=id,caption,media_type,timestamp,like_count,comments_count,permalink&limit=5&access_token=$PAGE_TOKEN")
+          echo "$MEDIA" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          posts = data.get('data', [])
+          if not posts:
+              print('No posts found')
+              sys.exit(0)
+          print(f'Last {len(posts)} posts:')
+          for i, post in enumerate(posts, 1):
+              caption = post.get('caption', '')
+              short = (caption[:60] + '...') if len(caption) > 60 else caption or 'No caption'
+              print(f\"  {i}. [{post.get('media_type','?')}] {short}\")
+              print(f\"     ❤️  {post.get('like_count', '?')} likes  💬 {post.get('comments_count', '?')} comments\")
+              print(f\"     📅 {post.get('timestamp','')[:10]}  🔗 {post.get('permalink','')}\")
+          "
