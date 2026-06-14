@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feed Preview @nikolay_cheusov</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#05000f;color:#fff;font-family:'Arial Black',Arial,sans-serif;min-height:100vh}
+
+/* ── HEADER ── */
+.header{padding:40px 20px 0;text-align:center}
+h1{color:#CCFF00;font-size:22px;letter-spacing:4px;text-transform:uppercase}
+.sub{color:#444;font-size:11px;font-family:monospace;margin-top:4px;margin-bottom:30px}
+
+/* ── TABS ── */
+.tabs{display:flex;justify-content:center;gap:0;margin-bottom:30px}
+.tab{padding:8px 24px;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-family:monospace;cursor:pointer;border:1px solid #222;color:#555;background:transparent;transition:.15s}
+.tab.active{background:#CCFF00;color:#000;border-color:#CCFF00}
+.tab:hover:not(.active){color:#CCFF00;border-color:#CCFF0044}
+
+/* ── FEED GRID ── */
+#view-feed{display:block}
+#view-detail{display:none}
+.feed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:600px;margin:0 auto 60px}
+.feed-cell{
+  aspect-ratio:1;position:relative;overflow:hidden;cursor:pointer;
+  border:1px solid #222;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:12px 8px;text-align:center;
+  transition:transform .15s,filter .15s;
+}
+.feed-cell:hover{transform:scale(1.03);filter:brightness(1.15);z-index:2}
+.fc-badge{position:absolute;top:6px;left:6px;font-size:7px;font-family:monospace;padding:2px 5px;border-radius:3px;font-weight:900;letter-spacing:1px}
+.fc-num{position:absolute;top:6px;right:8px;font-size:9px;font-family:monospace;font-weight:900}
+.fc-emoji{font-size:28px;margin-bottom:6px}
+.fc-headline{font-size:9px;font-weight:900;line-height:1.3;text-transform:uppercase;letter-spacing:.3px}
+.fc-style{font-size:7px;font-family:monospace;position:absolute;bottom:6px;right:6px;letter-spacing:1px}
+
+/* ── LEGEND ── */
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:600px;margin:0 auto 40px;padding:0 20px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;font-family:monospace;color:#555}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+
+/* ── DETAIL VIEW ── */
+.detail-nav{display:flex;align-items:center;justify-content:space-between;padding:0 20px 20px;max-width:900px;margin:0 auto}
+.back-btn{background:none;border:1px solid #CCFF0044;color:#CCFF00;padding:6px 14px;font-size:11px;font-family:monospace;letter-spacing:2px;cursor:pointer}
+.back-btn:hover{background:#CCFF0011}
+.detail-meta{font-size:11px;font-family:monospace;color:#555}
+
+.post-block{max-width:900px;margin:0 auto 60px;padding:0 20px}
+.post-header{margin-bottom:16px}
+.pm{font-size:11px;color:#CCFF00;letter-spacing:3px;font-family:monospace;text-transform:uppercase;margin-bottom:4px}
+.ph{font-size:20px;font-weight:900;color:#fff;margin-bottom:2px}
+.pi{font-size:10px;color:#333;font-family:monospace;margin-bottom:16px}
+
+.slides-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px}
+.slides-row::-webkit-scrollbar{height:3px}
+.slides-row::-webkit-scrollbar-thumb{background:#CCFF00;border-radius:2px}
+.slides-row::-webkit-scrollbar-track{background:#111}
+
+.thumb{
+  flex:0 0 195px;width:195px;height:244px;
+  border-radius:7px;border:1px solid #1a0040;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 11px 16px;text-align:center;
+  transition:transform .15s,border-color .15s;cursor:pointer;
+}
+.thumb:hover{transform:scale(1.05)}
+.t-kicker{position:absolute;top:7px;right:8px;font-size:7px;font-family:monospace;letter-spacing:2px;font-weight:900}
+.t-emoji{font-size:24px;margin-bottom:6px}
+.t-headline{font-size:10.5px;font-weight:900;line-height:1.25;margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+.t-body{font-size:8px;line-height:1.4;font-family:Arial,sans-serif;font-weight:normal}
+.t-line{position:absolute;bottom:0;left:0;right:0;height:2px;opacity:.5}
+
+.caption-box{margin-top:14px;background:#0c001e;border:1px solid #1a0040;border-radius:6px;padding:12px 15px;font-size:10.5px;color:#777;font-family:monospace;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.cap-hash{color:#CCFF0044}
+.divider{height:1px;background:linear-gradient(90deg,transparent,#CCFF0015,transparent);margin:50px 0}
+
+.style-tag{display:inline-block;padding:3px 8px;border-radius:3px;font-size:9px;font-family:monospace;letter-spacing:1px;margin-bottom:4px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>@nikolay_cheusov</h1>
+  <p class="sub">FEED PREVIEW · 9 POSTS · 3 DAYS · TARGET: 5000 ПОДПИСЧИКОВ</p>
+  <div class="tabs">
+    <button class="tab active" onclick="showView('feed')">🗂 ЛЕНТА</button>
+    <button class="tab" onclick="showView('detail')">📋 ВСЕ СЛАЙДЫ</button>
+  </div>
+</div>
+
+<!-- FEED VIEW -->
+<div id="view-feed">
+  <div class="feed-grid">
+    <div class="feed-cell" style="background:#080018;border-color:#CCFF0044" onclick="showPost(0)">
+    <div class="fc-badge" style="background:#CCFF00;color:#080018">Д1 09:00</div>
+    <div class="fc-num" style="color:#CCFF0099">#1</div>
+    <div class="fc-emoji">🤖</div>
+    <div class="fc-headline" style="color:#CCFF00">10 нейросетей заменяют целую команду</div>
+    <div class="fc-style" style="color:#CCFF0066">BrutalistNeon</div>
+  </div>
+    <div class="feed-cell" style="background:#f5f5f0;border-color:#11144" onclick="showPost(1)">
+    <div class="fc-badge" style="background:#111;color:#f5f5f0">Д1 14:00</div>
+    <div class="fc-num" style="color:#11199">#2</div>
+    <div class="fc-emoji">⏰</div>
+    <div class="fc-headline" style="color:#111">Работаю 3 часа в день. Зарабатываю 200к</div>
+    <div class="fc-style" style="color:#11166">SwissBold</div>
+  </div>
+    <div class="feed-cell" style="background:#111;border-color:#FF3B3B44" onclick="showPost(2)">
+    <div class="fc-badge" style="background:#FF3B3B;color:#111">Д1 20:00</div>
+    <div class="fc-num" style="color:#FF3B3B99">#3</div>
+    <div class="fc-emoji">🎯</div>
+    <div class="fc-headline" style="color:#FF3B3B">ИИ тебя не уволит. Тебя уволит тот кто умеет с ним работать</div>
+    <div class="fc-style" style="color:#FF3B3B66">RetroVHS</div>
+  </div>
+    <div class="feed-cell" style="background:#080018;border-color:#CCFF0044" onclick="showPost(3)">
+    <div class="fc-badge" style="background:#CCFF00;color:#080018">Д2 09:00</div>
+    <div class="fc-num" style="color:#CCFF0099">#4</div>
+    <div class="fc-emoji">💰</div>
+    <div class="fc-headline" style="color:#CCFF00">5 способов заработать на ИИ уже в этом месяце</div>
+    <div class="fc-style" style="color:#CCFF0066">BrutalistNeon</div>
+  </div>
+    <div class="feed-cell" style="background:#0d1117;border-color:#4DA6FF44" onclick="showPost(4)">
+    <div class="fc-badge" style="background:#4DA6FF;color:#0d1117">Д2 14:00</div>
+    <div class="fc-num" style="color:#4DA6FF99">#5</div>
+    <div class="fc-emoji">💥</div>
+    <div class="fc-headline" style="color:#4DA6FF">20к → 120к за 30 дней. Без опыта. Только ChatGPT</div>
+    <div class="fc-style" style="color:#4DA6FF66">Glassmorphism</div>
+  </div>
+    <div class="feed-cell" style="background:#080018;border-color:#CCFF0044" onclick="showPost(5)">
+    <div class="fc-badge" style="background:#CCFF00;color:#080018">Д2 20:00</div>
+    <div class="fc-num" style="color:#CCFF0099">#6</div>
+    <div class="fc-emoji">⏱️</div>
+    <div class="fc-headline" style="color:#CCFF00">Один промпт экономит мне 4 часа каждый день</div>
+    <div class="fc-style" style="color:#CCFF0066">BrutalistNeon</div>
+  </div>
+    <div class="feed-cell" style="background:#0a0a1a;border-color:#2D7FFF44" onclick="showPost(6)">
+    <div class="fc-badge" style="background:#2D7FFF;color:#0a0a1a">Д3 09:00</div>
+    <div class="fc-num" style="color:#2D7FFF99">#7</div>
+    <div class="fc-emoji">🛠️</div>
+    <div class="fc-headline" style="color:#2D7FFF">Мой ИИ-стек 2026: 7 инструментов каждый день</div>
+    <div class="fc-style" style="color:#2D7FFF66">Bebas3D</div>
+  </div>
+    <div class="feed-cell" style="background:#f5f5f0;border-color:#11144" onclick="showPost(7)">
+    <div class="fc-badge" style="background:#111;color:#f5f5f0">Д3 14:00</div>
+    <div class="fc-num" style="color:#11199">#8</div>
+    <div class="fc-emoji">⚔️</div>
+    <div class="fc-headline" style="color:#111">Midjourney vs Flux vs Sora: честное сравнение</div>
+    <div class="fc-style" style="color:#11166">SwissBold</div>
+  </div>
+    <div class="feed-cell" style="background:#080018;border-color:#CCFF0044" onclick="showPost(8)">
+    <div class="fc-badge" style="background:#CCFF00;color:#080018">Д3 20:00</div>
+    <div class="fc-num" style="color:#CCFF0099">#9</div>
+    <div class="fc-emoji">⏱️</div>
+    <div class="fc-headline" style="color:#CCFF00">Контент на неделю за 40 минут. Вот моя система</div>
+    <div class="fc-style" style="color:#CCFF0066">BrutalistNeon</div>
+  </div>
+  </div>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#CCFF00"></div> BrutalistNeon (4 поста)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#f5f5f0"></div> SwissBold (2 поста)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#FF3B3B"></div> RetroVHS (1 пост)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#4DA6FF"></div> Glassmorphism (1 пост)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#2D7FFF"></div> Bebas3D (1 пост)</div>
+  </div>
+  <p style="text-align:center;font-family:monospace;font-size:10px;color:#333;margin-bottom:40px">Нажми на пост чтобы увидеть все слайды →</p>
+</div>
+
+<!-- DETAIL VIEW -->
+<div id="view-detail">
+  <div class="detail-nav">
+    <button class="back-btn" onclick="showView('feed')">← ЛЕНТА</button>
+    <div class="detail-meta" id="detail-meta">Все посты</div>
+  </div>
+  <div id="detail-content">
+    
+<div class="post-block" id="post-0">
+  <div class="post-header">
+    <div class="pm">ПОСТ #1 · ДЕНЬ 1 · 09:00 МСК</div>
+    <span class="style-tag" style="background:#CCFF0022;color:#CCFF00;border:1px solid #CCFF0044">BrutalistNeon</span>
+    <div class="ph">10 нейросетей заменяют целую команду</div>
+    <div class="pi">post_01 · 10 слайдов</div>
+  </div>
+  <div class="slides-row">
+    <div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ПОСТ #1 · ДЕНЬ 1</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🤖</div>
+    <div class="t-headline" style="color:#CCFF00;text-shadow:0 0 15px #CCFF0055">10 нейросетей заменяют целую команду</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Сохрани — используй уже сегодня.</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00"></div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">👥</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Раньше нужна была команда</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Копирайтер · Дизайнер · Монтажёр
+Таргетолог · Ассистент · Ан…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ТЕКСТЫ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">💬</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">ChatGPT</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Пишет тексты, письма, скрипты продаж.
+Экономит 3–4 часа кажд…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ДИЗАЙН</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🎨</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Midjourney</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Создаёт визуал за 30 секунд.
+Заменяет дизайнера за 5–8 тыс/п…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ВИДЕО</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🎭</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">HeyGen</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Видео с аватаром на любом языке.
+Без камеры. Без студии. За …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ГОЛОС</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🎙</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">ElevenLabs</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Голос как у профи-диктора.
+Аудио-курс из текста — за час.
+Mi…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">АНАЛИЗ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🔍</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Claude + Perplexity</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Claude — думает и пишет код.
+Perplexity — ищет без галлюцина…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">МОНТАЖ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🎬</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Runway + Sora</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Видео из текста или фото.
+Качество кино — за минуты.
+Контент…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ЦИФРЫ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">📊</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Реальная математика</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Раньше: команда 6 человек → 400к/мес
+Сейчас: 1 человек + ИИ …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">TELEGRAM</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">✈️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Весь мой ИИ-стек — в Telegram</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Инструменты · Промпты · Схемы заработка
+каждый день — без во…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div>
+  </div>
+  <div class="caption-box">Год назад мне нужна была команда из 6 человек.
+Сегодня — только ноутбук и ИИ.
+
+А всё потому что я нашёл 10 инструментов, которые делают всё то же самое — в 20 раз дешевле и в 3 раза быстрее 👇
+
+Сохрани карусель — и уже сегодня закрой хотя бы один рутинный процесс с помощью ИИ.
+
+Весь мой ИИ-стек, промпты и схемы заработка — каждый день в Telegram.
+Ссылка в шапке профиля ⚡️<span class="cap-hash">
+
+#нейросети,#ии,#chatgpt,#midjourney,#heygen,#искусственныйинтеллект,#заработоквинтернете,#aitools,#нейросеть,#технологии,#runway,#elevenlabs,#sora,#продуктивность,#онлайнзаработок,#контент,#smm,#иИнструменты,#chatgptрусский,#нейросетидляработы</span></div>
+</div>
+<div class="divider"></div>
+<div class="post-block" id="post-1">
+  <div class="post-header">
+    <div class="pm">ПОСТ #2 · ДЕНЬ 1 · 14:00 МСК</div>
+    <span class="style-tag" style="background:#11122;color:#111;border:1px solid #11144">SwissBold</span>
+    <div class="ph">Работаю 3 часа в день. Зарабатываю 200к</div>
+    <div class="pi">post_02 · 10 слайдов</div>
+  </div>
+  <div class="slides-row">
+    <div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">МОЙ ДЕНЬ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">⏰</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Работаю 3 часа в день. Зарабатываю 200к</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Без офиса. Без команды. Только я и 7 нейросетей. Смотри как …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">ШАГ 1</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">📋</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">8:00 — Планирование за 15 минут</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">ChatGPT составляет план дня, список задач и приоритеты. Рань…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">ШАГ 2</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">✍️</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">9:00 — Контент на неделю за 40 минут</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Claude пишет 7 постов, 3 сценария для видео и 10 идей. Копир…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">ШАГ 3</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">🎬</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">10:00 — Видео генерирует сам</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Runway + HeyGen делают видео пока я пью кофе. Раньше платил …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">ШАГ 4</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">📱</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">10:30 — Публикация в 5 соцсетей</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Make.com + ChatGPT адаптируют под каждую платформу и постят …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">ШАГ 5</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">💼</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">11:00 — Клиентские задачи</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Perplexity исследует. Claude анализирует. Я только принимаю …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">ИТОГ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">⚡</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Итого: 3 часа активной работы</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Остальное делают нейросети. Это не лень — это leverage. Умны…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">ЦЕНЫ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">💰</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Сколько это стоит?</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">ChatGPT Plus — 2000₽/мес. Claude Pro — 2000₽/мес. Runway — 2…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">СТАРТ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">🚀</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">С чего начать прямо сейчас?</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">1. ChatGPT Plus — базовый стек
+2. Автоматизируй одну задачу …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">TELEGRAM</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">✈️</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Подробный разбор каждого инструмента</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div>
+  </div>
+  <div class="caption-box">Зарабатываю 200к рублей, работаю 3 часа в день 🤖
+
+Нет, это не схема. Это ИИ-стек который я собирал год.
+
+Сохрани — это твой план на следующий месяц 👆
+
+Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑<span class="cap-hash">
+
+#нейросети #ии #chatgpt #заработокнаии #искусственныйинтеллект #удалённаяработа #фриланс #пассивныйдоход #автоматизация #нейросеть #aitools #chatgptрусский #заработок #бизнесонлайн #предпринимательство #цифровойномад #монетизация #технологии #будущееработы #иидляработы</span></div>
+</div>
+<div class="divider"></div>
+<div class="post-block" id="post-2">
+  <div class="post-header">
+    <div class="pm">ПОСТ #3 · ДЕНЬ 1 · 20:00 МСК</div>
+    <span class="style-tag" style="background:#FF3B3B22;color:#FF3B3B;border:1px solid #FF3B3B44">RetroVHS</span>
+    <div class="ph">ИИ тебя не уволит. Тебя уволит тот кто умеет с ним работать</div>
+    <div class="pi">post_03 · 10 слайдов</div>
+  </div>
+  <div class="slides-row">
+    <div class="thumb" style="background:#111;border-color:#FF3B3B33">
+    <div class="t-kicker" style="color:#FF3B3B">ВАЖНО</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #FF3B3B88)">🎯</div>
+    <div class="t-headline" style="color:#FF3B3B;text-shadow:0 0 15px #FF3B3B55">ИИ тебя не уволит. Тебя уволит тот кто умеет с ним работать</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Вот 9 навыков которые дают ×10 к зарплате с ChatGPT. Сохрани…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#FF3B3B,transparent)"></div>
+  </div><div class="thumb" style="background:#111;border-color:#FF3B3B33">
+    <div class="t-kicker" style="color:#FF3B3B">НАВЫК 1</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #FF3B3B88)">⌨️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Промпт-инжиниринг</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Умение правильно ставить задачу ИИ = умение управлять команд…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#FF3B3B,transparent)"></div>
+  </div><div class="thumb" style="background:#111;border-color:#FF3B3B33">
+    <div class="t-kicker" style="color:#FF3B3B">НАВЫК 2</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #FF3B3B88)">🧠</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Критическое мышление</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">ИИ галлюцинирует. Тот кто умеет проверять и улучшать — незам…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#FF3B3B,transparent)"></div>
+  </div><div class="thumb" style="background:#111;border-color:#FF3B3B33">
+    <div class="t-kicker" style="color:#FF3B3B">НАВЫК 3</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #FF3B3B88)">🤖</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Управление AI-агентами</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Настроить систему из 5 ИИ которые работают вместо команды — …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#FF3B3B,transparent)"></div>
+  </div><div class="thumb" style="background:#111;border-color:#FF3B3B33">
+    <div class="t-kicker" style="color:#FF3B3B">НАВЫК 4</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #FF3B3B88)">🤝</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Продажи и переговоры</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">ИИ не умеет строить доверие. Люди покупают у людей. Продавец…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#FF3B3B,transparent)"></div>
+  </div><div class="thumb" style="background:#111;border-color:#FF3B3B33">
+    <div class="t-kicker" style="color:#FF3B3B">НАВЫК 5</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #FF3B3B88)">♟️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Стратегическое мышление</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">ChatGPT исполняет. Стратегию задаёт человек. Директора и стр…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#FF3B3B,transparent)"></div>
+  </div><div class="thumb" style="background:#111;border-color:#FF3B3B33">
+    <div class="t-kicker" style="color:#FF3B3B">НАВЫК 6</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #FF3B3B88)">❤️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Эмоциональный интеллект</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Команды, клиенты, кризисы — всё требует эмпатии. ИИ не чувст…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#FF3B3B,transparent)"></div>
+  </div><div class="thumb" style="background:#111;border-color:#FF3B3B33">
+    <div class="t-kicker" style="color:#FF3B3B">НАВЫК 7</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #FF3B3B88)">📚</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Скорость обучения</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Каждые 6 месяцев появляется новый мощный инструмент. Кто учи…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#FF3B3B,transparent)"></div>
+  </div><div class="thumb" style="background:#111;border-color:#FF3B3B33">
+    <div class="t-kicker" style="color:#FF3B3B">ВЫВОД</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #FF3B3B88)">🏆</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Вывод: не бойся ИИ — оседлай его</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Те кто боятся — проиграют. Те кто изучают — заработают в 10 …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#FF3B3B,transparent)"></div>
+  </div><div class="thumb" style="background:#111;border-color:#FF3B3B33">
+    <div class="t-kicker" style="color:#FF3B3B">TELEGRAM</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #FF3B3B88)">✈️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Как прокачать эти навыки с ИИ?</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#FF3B3B,transparent)"></div>
+  </div>
+  </div>
+  <div class="caption-box">ChatGPT тебя не заменит. Тебя заменит тот кто умеет с ним работать 🔥
+
+Сохрани — это важно 👆
+
+Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑<span class="cap-hash">
+
+#нейросети #chatgpt #ии #искусственныйинтеллект #будущееработы #навыки #саморазвитие #карьера #технологии #автоматизация #нейросеть #aitools #профессия #заработок #цифровыенавыки #программирование #дизайн #маркетинг #предпринимательство #иидляработы</span></div>
+</div>
+<div class="divider"></div>
+<div class="post-block" id="post-3">
+  <div class="post-header">
+    <div class="pm">ПОСТ #4 · ДЕНЬ 2 · 09:00 МСК</div>
+    <span class="style-tag" style="background:#CCFF0022;color:#CCFF00;border:1px solid #CCFF0044">BrutalistNeon</span>
+    <div class="ph">5 способов заработать на ИИ уже в этом месяце</div>
+    <div class="pi">post_04 · 10 слайдов</div>
+  </div>
+  <div class="slides-row">
+    <div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ДЕНЬГИ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">💰</div>
+    <div class="t-headline" style="color:#CCFF00;text-shadow:0 0 15px #CCFF0055">5 способов заработать на ИИ уже в этом месяце</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Без опыта. Без офиса. Без стартового капитала. Проверено лич…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">СПОСОБ 1</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">✍️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Способ 1: ИИ-копирайтинг</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Claude + ChatGPT пишут тексты. Ты редактируешь и продаёшь. Ц…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">СПОСОБ 2</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🎨</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Способ 2: ИИ-дизайн и картинки</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Midjourney + Canva AI = логотипы, баннеры, иллюстрации. На K…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">СПОСОБ 3</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">⚙️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Способ 3: Автоматизация для бизнеса</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Настраиваешь чат-боты и автоворонки на Make.com. Малый бизне…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">СПОСОБ 4</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🎬</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Способ 4: ИИ-видео и Reels</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">HeyGen + Runway делают видео без камеры. Блогеры и бренды пл…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">СПОСОБ 5</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🎓</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Способ 5: Обучение работе с ИИ</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Научился сам — учи других. Курс или консультация: 5-50к. Рын…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ЦИФРЫ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">📈</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Сколько можно заработать в месяц?</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Новичок: 30-80к
+Через 3 месяца: 80-150к
+Через год: 200к+
+Всё…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">СТАРТ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🚀</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">С чего начать сегодня?</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">1. Выбери 1 способ из 5
+2. Зарегистрируйся на Kwork или FL.r…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ОШИБКА</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">⚠️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Главная ошибка новичков</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Ждут идеального момента. Его не будет. Первые 3 клиента беру…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">TELEGRAM</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">✈️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Пошаговый план старта — в Telegram</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div>
+  </div>
+  <div class="caption-box">5 способов заработать на ИИ прямо сейчас 💰
+
+Без опыта. Без стартового капитала. Проверено лично.
+
+Сохрани — пригодится 👆
+
+Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑<span class="cap-hash">
+
+#заработокнаии #нейросети #фриланс #удалённаяработа #chatgpt #ии #пассивныйдоход #онлайнзаработок #предпринимательство #бизнесонлайн #монетизация #нейросеть #aitools #заработок #цифровойбизнес #контентмейкер #копирайтинг #дизайн #автоматизация #искусственныйинтеллект</span></div>
+</div>
+<div class="divider"></div>
+<div class="post-block" id="post-4">
+  <div class="post-header">
+    <div class="pm">ПОСТ #5 · ДЕНЬ 2 · 14:00 МСК</div>
+    <span class="style-tag" style="background:#4DA6FF22;color:#4DA6FF;border:1px solid #4DA6FF44">Glassmorphism</span>
+    <div class="ph">20к → 120к за 30 дней. Без опыта. Только ChatGPT</div>
+    <div class="pi">post_05 · 10 слайдов</div>
+  </div>
+  <div class="slides-row">
+    <div class="thumb" style="background:#0d1117;border-color:#4DA6FF33">
+    <div class="t-kicker" style="color:#4DA6FF">КЕЙС</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #4DA6FF88)">💥</div>
+    <div class="t-headline" style="color:#4DA6FF;text-shadow:0 0 15px #4DA6FF55">20к → 120к за 30 дней. Без опыта. Только ChatGPT</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Антон. 28 лет. Бывший менеджер в магазине. Вот его история �…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#4DA6FF,transparent)"></div>
+  </div><div class="thumb" style="background:#0d1117;border-color:#4DA6FF33">
+    <div class="t-kicker" style="color:#4DA6FF">БЫЛО</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #4DA6FF88)">😔</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Месяц назад: 20к рублей в месяц</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Работа в рознице. Зарплата 20к. Понимал что нужно менять, но…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#4DA6FF,transparent)"></div>
+  </div><div class="thumb" style="background:#0d1117;border-color:#4DA6FF33">
+    <div class="t-kicker" style="color:#4DA6FF">ШАГ 1</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #4DA6FF88)">🎯</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Шаг 1: Выбрал нишу за 1 день</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Попросил ChatGPT: 'Найди нишу для фриланса где мало конкурен…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#4DA6FF,transparent)"></div>
+  </div><div class="thumb" style="background:#0d1117;border-color:#4DA6FF33">
+    <div class="t-kicker" style="color:#4DA6FF">ШАГ 2</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #4DA6FF88)">📁</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Шаг 2: Портфолио за 3 дня</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">ChatGPT написал 5 текстов-примеров. Антон отредактировал. Ра…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#4DA6FF,transparent)"></div>
+  </div><div class="thumb" style="background:#0d1117;border-color:#4DA6FF33">
+    <div class="t-kicker" style="color:#4DA6FF">ШАГ 3</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #4DA6FF88)">🤝</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Шаг 3: Первые 3 клиента за неделю</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Цена: 1500₽ за текст. Chatgpt пишет за 10 минут. Антон прави…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#4DA6FF,transparent)"></div>
+  </div><div class="thumb" style="background:#0d1117;border-color:#4DA6FF33">
+    <div class="t-kicker" style="color:#4DA6FF">ШАГ 4</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #4DA6FF88)">📈</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Шаг 4: Поднял цену × 3</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Через 2 недели и 20 отзывов поднял до 4500₽ за текст. Клиент…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#4DA6FF,transparent)"></div>
+  </div><div class="thumb" style="background:#0d1117;border-color:#4DA6FF33">
+    <div class="t-kicker" style="color:#4DA6FF">ШАГ 5</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #4DA6FF88)">⚙️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Шаг 5: Автоматизация</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Сделал шаблон промпта под нишу. Одно техзадание → готовый те…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#4DA6FF,transparent)"></div>
+  </div><div class="thumb" style="background:#0d1117;border-color:#4DA6FF33">
+    <div class="t-kicker" style="color:#4DA6FF">ИТОГ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #4DA6FF88)">🏆</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Результат через 30 дней</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">15 текстов × 4500₽ × 20 рабочих дней = 135 000₽
+Затрат: 2000…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#4DA6FF,transparent)"></div>
+  </div><div class="thumb" style="background:#0d1117;border-color:#4DA6FF33">
+    <div class="t-kicker" style="color:#4DA6FF">СЕКРЕТ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #4DA6FF88)">🔑</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Главный секрет: правильный промпт</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Антон использовал один промпт-шаблон. Этот промпт я публикую…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#4DA6FF,transparent)"></div>
+  </div><div class="thumb" style="background:#0d1117;border-color:#4DA6FF33">
+    <div class="t-kicker" style="color:#4DA6FF">TELEGRAM</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #4DA6FF88)">✈️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Хочешь такой же результат?</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#4DA6FF,transparent)"></div>
+  </div>
+  </div>
+  <div class="caption-box">Кейс: фрилансер вырос с 20к до 120к за месяц с помощью ChatGPT 🚀
+
+Он не программист. Не дизайнер. Просто научился одному промпту.
+
+Сохрани — это твой план 👆
+
+Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑<span class="cap-hash">
+
+#кейс #chatgpt #фриланс #заработокнаии #нейросети #успех #мотивация #ии #удалённаяработа #бизнесонлайн #монетизация #нейросеть #историяуспеха #предпринимательство #заработок #копирайтинг #aitools #искусственныйинтеллект #онлайнзаработок #результат</span></div>
+</div>
+<div class="divider"></div>
+<div class="post-block" id="post-5">
+  <div class="post-header">
+    <div class="pm">ПОСТ #6 · ДЕНЬ 2 · 20:00 МСК</div>
+    <span class="style-tag" style="background:#CCFF0022;color:#CCFF00;border:1px solid #CCFF0044">BrutalistNeon</span>
+    <div class="ph">Один промпт экономит мне 4 часа каждый день</div>
+    <div class="pi">post_06 · 10 слайдов</div>
+  </div>
+  <div class="slides-row">
+    <div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ЛАЙФХАК</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">⏱️</div>
+    <div class="t-headline" style="color:#CCFF00;text-shadow:0 0 15px #CCFF0055">Один промпт экономит мне 4 часа каждый день</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Использую его 6 месяцев. Сохрани — это работает для любой за…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">СУТЬ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🧠</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Что за промпт?</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Называю его 'Мастер-промпт'. Он заставляет ChatGPT думать ка…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">БЛОК 1</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🎭</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Часть 1: Роль и контекст</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">«Ты — эксперт в [НИША] с 10 годами опыта. Твоя аудитория — […</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">БЛОК 2</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">📋</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Часть 2: Задача и формат</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">«Твоя задача: [ЧТО НУЖНО]. Формат ответа: [КАК]. Объём: [СКО…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">БЛОК 3</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🚫</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Часть 3: Ограничения</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">«Не используй: воду, клише, общие фразы. Только конкретика с…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">БЛОК 4</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">✅</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Часть 4: Пример результата</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">«Вот пример ХОРОШЕГО результата: [ПРИМЕР]. Вот пример ПЛОХОГ…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ПРИМЕР</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">📱</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Пример: промпт для поста в Инстаграм</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">«Ты — SMM-эксперт. Аудитория: предприниматели 25-40. Боль: н…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">СРАВНЕНИЕ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">⚡</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Результат без промпта vs с промптом</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Без: общий текст, 20 минут правок
+С промптом: готово за 3 ми…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ПРИМЕНЕНИЕ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🎯</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Где ещё работает этот принцип?</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">✅ Email-рассылки
+✅ Коммерческие предложения
+✅ SEO-статьи
+✅ С…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">TELEGRAM</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">✈️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Полная библиотека из 50 промптов</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div>
+  </div>
+  <div class="caption-box">Промпт который экономит мне 4 часа каждый день 🤖
+
+Копируй. Вставляй. Работает для любой ниши.
+
+Сохрани — потеряешь 👆
+
+Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑<span class="cap-hash">
+
+#промпт #chatgpt #нейросети #ии #продуктивность #автоматизация #заработокнаии #лайфхак #нейросеть #aitools #искусственныйинтеллект #работа #фриланс #маркетинг #копирайтинг #контент #бизнес #эффективность #технологии #иидляработы</span></div>
+</div>
+<div class="divider"></div>
+<div class="post-block" id="post-6">
+  <div class="post-header">
+    <div class="pm">ПОСТ #7 · ДЕНЬ 3 · 09:00 МСК</div>
+    <span class="style-tag" style="background:#2D7FFF22;color:#2D7FFF;border:1px solid #2D7FFF44">Bebas3D</span>
+    <div class="ph">Мой ИИ-стек 2026: 7 инструментов каждый день</div>
+    <div class="pi">post_07 · 10 слайдов</div>
+  </div>
+  <div class="slides-row">
+    <div class="thumb" style="background:#0a0a1a;border-color:#2D7FFF33">
+    <div class="t-kicker" style="color:#2D7FFF">МОЙ СТЕК</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #2D7FFF88)">🛠️</div>
+    <div class="t-headline" style="color:#2D7FFF;text-shadow:0 0 15px #2D7FFF55">Мой ИИ-стек 2026: 7 инструментов каждый день</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">6500₽/мес на всё. Зарабатываю 200к+. Вот что использую 👇</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#2D7FFF,transparent)"></div>
+  </div><div class="thumb" style="background:#0a0a1a;border-color:#2D7FFF33">
+    <div class="t-kicker" style="color:#2D7FFF">ИНСТРУМЕНТ 1</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #2D7FFF88)">🤖</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">1. ChatGPT Plus — 2000₽/мес</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Мозг всей системы. Пишет, анализирует, планирует. Использую …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#2D7FFF,transparent)"></div>
+  </div><div class="thumb" style="background:#0a0a1a;border-color:#2D7FFF33">
+    <div class="t-kicker" style="color:#2D7FFF">ИНСТРУМЕНТ 2</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #2D7FFF88)">📝</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">2. Claude Pro — 2000₽/мес</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Длинные тексты, анализ документов, стратегия. Лучше ChatGPT …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#2D7FFF,transparent)"></div>
+  </div><div class="thumb" style="background:#0a0a1a;border-color:#2D7FFF33">
+    <div class="t-kicker" style="color:#2D7FFF">ИНСТРУМЕНТ 3</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #2D7FFF88)">🎨</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">3. Midjourney — 1200₽/мес</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Все картинки для постов, превью, обложки. 2 минуты вместо 2 …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#2D7FFF,transparent)"></div>
+  </div><div class="thumb" style="background:#0a0a1a;border-color:#2D7FFF33">
+    <div class="t-kicker" style="color:#2D7FFF">ИНСТРУМЕНТ 4</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #2D7FFF88)">🎬</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">4. Runway Gen-4 — бесплатно (пока)</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Видео из текста и картинок. Reels, сторис, рекламные ролики.…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#2D7FFF,transparent)"></div>
+  </div><div class="thumb" style="background:#0a0a1a;border-color:#2D7FFF33">
+    <div class="t-kicker" style="color:#2D7FFF">ИНСТРУМЕНТ 5</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #2D7FFF88)">👤</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">5. HeyGen — 0₽ (базовый план)</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Видео с аватаром на любом языке. Перевожу контент на английс…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#2D7FFF,transparent)"></div>
+  </div><div class="thumb" style="background:#0a0a1a;border-color:#2D7FFF33">
+    <div class="t-kicker" style="color:#2D7FFF">ИНСТРУМЕНТ 6</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #2D7FFF88)">🔍</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">6. Perplexity AI — бесплатно</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Исследования и актуальные данные. ChatGPT врёт про цифры — P…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#2D7FFF,transparent)"></div>
+  </div><div class="thumb" style="background:#0a0a1a;border-color:#2D7FFF33">
+    <div class="t-kicker" style="color:#2D7FFF">ИНСТРУМЕНТ 7</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #2D7FFF88)">⚙️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">7. Make.com — 0₽ (базовый план)</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Автоматизирует всё что можно. Постинг, уведомления, отчёты. …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#2D7FFF,transparent)"></div>
+  </div><div class="thumb" style="background:#0a0a1a;border-color:#2D7FFF33">
+    <div class="t-kicker" style="color:#2D7FFF">ЭКОНОМИЯ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #2D7FFF88)">💰</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Итого: 6500₽/мес</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Заменяет: копирайтера (50к) + дизайнера (60к) + видеографа (…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#2D7FFF,transparent)"></div>
+  </div><div class="thumb" style="background:#0a0a1a;border-color:#2D7FFF33">
+    <div class="t-kicker" style="color:#2D7FFF">TELEGRAM</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #2D7FFF88)">✈️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Полный гайд по каждому инструменту</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#2D7FFF,transparent)"></div>
+  </div>
+  </div>
+  <div class="caption-box">Мой ИИ-стек 2026: 7 инструментов которые использую каждый день 🛠️
+
+Трачу 6500₽ в месяц. Зарабатываю 200к+.
+
+Сохрани — это твоя точка старта 👆
+
+Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑<span class="cap-hash">
+
+#аистек #нейросети #ии #chatgpt #claude #midjourney #runway #heygen #инструменты #технологии #заработокнаии #автоматизация #нейросеть #aitools #искусственныйинтеллект #продуктивность #бизнес #фриланс #онлайнработа #иидляработы</span></div>
+</div>
+<div class="divider"></div>
+<div class="post-block" id="post-7">
+  <div class="post-header">
+    <div class="pm">ПОСТ #8 · ДЕНЬ 3 · 14:00 МСК</div>
+    <span class="style-tag" style="background:#11122;color:#111;border:1px solid #11144">SwissBold</span>
+    <div class="ph">Midjourney vs Flux vs Sora: честное сравнение</div>
+    <div class="pi">post_08 · 10 слайдов</div>
+  </div>
+  <div class="slides-row">
+    <div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">СРАВНЕНИЕ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">⚔️</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Midjourney vs Flux vs Sora: честное сравнение</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Потратил 3 дня и 5000₽ на тесты. Вот что реально работает дл…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">MIDJOURNEY</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">🎨</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Midjourney: король картинок</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Цена: $10/мес. Качество: 10/10. Скорость: 30 сек. Минус: тол…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">FLUX</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">⚡</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Flux: бесплатная альтернатива</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Цена: бесплатно (через API). Качество: 8/10. Скорость: 20 се…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">SORA</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">🎬</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Sora: революция в видео</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Цена: $20/мес (ChatGPT Plus). Качество: 9/10. До 20 сек виде…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">КОНТЕНТ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">📱</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Для заработка на контенте</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">🥇 Midjourney — картинки для постов
+🥈 Flux — бесплатные илл…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">ДИЗАЙН</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">💼</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Для дизайна и клиентов</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">🥇 Midjourney — клиенты платят за это
+🥈 Flux — быстрые конц…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">ВИДЕО</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">🎥</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Для продакшена видео</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">🥇 Sora — кинематографичное качество
+🥈 Runway Gen-4 — больш…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">ВЕРДИКТ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">🏆</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Мой вердикт: используй все три</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Midjourney для картинок. Flux когда нужно быстро и бесплатно…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">БУДУЩЕЕ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">🔮</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Что появится в 2026?</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Adobe Firefly Video, Google Veo 2, Pika 2.0 — конкуренция ра…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div><div class="thumb" style="background:#f5f5f0;border-color:#11133">
+    <div class="t-kicker" style="color:#111">TELEGRAM</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #11188)">✈️</div>
+    <div class="t-headline" style="color:#111;text-shadow:none">Сравнительные промпты для тестов</div>
+    <div class="t-body" style="color:rgba(0,0,0,.5)">Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#111,transparent)"></div>
+  </div>
+  </div>
+  <div class="caption-box">Midjourney vs Flux vs Sora: что выбрать для заработка в 2026? 🎨
+
+Протестировал все три. Потратил 3 дня и 5000₽. Вот честный вывод.
+
+Сохрани — сэкономишь деньги 👆
+
+Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑<span class="cap-hash">
+
+#midjourney #flux #sora #нейросети #ии #сравнение #генерацияизображений #видеоии #искусственныйинтеллект #aitools #нейросеть #заработокнаии #дизайн #контент #технологии #runway #генерациявидео #иидляработы #автоматизация #будущее</span></div>
+</div>
+<div class="divider"></div>
+<div class="post-block" id="post-8">
+  <div class="post-header">
+    <div class="pm">ПОСТ #9 · ДЕНЬ 3 · 20:00 МСК</div>
+    <span class="style-tag" style="background:#CCFF0022;color:#CCFF00;border:1px solid #CCFF0044">BrutalistNeon</span>
+    <div class="ph">Контент на неделю за 40 минут. Вот моя система</div>
+    <div class="pi">post_09 · 10 слайдов</div>
+  </div>
+  <div class="slides-row">
+    <div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">СИСТЕМА</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">⏱️</div>
+    <div class="t-headline" style="color:#CCFF00;text-shadow:0 0 15px #CCFF0055">Контент на неделю за 40 минут. Вот моя система</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">7 постов. 7 сторис. 3 Reels. Всё за 40 минут с ИИ. Копируй �…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ШАГ 1</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">📋</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Минута 1-10: Контент-план</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Промпт: «Придумай 7 тем для постов про [НИША] на неделю. Для…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ШАГ 2</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">✍️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Минута 10-20: Тексты постов</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">ChatGPT пишет 7 постов по шаблону. Я читаю, правлю интонацию…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ШАГ 3</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🎨</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Минута 20-30: Картинки и карусели</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Midjourney генерирует обложки. ChatGPT придумывает текст для…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ШАГ 4</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">📱</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Минута 30-35: Сторис</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">CapCut AI делает сторис из постов. Или просто переформатирую…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ШАГ 5</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🚀</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Минута 35-40: Публикация</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Make.com автоматически постит по расписанию. Оптимальное вре…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">СЕКРЕТ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">🔑</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Главный секрет: шаблоны</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">У меня 5 форматов постов. Каждую неделю просто меняю тему — …</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">РЕЗУЛЬТАТ</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">📈</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Что даёт эта система?</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Раньше: 10-15 часов в неделю на контент
+Сейчас: 40 минут
+Осв…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">ОШИБКА</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">⚠️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Самая частая ошибка</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Пытаются сделать всё вручную. ИИ — не угроза. ИИ — это ×10 к…</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div><div class="thumb" style="background:#080018;border-color:#CCFF0033">
+    <div class="t-kicker" style="color:#CCFF00">TELEGRAM</div>
+    <div class="t-emoji" style="filter:drop-shadow(0 0 6px #CCFF0088)">✈️</div>
+    <div class="t-headline" style="color:#fff;text-shadow:none">Шаблоны промптов и схему автоматизации</div>
+    <div class="t-body" style="color:rgba(255,255,255,.55)">Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑</div>
+    <div class="t-line" style="background:linear-gradient(90deg,transparent,#CCFF00,transparent)"></div>
+  </div>
+  </div>
+  <div class="caption-box">Как я делаю контент на целую неделю за 40 минут с ИИ 🚀
+
+Полная инструкция. Копируй систему.
+
+Сохрани — будешь возвращаться 👆
+
+Больше без воды — в моём Telegram. Ссылка в шапке профиля ↑<span class="cap-hash">
+
+#контентмейкинг #нейросети #ии #chatgpt #smm #инстаграм #контентплан #автоматизация #нейросеть #aitools #искусственныйинтеллект #продуктивность #блогинг #инстаблог #контент #маркетинг #иидляработы #заработокнаии #бизнесонлайн #лайфхак</span></div>
+</div>
+
+  </div>
+</div>
+
+<script>
+function showView(v){
+  document.getElementById('view-feed').style.display = v==='feed'?'block':'none';
+  document.getElementById('view-detail').style.display = v==='detail'?'block':'none';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&v==='feed')||(i===1&&v==='detail')));
+  if(v==='detail') document.getElementById('detail-meta').textContent='Все 9 постов';
+}
+function showPost(idx){
+  showView('detail');
+  setTimeout(()=>{
+    const el=document.getElementById('post-'+idx);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+    document.getElementById('detail-meta').textContent='Пост #'+(idx+1);
+  },50);
+}
+</script>
+</body></html>
