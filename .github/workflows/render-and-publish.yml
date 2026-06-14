@@ -77,6 +77,14 @@ jobs:
           echo "📋 Содержимое slides.json:"
           cat remotion-carousel/src/slides.json
 
+      - name: 🎵 Generate SFX (cyberpunk sound effects)
+        working-directory: remotion-carousel
+        run: |
+          echo "Генерирую звуковые эффекты через ffmpeg..."
+          node generate-sfx.mjs
+          echo "✅ SFX готовы:"
+          ls -lh public/sfx/
+
       - name: 🎬 Render individual slides (CPU)
         working-directory: remotion-carousel
         env:
