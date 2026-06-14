@@ -9,6 +9,7 @@ import { Style04 } from './styles/Style04';
 import { Style05 } from './styles/Style05';
 import { Style06 } from './styles/Style06';
 import { Style07 } from './styles/Style07';
+import type { SlideInput } from './theme';
 
 const defaultSlides: CarouselProps['slides'] = [
   {
@@ -30,14 +31,38 @@ const defaultSlides: CarouselProps['slides'] = [
   },
 ];
 
-const styleSlides = [
+const styleSlides: SlideInput[] = [
   { headline: 'Топ-5 нейросетей для видео в 2026', body: 'Sora, Runway, Kling — реальные кейсы с цифрами.', emoji: '🎬', bgColor: '#000', accentColor: '#2D7FFF', kicker: 'ШАГ 1' },
   { headline: 'Sora генерирует 1 мин видео за 3 мин', body: 'Цена: $0.15/сек. Уже используют 50k+ создателей.', emoji: '⚡', bgColor: '#000', accentColor: '#2D7FFF', kicker: 'ФАКТ' },
   { headline: 'Runway Gen-4 — 4K без артефактов', body: 'motion-brush управляет каждым объектом отдельно.', emoji: '🎥', bgColor: '#000', accentColor: '#2D7FFF', kicker: 'ТРЕНД' },
   { headline: 'Больше — в Telegram', body: 'Ссылка в шапке профиля ↓', emoji: '✈️', bgColor: '#000', accentColor: '#2AABEE', isLast: true, telegram: true, profileHandle: '@nikolay_cheusov' },
 ];
 
-const N = styleSlides.length;
+type SlidesOnly = { slides: SlideInput[] };
+
+// Wrapper-компоненты: Slide захардкожен внутри, не сериализуется через JSON
+// Это фикс React error #130 — компоненты теряются в inputProps IPC
+const Style01Carousel: React.FC<SlidesOnly> = ({ slides }) => (
+  <StyleCarousel slides={slides} Slide={Style01} bg="#0a0a1a" />
+);
+const Style02Carousel: React.FC<SlidesOnly> = ({ slides }) => (
+  <StyleCarousel slides={slides} Slide={Style02} bg="#fff0f5" />
+);
+const Style03Carousel: React.FC<SlidesOnly> = ({ slides }) => (
+  <StyleCarousel slides={slides} Slide={Style03} bg="#080018" />
+);
+const Style04Carousel: React.FC<SlidesOnly> = ({ slides }) => (
+  <StyleCarousel slides={slides} Slide={Style04} bg="#0d1117" />
+);
+const Style05Carousel: React.FC<SlidesOnly> = ({ slides }) => (
+  <StyleCarousel slides={slides} Slide={Style05} bg="#0a0a0a" />
+);
+const Style06Carousel: React.FC<SlidesOnly> = ({ slides }) => (
+  <StyleCarousel slides={slides} Slide={Style06} bg="#111" />
+);
+const Style07Carousel: React.FC<SlidesOnly> = ({ slides }) => (
+  <StyleCarousel slides={slides} Slide={Style07} bg="#f5f5f0" />
+);
 
 const Root: React.FC = () => (
   <>
@@ -47,101 +72,50 @@ const Root: React.FC = () => (
       defaultProps={{ slides: defaultSlides }}
       calculateMetadata={({ props }) => ({
         durationInFrames: props.slides.length * 150 - (props.slides.length - 1) * 10,
-        fps: 30,
-        width: 1080,
-        height: 1350,
+        fps: 30, width: 1080, height: 1350,
       })}
     />
-
-    {/* Стиль 01 — Bebas 3D Extrude / Electric Blue */}
     <Composition
       id="Style01-Bebas3D"
-      component={StyleCarousel}
-      defaultProps={{ slides: styleSlides, Slide: Style01 }}
-      calculateMetadata={({ props }) => ({
-        durationInFrames: carouselDuration(props.slides.length),
-        fps: 30,
-        width: 1080,
-        height: 1350,
-      })}
+      component={Style01Carousel}
+      defaultProps={{ slides: styleSlides }}
+      calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
     />
-
-    {/* Стиль 02 — Unbounded Candy Pop */}
     <Composition
       id="Style02-CandyPop"
-      component={StyleCarousel}
-      defaultProps={{ slides: styleSlides, Slide: Style02 }}
-      calculateMetadata={({ props }) => ({
-        durationInFrames: carouselDuration(props.slides.length),
-        fps: 30,
-        width: 1080,
-        height: 1350,
-      })}
+      component={Style02Carousel}
+      defaultProps={{ slides: styleSlides }}
+      calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
     />
-
-    {/* Стиль 03 — Brutalist Neon Grid */}
     <Composition
       id="Style03-BrutalistNeon"
-      component={StyleCarousel}
-      defaultProps={{ slides: styleSlides, Slide: Style03 }}
-      calculateMetadata={({ props }) => ({
-        durationInFrames: carouselDuration(props.slides.length),
-        fps: 30,
-        width: 1080,
-        height: 1350,
-      })}
+      component={Style03Carousel}
+      defaultProps={{ slides: styleSlides }}
+      calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
     />
-
-    {/* Стиль 04 — Glassmorphism */}
     <Composition
       id="Style04-Glassmorphism"
-      component={StyleCarousel}
-      defaultProps={{ slides: styleSlides, Slide: Style04 }}
-      calculateMetadata={({ props }) => ({
-        durationInFrames: carouselDuration(props.slides.length),
-        fps: 30,
-        width: 1080,
-        height: 1350,
-      })}
+      component={Style04Carousel}
+      defaultProps={{ slides: styleSlides }}
+      calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
     />
-
-    {/* Стиль 05 — Liquid Gradient Blobs */}
     <Composition
       id="Style05-LiquidBlobs"
-      component={StyleCarousel}
-      defaultProps={{ slides: styleSlides, Slide: Style05 }}
-      calculateMetadata={({ props }) => ({
-        durationInFrames: carouselDuration(props.slides.length),
-        fps: 30,
-        width: 1080,
-        height: 1350,
-      })}
+      component={Style05Carousel}
+      defaultProps={{ slides: styleSlides }}
+      calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
     />
-
-    {/* Стиль 06 — Retro VHS Chromatic */}
     <Composition
       id="Style06-RetroVHS"
-      component={StyleCarousel}
-      defaultProps={{ slides: styleSlides, Slide: Style06 }}
-      calculateMetadata={({ props }) => ({
-        durationInFrames: carouselDuration(props.slides.length),
-        fps: 30,
-        width: 1080,
-        height: 1350,
-      })}
+      component={Style06Carousel}
+      defaultProps={{ slides: styleSlides }}
+      calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
     />
-
-    {/* Стиль 07 — Swiss Bold Minimal */}
     <Composition
       id="Style07-SwissBold"
-      component={StyleCarousel}
-      defaultProps={{ slides: styleSlides, Slide: Style07 }}
-      calculateMetadata={({ props }) => ({
-        durationInFrames: carouselDuration(props.slides.length),
-        fps: 30,
-        width: 1080,
-        height: 1350,
-      })}
+      component={Style07Carousel}
+      defaultProps={{ slides: styleSlides }}
+      calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
     />
   </>
 );
