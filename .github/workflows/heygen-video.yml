@@ -1,0 +1,271 @@
+name: HeyGen — Video Carousel Generator
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Тема видео (напр: Топ-5 нейросетей для видео 2026)'
+        required: true
+        default: 'Топ-5 нейросетей для создания видео в 2026'
+      avatar_id:
+        description: 'HeyGen Avatar ID (default: Kristin - professional female)'
+        required: false
+        default: 'Kristin_public_2_20240108'
+      voice_id:
+        description: 'HeyGen Voice ID (Russian)'
+        required: false
+        default: 'ru-RU-SvetlanaNeural'
+      slides:
+        description: 'Количество слайдов (5-8)'
+        required: false
+        default: '6'
+
+jobs:
+  generate-video:
+    runs-on: ubuntu-latest
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      HEYGEN_API_KEY: ${{ secrets.HEYGEN_API_KEY }}
+      TOPIC: ${{ inputs.topic }}
+      AVATAR_ID: ${{ inputs.avatar_id }}
+      VOICE_ID: ${{ inputs.voice_id }}
+      SLIDES: ${{ inputs.slides }}
+
+    steps:
+      - name: "🎥 HeyGen Video Carousel Generator"
+        run: |
+          python3 << 'PYEOF'
+          import json, urllib.request, os, time
+
+          OR_KEY     = os.environ["OPENROUTER_API_KEY"]
+          HG_KEY     = os.environ["HEYGEN_API_KEY"]
+          TOPIC      = os.environ["TOPIC"]
+          AVATAR_ID  = os.environ["AVATAR_ID"]
+          VOICE_ID   = os.environ["VOICE_ID"]
+          SLIDES     = int(os.environ.get("SLIDES", "6"))
+
+          # ──────────────────────────────────────────
+          # ШАГ 1: Генерация скрипта через OpenRouter
+          # ──────────────────────────────────────────
+          print("═" * 60)
+          print("  🎥 HEYGEN VIDEO CAROUSEL GENERATOR")
+          print("═" * 60)
+          print(f"  Тема: {TOPIC}")
+          print(f"  Слайдов: {SLIDES}")
+          print()
+
+          print("🧠 [ШАГ 1] Генерирую скрипт видео...")
+
+          def openrouter(system, user):
+              payload = json.dumps({
+                  "model": "google/gemini-3.1-flash-image-preview",
+                  "temperature": 0.8,
+                  "max_tokens": 3000,
+                  "messages": [
+                      {"role": "system", "content": system},
+                      {"role": "user",   "content": user}
+                  ]
+              }).encode()
+              req = urllib.request.Request(
+                  "https://openrouter.ai/api/v1/chat/completions",
+                  data=payload,
+                  headers={
+                      "Authorization": f"Bearer {OR_KEY}",
+                      "Content-Type": "application/json",
+                      "HTTP-Referer": "https://github.com/cheusovn/instagram-mcp",
+                      "X-Title": "HeyGenCarousel"
+                  }
+              )
+              with urllib.request.urlopen(req, timeout=90) as r:
+                  return json.loads(r.read())["choices"][0]["message"]["content"]
+
+          script_raw = openrouter(
+              """Ты — эксперт по нейросетям. Пишешь короткие вирусные скрипты для Instagram-видео.
+              Стиль: энергично, быстро, с цифрами и фактами. Аудитория: русскоязычные 25-40 лет интересующиеся ИИ.
+              Отвечай обязательно в JSON.""",
+              f"""Тема: "{TOPIC}"
+
+Сгенерируй скрипт для видео карусели из {SLIDES} сцен.
+Отвечай строго в JSON без комментариев:
+
+{{
+  "title": "название видео",
+  "scenes": [
+    {{
+      "scene_number": 1,
+      "headline": "заголовок для отображения на экране (max 8 слов)",
+      "script": "что говорит аватар (1-2 предложения, 10-15 секунд воиспроизведения)",
+      "duration": 10,
+      "background_color": "#0a0a1a"
+    }}
+  ],
+  "cta_word": "слово для CTA в комментах",
+  "caption": "полный caption для Instagram поста"
+}}
+
+Сцена 1 = хук (шокирующий факт)
+Сцены 2-{SLIDES-1} = ценный контент с реальными фактами
+Сцена {SLIDES} = Telegram CTA (ссылка в шапке профиля)"""
+          )
+
+          # Парсим JSON
+          try:
+              # чистим от markdown-блоков
+              clean = script_raw.strip()
+              if clean.startswith("```"):
+                  clean = clean.split("```")[1]
+                  if clean.startswith("json"):
+                      clean = clean[4:]
+              if clean.endswith("```"):
+                  clean = clean[:-3]
+              script = json.loads(clean.strip())
+          except Exception as e:
+              print(f"  ❌ Ошибка парсинга JSON: {e}")
+              print(f"  Сырой ответ: {script_raw[:500]}")
+              raise
+
+          print(f"  ✅ Скрипт готов: {len(script.get('scenes', []))} сцен")
+          print(f"  Заголовок: {script.get('title', '')}")
+          print(f"  CTA-слово: {script.get('cta_word', '')}")
+          print()
+
+          # ──────────────────────────────────────────
+          # ШАГ 2: Сборка HeyGen API payload
+          # ──────────────────────────────────────────
+          print("🎥 [ШАГ 2] Создаю видео в HeyGen...")
+
+          scenes = script.get("scenes", [])
+          video_inputs = []
+          bg_colors = ["#0a0a1a", "#0d0d2b", "#0a1628", "#0f0a1e", "#0a1a0f", "#1a0a0a"]
+
+          for i, scene in enumerate(scenes):
+              bg_color = scene.get("background_color", bg_colors[i % len(bg_colors)])
+              scene_script = scene.get("script", "")
+              headline    = scene.get("headline", "")
+              duration    = scene.get("duration", 8)
+
+              video_input = {
+                  "character": {
+                      "type": "avatar",
+                      "avatar_id": AVATAR_ID,
+                      "avatar_style": "normal",
+                      "scale": 0.6,
+                      "offset": {"x": 0.5, "y": 0.8}  # аватар внизу
+                  },
+                  "voice": {
+                      "type": "text",
+                      "input_text": scene_script,
+                      "voice_id": VOICE_ID,
+                      "speed": 1.05
+                  },
+                  "background": {
+                      "type": "color",
+                      "value": bg_color
+                  },
+                  "title": headline,
+                  "script": scene_script
+              }
+              video_inputs.append(video_input)
+
+          heygen_payload = {
+              "video_inputs": video_inputs,
+              "dimension": {
+                  "width": 1080,
+                  "height": 1920
+              },
+              "title": script.get("title", TOPIC),
+              "caption": False,
+              "callback_id": ""
+          }
+
+          # ──────────────────────────────────────────
+          # ШАГ 3: Отправка в HeyGen API
+          # ──────────────────────────────────────────
+          def heygen_post(path, data):
+              req = urllib.request.Request(
+                  f"https://api.heygen.com{path}",
+                  data=json.dumps(data).encode(),
+                  headers={
+                      "X-Api-Key": HG_KEY,
+                      "Content-Type": "application/json"
+                  }
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      return json.loads(r.read())
+              except urllib.error.HTTPError as e:
+                  body = e.read().decode()
+                  print(f"  ❌ HeyGen HTTP {e.code}: {body[:500]}")
+                  raise
+
+          def heygen_get(path):
+              req = urllib.request.Request(
+                  f"https://api.heygen.com{path}",
+                  headers={"X-Api-Key": HG_KEY}
+              )
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return json.loads(r.read())
+
+          # Создаём видео
+          create_resp = heygen_post("/v2/video/generate", heygen_payload)
+          video_id = create_resp.get("data", {}).get("video_id") or create_resp.get("video_id")
+
+          if not video_id:
+              print(f"  ❌ Ошибка HeyGen: {create_resp}")
+              raise Exception("No video_id in response")
+
+          print(f"  ✅ Видео запущено. ID: {video_id}")
+          print()
+
+          # ──────────────────────────────────────────
+          # ШАГ 4: Ожидание готовности
+          # ──────────────────────────────────────────
+          print("⏳ [ШАГ 3] Жду генерацию видео (3-8 мин)...")
+
+          max_wait = 600  # 10 минут
+          elapsed  = 0
+          interval = 15
+
+          while elapsed < max_wait:
+              time.sleep(interval)
+              elapsed += interval
+              status_resp = heygen_get(f"/v1/video_status.get?video_id={video_id}")
+              status = status_resp.get("data", {}).get("status") or status_resp.get("status", "")
+              print(f"  [{elapsed}s] Статус: {status}")
+
+              if status == "completed":
+                  video_url = (status_resp.get("data", {}).get("video_url")
+                               or status_resp.get("video_url", ""))
+                  thumbnail  = (status_resp.get("data", {}).get("thumbnail_url")
+                               or status_resp.get("thumbnail_url", ""))
+                  break
+              elif status in ("failed", "error"):
+                  print(f"  ❌ HeyGen ошибка: {status_resp}")
+                  raise Exception(f"Video generation failed: {status}")
+          else:
+              print("  ⚠️ Таймаут (10 мин). Проверь вручную: https://app.heygen.com/videos")
+              raise Exception("Timeout")
+
+          # ──────────────────────────────────────────
+          # РЕЗУЛЬТАТ
+          # ──────────────────────────────────────────
+          print()
+          print("═" * 60)
+          print("  ✅ ВИДЕО ГОТОВО!")
+          print("═" * 60)
+          print(f"  🎥 Скачать MP4:")
+          print(f"  {video_url}")
+          if thumbnail:
+              print(f"  🖼️  Превью:")
+              print(f"  {thumbnail}")
+          print()
+          print(f"  🔗 HeyGen кабинет: https://app.heygen.com/videos")
+          print()
+          print("  ━" * 30)
+          print("  📝 CAPTION ДЛЯ ПОСТА:")
+          print("  ━" * 30)
+          print(script.get("caption", ""))
+          print()
+          print(f"  🏷️  CTA-слово: {script.get('cta_word', '')}")    
+          print("═" * 60)
+          PYEOF
