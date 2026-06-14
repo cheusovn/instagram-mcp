@@ -34,8 +34,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
-      INSTAGRAM_TOKEN: ${{ secrets.INSTAGRAM_TOKEN }}
+      INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
+      INSTAGRAM_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
 
     steps:
       - name: Checkout

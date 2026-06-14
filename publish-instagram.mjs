@@ -24,16 +24,15 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ── Config ──────────────────────────────────────────────────────────────────
-const IG_USER_ID = process.env.INSTAGRAM_USER_ID;
-const ACCESS_TOKEN = process.env.INSTAGRAM_TOKEN;
+const IG_USER_ID = process.env.INSTAGRAM_USER_ID || process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID;
+const ACCESS_TOKEN = process.env.INSTAGRAM_TOKEN || process.env.INSTAGRAM_ACCESS_TOKEN;
 
 const postFile = process.argv[process.argv.indexOf('--post') + 1];
 const videoUrl = process.argv[process.argv.indexOf('--video') + 1]
   || process.env.VIDEO_URL;
 
 if (!IG_USER_ID || !ACCESS_TOKEN) {
-  console.error('❌ Нужны переменные: INSTAGRAM_USER_ID и INSTAGRAM_TOKEN');
-  console.error('   Получи их: https://developers.facebook.com/docs/instagram-platform');
+  console.error('❌ Нужны secrets: INSTAGRAM_BUSINESS_ACCOUNT_ID и INSTAGRAM_ACCESS_TOKEN');
   process.exit(1);
 }
 
