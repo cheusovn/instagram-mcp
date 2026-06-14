@@ -13,7 +13,7 @@ on:
         default: '8'
         type: string
       palette:
-        description: 'Цветовая схема'
+        description: 'Цветовая схема (для оригинальной Carousel)'
         required: false
         default: 'dark-blue'
         type: choice
@@ -25,6 +25,20 @@ on:
           - dark-orange
           - neon-pink
           - gold-black
+      style:
+        description: 'Стиль карусели (оставь пусто = оригинальный Carousel)'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - Style01_Bebas3D
+          - Style02_CandyPop
+          - Style03_BrutalistNeon
+          - Style04_Glassmorphism
+          - Style05_LiquidBlobs
+          - Style06_RetroVHS
+          - Style07_SwissBold
 
 jobs:
   generate-and-render:
@@ -176,7 +190,9 @@ jobs:
           PYEOF
 
       - name: Render with Remotion
-        run: node --experimental-vm-modules render.mjs ../out/carousel.mp4
+        env:
+          COMPOSITION_ID: ${{ inputs.style != '' && inputs.style || 'Carousel' }}
+        run: node --experimental-vm-modules render.mjs ../out/carousel.mp4 "$COMPOSITION_ID"
 
       - name: Show slides summary
         run: |
