@@ -1,12 +1,8 @@
 {
   "mcpServers": {
-    "instagram": {
-      "command": "npx",
-      "args": ["-y", "@mcpware/instagram-mcp"],
-      "env": {
-        "INSTAGRAM_ACCESS_TOKEN": "",
-        "INSTAGRAM_ACCOUNT_ID": ""
-      }
+    "instagram-gumloop": {
+      "type": "sse",
+      "url": "https://mcp.gumloop.com/instagram/mcp"
     }
   }
 }
