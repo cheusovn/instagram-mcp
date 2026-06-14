@@ -59,15 +59,15 @@ jobs:
         run: |
           echo "=== EXISTING TOPICS ==="
           python3 -c "
-import re
-try:
-    with open('../CONTENT_LOG.md', encoding='utf-8') as f:
-        log = f.read()
-    topics = re.findall(r'- \\*\\*Слайды:\\*\\* (.+)', log)
-    print(f'Already used {len(topics)} carousels:')
-    for t in topics[-5:]: print(f'  - {t[:80]}')
-except: print('No log yet')
-"
+          import re
+          try:
+              with open('../CONTENT_LOG.md', encoding='utf-8') as f:
+                  log = f.read()
+              topics = re.findall(r'- \\*\\*Слайды:\\*\\* (.+)', log)
+              print(f'Already used {len(topics)} carousels:')
+              for t in topics[-5:]: print(f'  - {t[:80]}')
+          except: print('No log yet')
+          "
 
       - name: Generate slides via OpenRouter
         env:
