@@ -1,0 +1,166 @@
+name: 🎬 Remotion Video Carousel
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Тема карусели (например: 5 нейросетей для заработка)'
+        required: true
+        type: string
+      slides:
+        description: 'Количество слайдов (5-10)'
+        required: false
+        default: '8'
+        type: string
+      palette:
+        description: 'Цветовая схема'
+        required: false
+        default: 'dark-blue'
+        type: choice
+        options:
+          - dark-blue
+          - dark-purple
+          - dark-green
+          - dark-red
+          - dark-orange
+          - neon-pink
+          - gold-black
+
+jobs:
+  generate-and-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: remotion-carousel
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Chrome dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+            libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 \
+            libxrandr2 libgbm1 libasound2t64 libpango-1.0-0 \
+            libcairo2 libatspi2.0-0
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate slides via OpenRouter
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          TOPIC: ${{ inputs.topic }}
+          SLIDES: ${{ inputs.slides }}
+          PALETTE: ${{ inputs.palette }}
+        run: |
+          python3 << 'PYEOF'
+          import os, json, urllib.request
+
+          TOPIC = os.environ['TOPIC']
+          N = int(os.environ.get('SLIDES', '8'))
+          PALETTE = os.environ.get('PALETTE', 'dark-blue')
+          API_KEY = os.environ['OPENROUTER_API_KEY']
+          MODEL = 'google/gemini-flash-1.5'
+
+          PALETTES = {
+              'dark-blue':   {'bg': 'linear-gradient(160deg,#0a0a1a,#0d1a3a)', 'bg2': 'linear-gradient(160deg,#050510,#0a1428)', 'accent': '#00d4ff', 'accent2': '#4488ff'},
+              'dark-purple': {'bg': 'linear-gradient(160deg,#0a0a1a,#1a0a2e)', 'bg2': 'linear-gradient(160deg,#080810,#150a20)', 'accent': '#c084fc', 'accent2': '#a855f7'},
+              'dark-green':  {'bg': 'linear-gradient(160deg,#050f0a,#0a1e0f)', 'bg2': 'linear-gradient(160deg,#040a06,#081508)', 'accent': '#22c55e', 'accent2': '#16a34a'},
+              'dark-red':    {'bg': 'linear-gradient(160deg,#120505,#2a0a0a)', 'bg2': 'linear-gradient(160deg,#0a0303,#1e0707)', 'accent': '#ff4444', 'accent2': '#ef4444'},
+              'dark-orange': {'bg': 'linear-gradient(160deg,#0f0800,#1e1000)', 'bg2': 'linear-gradient(160deg,#0a0500,#150b00)', 'accent': '#f97316', 'accent2': '#ea580c'},
+              'neon-pink':   {'bg': 'linear-gradient(160deg,#0f0014,#1a0028)', 'bg2': 'linear-gradient(160deg,#0a0010,#12001e)', 'accent': '#ff0080', 'accent2': '#e1005a'},
+              'gold-black':  {'bg': 'linear-gradient(160deg,#0a0800,#1a1400)', 'bg2': 'linear-gradient(160deg,#060500,#100e00)', 'accent': '#fbbf24', 'accent2': '#d97706'},
+          }
+
+          pal = PALETTES.get(PALETTE, PALETTES['dark-blue'])
+
+          def call_openrouter(prompt):
+              data = json.dumps({'model': MODEL, 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 3000}).encode()
+              req = urllib.request.Request(
+                  'https://openrouter.ai/api/v1/chat/completions', data=data,
+                  headers={'Authorization': f'Bearer {API_KEY}', 'Content-Type': 'application/json',
+                           'HTTP-Referer': 'https://github.com/cheusovn/instagram-mcp'})
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  return json.loads(r.read())['choices'][0]['message']['content']
+
+          # Agent 0: Facts
+          facts_raw = call_openrouter(f"""Ты эксперт по нейросетям и ИИ-инструментам. Тема: {TOPIC}
+          Дай {N-1} реальных, проверенных, интересных факта/совета с конкретными цифрами, названиями, датами.
+          Формат: JSON массив [{"headline": "...", "body": "...", "emoji": "..."}]
+          - headline: цепляющий заголовок макс 8 слов (русский)
+          - body: 1-2 предложения с конкретным фактом/цифрой (макс 25 слов)
+          - emoji: 1 подходящий emoji
+          Только JSON, без markdown.""")
+
+          raw = facts_raw.strip()
+          if raw.startswith('```'):
+              raw = raw.split('```')[1]
+              if raw.startswith('json'): raw = raw[4:]
+          facts = json.loads(raw.strip().rstrip('`').strip())
+
+          slides = []
+          for i, f in enumerate(facts[:N-1]):
+              slides.append({
+                  'headline': f['headline'], 'body': f['body'], 'emoji': f.get('emoji','✨'),
+                  'bgColor': pal['bg'] if i%2==0 else pal['bg2'],
+                  'accentColor': pal['accent'] if i%2==0 else pal['accent2'],
+              })
+
+          # Last slide: CTA
+          slides.append({
+              'headline': 'Хочешь ещё больше?',
+              'body': '• ежедневные фишки и промпты\n• разборы ИИ-инструментов\n• кейсы + шаблоны',
+              'emoji': '🔥',
+              'bgColor': 'linear-gradient(160deg,#0a0a1a,#1a0a2e 50%,#0d1a3a)',
+              'accentColor': pal['accent'],
+              'isLast': True,
+          })
+
+          with open('src/slides.json', 'w', encoding='utf-8') as f:
+              json.dump({'slides': slides}, f, ensure_ascii=False, indent=2)
+          print(f'✅ {len(slides)} slides generated')
+
+          # Caption
+          caption = call_openrouter(f"""Напиши цепляющую подпись для Instagram поста о: {TOPIC}
+          - Первая строка — крюк (вопрос или неожиданный факт), макс 15 слов
+          - 2-3 строки пользы
+          - 5-7 хэштегов (#нейросети #ИИ и релевантные)
+          - Последняя строка: ⬇️ Больше — в Telegram. Ссылка в шапке профиля.
+          Только текст подписи, без пояснений.""")
+          with open('/tmp/caption.txt', 'w', encoding='utf-8') as f:
+              f.write(caption)
+          print('📝 Caption ready')
+          PYEOF
+
+      - name: Render with Remotion
+        run: node --experimental-vm-modules render.mjs ../out/carousel.mp4
+
+      - name: Show caption
+        run: |
+          echo "=========================================="
+          echo "📋 CAPTION FOR INSTAGRAM:"
+          echo "=========================================="
+          cat /tmp/caption.txt
+
+      - name: Upload MP4
+        uses: actions/upload-artifact@v4
+        with:
+          name: carousel-${{ inputs.palette }}-${{ github.run_number }}
+          path: out/carousel.mp4
+          retention-days: 7
+
+      - name: Upload caption
+        uses: actions/upload-artifact@v4
+        with:
+          name: caption-${{ github.run_number }}
+          path: /tmp/caption.txt
+          retention-days: 7
