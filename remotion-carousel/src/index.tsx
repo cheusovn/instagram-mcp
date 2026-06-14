@@ -1,23 +1,30 @@
+import React from 'react';
 import { registerRoot, Composition } from 'remotion';
-import { Carousel } from './Carousel';
-import slidesData from './slides.json';
+import { Carousel, type CarouselProps } from './Carousel';
 
-const SLIDES_COUNT = slidesData.slides.length;
-const FPS = 30;
-const SLIDE_DURATION = 150;
-const TRANSITION = 10;
-const TOTAL_FRAMES = SLIDES_COUNT * SLIDE_DURATION - (SLIDES_COUNT - 1) * TRANSITION;
+// Placeholder — перезаписывается при рендере через inputProps
+const defaultSlides: CarouselProps['slides'] = [
+  {
+    headline: 'Топ-10 нейросетей 2026',
+    body: 'Запусти content-factory.yml чтобы сгенерировать карусель',
+    emoji: '🚀',
+    bgColor: 'linear-gradient(160deg, #020d00 0%, #0a2200 40%, #001a00 100%)',
+    accentColor: '#39FF14',
+  },
+];
 
-export const RemotionRoot: React.FC = () => (
+const Root: React.FC = () => (
   <Composition
     id="Carousel"
     component={Carousel}
-    durationInFrames={TOTAL_FRAMES}
-    fps={FPS}
-    width={1080}
-    height={1920}
-    defaultProps={{ slides: slidesData.slides }}
+    defaultProps={{ slides: defaultSlides }}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: props.slides.length * 150 - (props.slides.length - 1) * 10,
+      fps: 30,
+      width: 1080,
+      height: 1920,
+    })}
   />
 );
 
-registerRoot(RemotionRoot);
+registerRoot(Root);
