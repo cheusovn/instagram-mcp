@@ -285,8 +285,17 @@ export const Style03: React.FC<SlideData> = (props) => {
 
   return (
     <AbsoluteFill style={{ background: bg, opacity: fadeOut, overflow: 'hidden', transform: `translate(${gx}px, ${gy}px)` }}>
+      {/* AI-фон от Nano Banana (когда image URL передан через slides.json) */}
+      {image && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <KenBurnsImage src={image} style={{ width: '100%', height: '100%' }} />
+          {/* Cyberpunk color grade overlay поверх AI-фона */}
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(8,0,24,0.55) 0%, rgba(22,0,58,0.45) 40%, rgba(10,0,28,0.6) 100%)', mixBlendMode: 'multiply' }} />
+          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 20% 30%, ${withAlpha(accent, 0.12)} 0%, transparent 55%), radial-gradient(ellipse at 80% 70%, ${withAlpha(MAGENTA, 0.1)} 0%, transparent 50%)` }} />
+        </div>
+      )}
       {/* Фон */}
-      <NeonGrid accent={accent} opacity={0.15} />
+      <NeonGrid accent={accent} opacity={image ? 0.08 : 0.15} />
       <EnergyParticles frame={frame} fps={fps} slideNum={slideNum} accent={accent} />
       <ScanlineSweep frame={frame} accent={accent} />
       <GlitchBurst frame={frame} slideNum={slideNum} />
