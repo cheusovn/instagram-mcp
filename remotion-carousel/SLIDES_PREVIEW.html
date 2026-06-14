@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview — Post #1 · @nikolay_cheusov</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0010; color: #fff; font-family: 'Oswald', sans-serif; padding: 40px 20px; }
+  h1 { text-align: center; font-size: 28px; color: #00F0FF; letter-spacing: 4px; margin-bottom: 8px; text-shadow: 0 0 20px #00F0FF; }
+  .subtitle { text-align: center; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.4); font-size: 13px; letter-spacing: 2px; margin-bottom: 40px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
+  .slide {
+    width: 100%;
+    aspect-ratio: 4/5;
+    background: linear-gradient(135deg, #080018 0%, #16003a 40%, #0a001c 70%, #000a20 100%);
+    border: 1px solid rgba(0,240,255,0.2);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .slide:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(0,240,255,0.3); }
+
+  /* Neon grid */
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,240,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,0.06) 1px, transparent 1px);
+    background-size: 27px 27px;
+    z-index: 1;
+  }
+
+  /* Corner markers */
+  .slide::after {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px;
+    width: 16px; height: 16px;
+    border-top: 2px solid #00F0FF;
+    border-left: 2px solid #00F0FF;
+    z-index: 10;
+  }
+
+  .corner-br {
+    position: absolute;
+    bottom: 8px; right: 8px;
+    width: 16px; height: 16px;
+    border-bottom: 2px solid #00F0FF;
+    border-right: 2px solid #00F0FF;
+    z-index: 10;
+  }
+  .corner-tr {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 16px; height: 16px;
+    border-top: 2px solid #FF2BD6;
+    border-right: 2px solid #FF2BD6;
+    z-index: 10;
+  }
+  .corner-bl {
+    position: absolute;
+    bottom: 8px; left: 8px;
+    width: 16px; height: 16px;
+    border-bottom: 2px solid #FF2BD6;
+    border-left: 2px solid #FF2BD6;
+    z-index: 10;
+  }
+
+  .inner { position: absolute; inset: 0; z-index: 5; padding: 16px; display: flex; flex-direction: column; }
+
+  /* Header */
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .brand { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: rgba(0,240,255,0.7); letter-spacing: 2px; }
+  .slide-num { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); }
+
+  /* Progress bar */
+  .progress-track { height: 2px; background: rgba(255,255,255,0.1); border-radius: 1px; margin-bottom: 8px; }
+  .progress-fill { height: 100%; background: #00F0FF; border-radius: 1px; box-shadow: 0 0 6px #00F0FF; }
+
+  /* Kicker */
+  .kicker {
+    display: inline-block;
+    align-self: flex-start;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #FF2BD6;
+    border: 1px solid #FF2BD6;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    box-shadow: 0 0 8px rgba(255,43,214,0.3);
+    margin-bottom: 8px;
+    text-shadow: 0 0 6px #FF2BD6;
+  }
+
+  /* Emoji box */
+  .emoji-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    font-size: 28px;
+    border: 2px solid #00F0FF;
+    box-shadow: 0 0 14px #00F0FF, 3px 3px 0 #FF2BD6;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+    background: rgba(0,240,255,0.05);
+  }
+
+  /* Headline */
+  .headline {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    text-transform: uppercase;
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: 2px 0 #FF2BD6, -2px 0 rgba(0,240,255,0.5);
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .headline .highlight {
+    color: #000;
+    background: #00F0FF;
+    padding: 0 4px;
+    box-shadow: 0 0 14px #00F0FF, 2px 2px 0 #FF2BD6;
+    display: inline;
+  }
+
+  /* Body card */
+  .body-card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(8px);
+    border: 1px solid #00F0FF;
+    border-radius: 6px;
+    box-shadow: 0 0 12px rgba(0,240,255,0.2);
+    padding: 8px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    color: rgba(255,255,255,0.88);
+    line-height: 1.6;
+    border-left: 2px solid #FF2BD6;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* Data tags */
+  .tags { display: flex; gap: 5px; margin-top: 6px; flex-wrap: nowrap; }
+  .tag {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1.4;
+    box-shadow: 0 0 6px currentColor;
+  }
+  .tag .tag-label { opacity: 0.7; display: block; }
+  .tag .tag-val { font-size: 11px; font-weight: 700; display: block; }
+  .tag-handle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #FFE600;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    color: #FFE600;
+    box-shadow: 0 0 6px #FFE600;
+    background: rgba(255,230,0,0.04);
+    padding: 3px 5px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* CTA slide special */
+  .slide.cta { border-color: rgba(42,171,238,0.5); }
+  .cta-inner {
+    position: absolute; inset: 0; z-index: 5;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px; gap: 14px;
+  }
+  .tg-card {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid #2AABEE;
+    border-radius: 10px;
+    box-shadow: 0 0 24px rgba(42,171,238,0.4), inset 0 0 16px rgba(42,171,238,0.06);
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .tg-icon { font-size: 38px; filter: drop-shadow(0 0 12px #2AABEE); }
+  .tg-headline {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    text-transform: uppercase;
+    color: #fff;
+    text-align: center;
+    line-height: 1.2;
+    text-shadow: 2px 0 #2AABEE, -2px 0 rgba(42,171,238,0.4);
+  }
+  .tg-headline span { color: #2AABEE; text-shadow: 0 0 14px #2AABEE; }
+  .tg-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 3px;
+    text-align: center;
+  }
+  .ig-mock {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(42,171,238,0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ig-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #2AABEE, #FF2BD6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .ig-info { flex: 1; }
+  .ig-handle { font-family: 'Oswald', sans-serif; font-size: 12px; color: #2AABEE; letter-spacing: 1px; }
+  .ig-sub-text { font-family: 'JetBrains Mono', monospace; font-size: 7px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .ig-follow {
+    background: #2AABEE; color: #000; font-family: 'Oswald', sans-serif;
+    font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* Scanline animation */
+  @keyframes scan { 0% { top: 100% } 100% { top: -5% } }
+  .scanline {
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: #00F0FF;
+    box-shadow: 0 0 8px #00F0FF;
+    opacity: 0.5;
+    animation: scan 3s linear infinite;
+    z-index: 8;
+  }
+
+  /* Slide number badge */
+  .slide-badge {
+    position: absolute;
+    top: 8px; right: 26px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    color: rgba(255,255,255,0.3);
+    z-index: 15;
+    letter-spacing: 1px;
+  }
+
+  .section-label {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 4px;
+    margin: 30px 0 16px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<h1>◈ ПОСТ #1 — ДЕНЬ 1 · 09:00</h1>
+<p class="subtitle">«10 НЕЙРОСЕТЕЙ ЗАМЕНЯЮТ ЦЕЛУЮ КОМАНДУ» · STYLE03 BRUTALIST NEON · 10 СЛАЙДОВ × 4 СЕК</p>
+
+<div class="section-label">▸ ПРЕДПРОСМОТР ВСЕХ 10 СЛАЙДОВ ▸</div>
+
+<div class="grid">
+
+  <!-- СЛАЙД 1 — КРЮЧОК -->
+  <div class="slide">
+    <div class="corner-br"></div><div class="corner-tr"></div><div class="corner-bl"></div>
+    <div class="scanline" style="animation-delay:0s"></div>
+    <div class="inner">
+      <div class="header">
+        <span class="brand">@nikolay_cheusov</span>
+        <span class="slide-num">1/10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:10%"></div></div>
+      <div class="kicker">ПОСТ #1 · ДЕНЬ 1</div>
+      <div class="emoji-box">🤖</div>
+      <div class="headline"><span class="highlight">10</span> НЕЙРОСЕТЕЙ ЗАМЕНЯЮТ ЦЕЛУЮ КОМАНДУ</div>
+      <div class="body-card">▶ Сохрани — используй уже сегодня.</div>
+      <div class="tags">
+        <div class="tag" style="color:#00F0FF"><span class="tag-label">СЛАЙД</span><span class="tag-val">1/10</span></div>
+        <div class="tag" style="color:#FF2BD6"><span class="tag-label">2026</span><span class="tag-val">AI↑</span></div>
+        <div class="tag" style="color:#00FF9F"><span class="tag-label">TG</span><span class="tag-val">⇩</span></div>
+        <div class="tag-handle">@nikolay_cheusov</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СЛАЙД 2 — БОЛЬ -->
+  <div class="slide">
+    <div class="corner-br"></div><div class="corner-tr"></div><div class="corner-bl"></div>
+    <div class="scanline" style="animation-delay:0.5s"></div>
+    <div class="inner">
+      <div class="header">
+        <span class="brand">@nikolay_cheusov</span>
+        <span class="slide-num">2/10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:20%"></div></div>
+      <div class="kicker">SYS://SLIDE_02</div>
+      <div class="emoji-box">👥</div>
+      <div class="headline">РАНЬШЕ НУЖНА БЫЛА <span class="highlight">КОМАНДА</span></div>
+      <div class="body-card">▶ Копирайтер · Дизайнер · Монтажёр<br>Таргетолог · Ассистент · Аналитик<br><br>Сейчас — один человек + ИИ.</div>
+      <div class="tags">
+        <div class="tag" style="color:#00F0FF"><span class="tag-label">СЛАЙД</span><span class="tag-val">2/10</span></div>
+        <div class="tag" style="color:#FF2BD6"><span class="tag-label">2026</span><span class="tag-val">AI↑</span></div>
+        <div class="tag" style="color:#00FF9F"><span class="tag-label">TG</span><span class="tag-val">⇩</span></div>
+        <div class="tag-handle">@nikolay_cheusov</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СЛАЙД 3 — ChatGPT -->
+  <div class="slide">
+    <div class="corner-br"></div><div class="corner-tr"></div><div class="corner-bl"></div>
+    <div class="scanline" style="animation-delay:1s"></div>
+    <div class="inner">
+      <div class="header">
+        <span class="brand">@nikolay_cheusov</span>
+        <span class="slide-num">3/10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:30%"></div></div>
+      <div class="kicker">ТЕКСТЫ</div>
+      <div class="emoji-box">💬</div>
+      <div class="headline"><span class="highlight">CHATGPT</span></div>
+      <div class="body-card">▶ Пишет тексты, письма, скрипты продаж.<br>Экономит 3–4 часа каждый день.<br>В 2026 — обязательный инструмент.</div>
+      <div class="tags">
+        <div class="tag" style="color:#00F0FF"><span class="tag-label">СЛАЙД</span><span class="tag-val">3/10</span></div>
+        <div class="tag" style="color:#FF2BD6"><span class="tag-label">2026</span><span class="tag-val">AI↑</span></div>
+        <div class="tag" style="color:#00FF9F"><span class="tag-label">TG</span><span class="tag-val">⇩</span></div>
+        <div class="tag-handle">@nikolay_cheusov</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СЛАЙД 4 — Midjourney -->
+  <div class="slide">
+    <div class="corner-br"></div><div class="corner-tr"></div><div class="corner-bl"></div>
+    <div class="scanline" style="animation-delay:1.5s"></div>
+    <div class="inner">
+      <div class="header">
+        <span class="brand">@nikolay_cheusov</span>
+        <span class="slide-num">4/10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:40%"></div></div>
+      <div class="kicker">ДИЗАЙН</div>
+      <div class="emoji-box">🎨</div>
+      <div class="headline"><span class="highlight">MIDJOURNEY</span></div>
+      <div class="body-card">▶ Создаёт визуал за 30 секунд.<br>Заменяет дизайнера за 5–8 тыс/пост.<br>Окупается с первого месяца.</div>
+      <div class="tags">
+        <div class="tag" style="color:#00F0FF"><span class="tag-label">СЛАЙД</span><span class="tag-val">4/10</span></div>
+        <div class="tag" style="color:#FF2BD6"><span class="tag-label">2026</span><span class="tag-val">AI↑</span></div>
+        <div class="tag" style="color:#00FF9F"><span class="tag-label">TG</span><span class="tag-val">⇩</span></div>
+        <div class="tag-handle">@nikolay_cheusov</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СЛАЙД 5 — HeyGen -->
+  <div class="slide">
+    <div class="corner-br"></div><div class="corner-tr"></div><div class="corner-bl"></div>
+    <div class="scanline" style="animation-delay:2s"></div>
+    <div class="inner">
+      <div class="header">
+        <span class="brand">@nikolay_cheusov</span>
+        <span class="slide-num">5/10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:50%"></div></div>
+      <div class="kicker">ВИДЕО</div>
+      <div class="emoji-box">🎭</div>
+      <div class="headline"><span class="highlight">HEYGEN</span></div>
+      <div class="body-card">▶ Видео с аватаром на любом языке.<br>Без камеры. Без студии. За 10 минут.<br>Подходит для курсов и рилз.</div>
+      <div class="tags">
+        <div class="tag" style="color:#00F0FF"><span class="tag-label">СЛАЙД</span><span class="tag-val">5/10</span></div>
+        <div class="tag" style="color:#FF2BD6"><span class="tag-label">2026</span><span class="tag-val">AI↑</span></div>
+        <div class="tag" style="color:#00FF9F"><span class="tag-label">TG</span><span class="tag-val">⇩</span></div>
+        <div class="tag-handle">@nikolay_cheusov</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СЛАЙД 6 — ElevenLabs -->
+  <div class="slide">
+    <div class="corner-br"></div><div class="corner-tr"></div><div class="corner-bl"></div>
+    <div class="scanline" style="animation-delay:2.5s"></div>
+    <div class="inner">
+      <div class="header">
+        <span class="brand">@nikolay_cheusov</span>
+        <span class="slide-num">6/10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:60%"></div></div>
+      <div class="kicker">ГОЛОС</div>
+      <div class="emoji-box">🎙</div>
+      <div class="headline"><span class="highlight">ELEVENLABS</span></div>
+      <div class="body-card">▶ Голос как у профи-диктора.<br>Аудио-курс из текста — за час.<br>MidJourney для звука.</div>
+      <div class="tags">
+        <div class="tag" style="color:#00F0FF"><span class="tag-label">СЛАЙД</span><span class="tag-val">6/10</span></div>
+        <div class="tag" style="color:#FF2BD6"><span class="tag-label">2026</span><span class="tag-val">AI↑</span></div>
+        <div class="tag" style="color:#00FF9F"><span class="tag-label">TG</span><span class="tag-val">⇩</span></div>
+        <div class="tag-handle">@nikolay_cheusov</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СЛАЙД 7 — Claude + Perplexity -->
+  <div class="slide">
+    <div class="corner-br"></div><div class="corner-tr"></div><div class="corner-bl"></div>
+    <div class="scanline" style="animation-delay:0.8s"></div>
+    <div class="inner">
+      <div class="header">
+        <span class="brand">@nikolay_cheusov</span>
+        <span class="slide-num">7/10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:70%"></div></div>
+      <div class="kicker">АНАЛИЗ</div>
+      <div class="emoji-box">🔍</div>
+      <div class="headline">CLAUDE + <span class="highlight">PERPLEXITY</span></div>
+      <div class="body-card">▶ Claude — думает и пишет код.<br>Perplexity — ищет без галлюцинаций.<br>Вместе заменяют дорогого аналитика.</div>
+      <div class="tags">
+        <div class="tag" style="color:#00F0FF"><span class="tag-label">СЛАЙД</span><span class="tag-val">7/10</span></div>
+        <div class="tag" style="color:#FF2BD6"><span class="tag-label">2026</span><span class="tag-val">AI↑</span></div>
+        <div class="tag" style="color:#00FF9F"><span class="tag-label">TG</span><span class="tag-val">⇩</span></div>
+        <div class="tag-handle">@nikolay_cheusov</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СЛАЙД 8 — Runway + Sora -->
+  <div class="slide">
+    <div class="corner-br"></div><div class="corner-tr"></div><div class="corner-bl"></div>
+    <div class="scanline" style="animation-delay:1.2s"></div>
+    <div class="inner">
+      <div class="header">
+        <span class="brand">@nikolay_cheusov</span>
+        <span class="slide-num">8/10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:80%"></div></div>
+      <div class="kicker">МОНТАЖ</div>
+      <div class="emoji-box">🎬</div>
+      <div class="headline">RUNWAY + <span class="highlight">SORA</span></div>
+      <div class="body-card">▶ Видео из текста или фото.<br>Качество кино — за минуты.<br>Контент-план на месяц за выходные.</div>
+      <div class="tags">
+        <div class="tag" style="color:#00F0FF"><span class="tag-label">СЛАЙД</span><span class="tag-val">8/10</span></div>
+        <div class="tag" style="color:#FF2BD6"><span class="tag-label">2026</span><span class="tag-val">AI↑</span></div>
+        <div class="tag" style="color:#00FF9F"><span class="tag-label">TG</span><span class="tag-val">⇩</span></div>
+        <div class="tag-handle">@nikolay_cheusov</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СЛАЙД 9 — МАТЕМАТИКА -->
+  <div class="slide">
+    <div class="corner-br"></div><div class="corner-tr"></div><div class="corner-bl"></div>
+    <div class="scanline" style="animation-delay:1.7s"></div>
+    <div class="inner">
+      <div class="header">
+        <span class="brand">@nikolay_cheusov</span>
+        <span class="slide-num">9/10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:90%"></div></div>
+      <div class="kicker">ЦИФРЫ</div>
+      <div class="emoji-box">📊</div>
+      <div class="headline">РЕАЛЬНАЯ <span class="highlight">МАТЕМАТИКА</span></div>
+      <div class="body-card">▶ Раньше: команда 6 чел → 400к/мес<br>Сейчас: 1 человек + ИИ → 18к/мес<br><br>Разница: <span style="color:#00F0FF;font-weight:bold">382к чистой прибыли.</span></div>
+      <div class="tags">
+        <div class="tag" style="color:#00F0FF"><span class="tag-label">СЛАЙД</span><span class="tag-val">9/10</span></div>
+        <div class="tag" style="color:#FF2BD6"><span class="tag-label">2026</span><span class="tag-val">AI↑</span></div>
+        <div class="tag" style="color:#00FF9F"><span class="tag-label">TG</span><span class="tag-val">⇩</span></div>
+        <div class="tag-handle">@nikolay_cheusov</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СЛАЙД 10 — CTA -->
+  <div class="slide cta">
+    <div class="corner-br" style="border-color:#2AABEE"></div>
+    <div class="corner-tr" style="border-color:#2AABEE"></div>
+    <div class="corner-bl" style="border-color:#2AABEE"></div>
+    <div class="scanline" style="animation-delay:2.2s; background:#2AABEE; box-shadow: 0 0 8px #2AABEE;"></div>
+    <div class="cta-inner">
+      <div class="tg-card">
+        <div class="tg-icon">✈️</div>
+        <div class="tg-headline">ВЕСЬ МОЙ ИИ-СТЕК —<br><span>В МОЁМ TELEGRAM</span></div>
+        <div class="tg-sub">ИНСТРУМЕНТЫ · ПРОМПТЫ · СХЕМЫ ЗАРАБОТКА</div>
+        <div class="tg-sub" style="color:#2AABEE; letter-spacing:2px; margin-top:4px;">ССЫЛКА В ШАПКЕ ПРОФИЛЯ ↑</div>
+      </div>
+      <div class="ig-mock">
+        <div class="ig-avatar">N</div>
+        <div class="ig-info">
+          <div class="ig-handle">@nikolay_cheusov</div>
+          <div class="ig-sub-text">нейросети · заработок · ИИ-стек</div>
+        </div>
+        <div class="ig-follow">ПОДПИСАТЬСЯ</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-label" style="margin-top:40px">▸ ЛЕГЕНДА ▸</div>
+<div style="max-width:800px;margin:0 auto 40px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:6px">
+    <div style="width:12px;height:2px;background:#00F0FF;box-shadow:0 0 6px #00F0FF"></div> NEON CYAN — акцент
+  </div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:6px">
+    <div style="width:12px;height:2px;background:#FF2BD6;box-shadow:0 0 6px #FF2BD6"></div> MAGENTA — kicker / border-left
+  </div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:6px">
+    <div style="width:12px;height:2px;background:#FFE600;box-shadow:0 0 6px #FFE600"></div> YELLOW — @handle тег
+  </div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:6px">
+    <div style="width:12px;height:2px;background:#2AABEE;box-shadow:0 0 6px #2AABEE"></div> TELEGRAM BLUE — CTA слайд
+  </div>
+</div>
+
+</body>
+</html>
