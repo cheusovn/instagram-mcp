@@ -1,22 +1,16 @@
 name: 🤖 Auto Publish — Schedule
 
 on:
-  # 9:00 MSK = 06:00 UTC | 14:00 MSK = 11:00 UTC | 20:00 MSK = 17:00 UTC
   schedule:
     - cron: '0 6 * * *'
     - cron: '0 11 * * *'
     - cron: '0 17 * * *'
-
   workflow_dispatch:
     inputs:
       post_id:
-        description: 'Конкретный пост (оставь пустым для авто)'
+        description: 'Пост (оставь пустым для авто)'
         required: false
         default: ''
-      composition:
-        description: 'Стиль'
-        required: false
-        default: 'Style03-BrutalistNeon'
 
 jobs:
   auto-publish:
@@ -30,34 +24,52 @@ jobs:
       INSTAGRAM_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node 20
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Determine next post
-        id: schedule
+      - name: Determine post and style
+        id: pick
         run: |
-          if [ -n "${{ inputs.post_id }}" ]; then
-            echo "post_id=${{ inputs.post_id }}" >> $GITHUB_OUTPUT
-            echo "skip=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
           node --input-type=module << 'EOF'
           import fs from 'fs';
-          const schedule = ['post_01','post_02','post_03','post_04','post_05','post_06','post_07','post_08','post_09'];
+
+          const SCHEDULE = [
+            { post: 'post_01', style: 'Style03-BrutalistNeon' },
+            { post: 'post_02', style: 'Style07-SwissBold'     },
+            { post: 'post_03', style: 'Style06-RetroVHS'      },
+            { post: 'post_04', style: 'Style03-BrutalistNeon' },
+            { post: 'post_05', style: 'Style04-Glassmorphism' },
+            { post: 'post_06', style: 'Style03-BrutalistNeon' },
+            { post: 'post_07', style: 'Style01-Bebas3D'       },
+            { post: 'post_08', style: 'Style07-SwissBold'     },
+            { post: 'post_09', style: 'Style03-BrutalistNeon' },
+          ];
+
+          const forced = '${{ inputs.post_id }}';
+
           let published = [];
           try { published = (JSON.parse(fs.readFileSync('content/published.json','utf8')).posts||[]).map(p=>p.post_id); } catch{}
-          const next = schedule.find(p => !published.includes(p));
-          if (!next) { fs.appendFileSync(process.env.GITHUB_OUTPUT,'skip=true\n'); }
-          else { fs.appendFileSync(process.env.GITHUB_OUTPUT,`post_id=${next}\nskip=false\n`); console.log('Next post:',next); }
+
+          let entry;
+          if (forced) {
+            entry = SCHEDULE.find(s => s.post === forced);
+          } else {
+            entry = SCHEDULE.find(s => !published.includes(s.post));
+          }
+
+          if (!entry) {
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, 'skip=true\n');
+            console.log('✅ Все посты опубликованы!');
+          } else {
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `post_id=${entry.post}\nstyle=${entry.style}\nskip=false\n`);
+            console.log('Next:', entry.post, '|', entry.style);
+          }
           EOF
 
-      - name: Install system deps
-        if: steps.schedule.outputs.skip != 'true'
+      - name: Install deps
+        if: steps.pick.outputs.skip != 'true'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq \
@@ -67,68 +79,69 @@ jobs:
             libpango-1.0-0 libcairo2 libpangocairo-1.0-0 \
             ffmpeg fonts-liberation
 
-      - name: Install Remotion
-        if: steps.schedule.outputs.skip != 'true'
+      - name: npm install
+        if: steps.pick.outputs.skip != 'true'
         working-directory: remotion-carousel
         run: npm install
 
-      - name: Prepare slides for post
-        if: steps.schedule.outputs.skip != 'true'
-        run: node prepare-post.mjs ${{ steps.schedule.outputs.post_id }}
+      - name: Prepare slides
+        if: steps.pick.outputs.skip != 'true'
+        run: node prepare-post.mjs ${{ steps.pick.outputs.post_id }}
 
       - name: Generate SFX
-        if: steps.schedule.outputs.skip != 'true'
+        if: steps.pick.outputs.skip != 'true'
         working-directory: remotion-carousel
         run: node generate-sfx.mjs
 
-      - name: Render slides (CPU)
-        if: steps.schedule.outputs.skip != 'true'
+      - name: Render
+        if: steps.pick.outputs.skip != 'true'
         working-directory: remotion-carousel
         run: |
-          COMP="${{ inputs.composition || 'Style03-BrutalistNeon' }}"
+          COMP="${{ steps.pick.outputs.style }}"
+          echo "🎬 Рендерю стиль: $COMP"
           node render-slides.mjs "$COMP" --slides-only
           ls -lh ../out/slides/
 
-      - name: Assemble carousel
-        if: steps.schedule.outputs.skip != 'true'
+      - name: Assemble
+        if: steps.pick.outputs.skip != 'true'
         run: |
           ls out/slides/slide_*.mp4 | sort | awk '{print "file \x27" $0 "\x27"}' > /tmp/concat.txt
           ffmpeg -y -f concat -safe 0 -i /tmp/concat.txt \
             -c:v libx264 -preset medium -crf 20 -movflags +faststart \
             -vf "scale=1080:1350" out/carousel_full.mp4
 
-      - name: Upload to GitHub Releases
-        if: steps.schedule.outputs.skip != 'true'
+      - name: Upload release
+        if: steps.pick.outputs.skip != 'true'
         id: upload
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          POST_ID="${{ steps.schedule.outputs.post_id }}"
-          TAG="content-${POST_ID}-${TIMESTAMP}"
-          FILENAME="${POST_ID}_${TIMESTAMP}.mp4"
-          cp out/carousel_full.mp4 "/tmp/${FILENAME}"
+          POST="${{ steps.pick.outputs.post_id }}"
+          STYLE="${{ steps.pick.outputs.style }}"
+          TS=$(date +%Y%m%d_%H%M%S)
+          TAG="content-${POST}-${TS}"
+          FILE="${POST}_${TS}.mp4"
+          cp out/carousel_full.mp4 "/tmp/${FILE}"
           gh release create "${TAG}" \
             --repo cheusovn/instagram-mcp \
-            --title "📱 ${POST_ID} — $(date '+%d.%m.%Y %H:%M') MSK" \
-            --notes "Auto-published | Style03-BrutalistNeon" \
-            "/tmp/${FILENAME}"
-          echo "video_url=https://github.com/cheusovn/instagram-mcp/releases/download/${TAG}/${FILENAME}" >> $GITHUB_OUTPUT
+            --title "📱 ${POST} · ${STYLE} · $(date '+%d.%m.%Y %H:%M') MSK" \
+            --notes "Auto | ${STYLE}" \
+            "/tmp/${FILE}"
+          echo "video_url=https://github.com/cheusovn/instagram-mcp/releases/download/${TAG}/${FILE}" >> $GITHUB_OUTPUT
 
-      - name: Wait CDN (30s)
-        if: steps.schedule.outputs.skip != 'true'
+      - name: CDN wait
+        if: steps.pick.outputs.skip != 'true'
         run: sleep 30
 
-      - name: Publish to Instagram
-        if: steps.schedule.outputs.skip != 'true'
+      - name: Publish Instagram
+        if: steps.pick.outputs.skip != 'true'
         run: |
-          POST_ID="${{ steps.schedule.outputs.post_id }}"
           node publish-instagram.mjs \
-            --post "content/posts/${POST_ID}.json" \
+            --post "content/posts/${{ steps.pick.outputs.post_id }}.json" \
             --video "${{ steps.upload.outputs.video_url }}"
 
-      - name: Commit publish log
-        if: steps.schedule.outputs.skip != 'true'
+      - name: Commit log
+        if: steps.pick.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -136,5 +149,5 @@ jobs:
           git config user.email "bot@cheusov.ru"
           git add content/published.json 2>/dev/null || true
           git diff --cached --quiet || \
-            git commit -m "📱 auto: ${{ steps.schedule.outputs.post_id }} → Instagram $(date '+%d.%m.%Y %H:%M')"
+            git commit -m "📱 auto: ${{ steps.pick.outputs.post_id }} (${{ steps.pick.outputs.style }}) → Instagram $(date '+%d.%m.%Y %H:%M')"
           git push || true
