@@ -10,7 +10,6 @@ import { Style05 } from './styles/Style05';
 import { Style06 } from './styles/Style06';
 import { Style07 } from './styles/Style07';
 
-// Placeholder slides — перезаписываются при рендере через inputProps
 const defaultSlides: CarouselProps['slides'] = [
   {
     headline: 'Топ-10 нейросетей 2026',
@@ -32,17 +31,16 @@ const defaultSlides: CarouselProps['slides'] = [
 ];
 
 const styleSlides = [
-  { headline: 'Топ-5 нейросетей для видео в 2026', body: 'Sora, Runway, Kling — реальные кейсы с цифрами. Смотри следующий слайд 👇', emoji: '🎬', bgColor: '#000', accentColor: '#2D7FFF', kicker: 'ШАГ 1' },
-  { headline: 'Sora генерирует 1 мин видео за 3 мин', body: 'В декабре 2025 OpenAI открыли API. Цена: $0.15/сек. Уже используют 50k+ создателей.', emoji: '⚡', bgColor: '#000', accentColor: '#2D7FFF', kicker: 'ФАКТ' },
-  { headline: 'Runway Gen-4 — 4K без артефактов', body: 'Новый motion-brush управляет каждым объектом отдельно. Результат — кинематографичное качество.', emoji: '🎥', bgColor: '#000', accentColor: '#2D7FFF', kicker: 'ТРЕНД' },
-  { headline: 'Больше информации — в моём Telegram-канале', body: 'Ссылка в шапке профиля ↓', emoji: '✈️', bgColor: '#000', accentColor: '#2AABEE', isLast: true, telegram: true, profileHandle: '@nikolay_cheusov' },
+  { headline: 'Топ-5 нейросетей для видео в 2026', body: 'Sora, Runway, Kling — реальные кейсы с цифрами.', emoji: '🎬', bgColor: '#000', accentColor: '#2D7FFF', kicker: 'ШАГ 1' },
+  { headline: 'Sora генерирует 1 мин видео за 3 мин', body: 'Цена: $0.15/сек. Уже используют 50k+ создателей.', emoji: '⚡', bgColor: '#000', accentColor: '#2D7FFF', kicker: 'ФАКТ' },
+  { headline: 'Runway Gen-4 — 4K без артефактов', body: 'motion-brush управляет каждым объектом отдельно.', emoji: '🎥', bgColor: '#000', accentColor: '#2D7FFF', kicker: 'ТРЕНД' },
+  { headline: 'Больше — в Telegram', body: 'Ссылка в шапке профиля ↓', emoji: '✈️', bgColor: '#000', accentColor: '#2AABEE', isLast: true, telegram: true, profileHandle: '@nikolay_cheusov' },
 ];
 
 const N = styleSlides.length;
 
 const Root: React.FC = () => (
   <>
-    {/* Оригинальная карусель (обратная совместимость) */}
     <Composition
       id="Carousel"
       component={Carousel}
@@ -57,7 +55,7 @@ const Root: React.FC = () => (
 
     {/* Стиль 01 — Bebas 3D Extrude / Electric Blue */}
     <Composition
-      id="Style01_Bebas3D"
+      id="Style01-Bebas3D"
       component={StyleCarousel}
       defaultProps={{ slides: styleSlides, Slide: Style01 }}
       calculateMetadata={({ props }) => ({
@@ -70,7 +68,7 @@ const Root: React.FC = () => (
 
     {/* Стиль 02 — Unbounded Candy Pop */}
     <Composition
-      id="Style02_CandyPop"
+      id="Style02-CandyPop"
       component={StyleCarousel}
       defaultProps={{ slides: styleSlides, Slide: Style02 }}
       calculateMetadata={({ props }) => ({
@@ -83,7 +81,7 @@ const Root: React.FC = () => (
 
     {/* Стиль 03 — Brutalist Neon Grid */}
     <Composition
-      id="Style03_BrutalistNeon"
+      id="Style03-BrutalistNeon"
       component={StyleCarousel}
       defaultProps={{ slides: styleSlides, Slide: Style03 }}
       calculateMetadata={({ props }) => ({
@@ -96,7 +94,7 @@ const Root: React.FC = () => (
 
     {/* Стиль 04 — Glassmorphism */}
     <Composition
-      id="Style04_Glassmorphism"
+      id="Style04-Glassmorphism"
       component={StyleCarousel}
       defaultProps={{ slides: styleSlides, Slide: Style04 }}
       calculateMetadata={({ props }) => ({
@@ -109,7 +107,7 @@ const Root: React.FC = () => (
 
     {/* Стиль 05 — Liquid Gradient Blobs */}
     <Composition
-      id="Style05_LiquidBlobs"
+      id="Style05-LiquidBlobs"
       component={StyleCarousel}
       defaultProps={{ slides: styleSlides, Slide: Style05 }}
       calculateMetadata={({ props }) => ({
@@ -122,7 +120,7 @@ const Root: React.FC = () => (
 
     {/* Стиль 06 — Retro VHS Chromatic */}
     <Composition
-      id="Style06_RetroVHS"
+      id="Style06-RetroVHS"
       component={StyleCarousel}
       defaultProps={{ slides: styleSlides, Slide: Style06 }}
       calculateMetadata={({ props }) => ({
@@ -135,7 +133,7 @@ const Root: React.FC = () => (
 
     {/* Стиль 07 — Swiss Bold Minimal */}
     <Composition
-      id="Style07_SwissBold"
+      id="Style07-SwissBold"
       component={StyleCarousel}
       defaultProps={{ slides: styleSlides, Slide: Style07 }}
       calculateMetadata={({ props }) => ({

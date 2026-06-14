@@ -21,16 +21,16 @@ on:
       composition:
         description: 'Remotion composition'
         required: false
-        default: 'Style03_BrutalistNeon'
+        default: 'Style03-BrutalistNeon'
         type: choice
         options:
-          - Style03_BrutalistNeon
-          - Style01_Bebas3D
-          - Style02_CandyPop
-          - Style04_Glassmorphism
-          - Style05_LiquidBlobs
-          - Style06_RetroVHS
-          - Style07_SwissBold
+          - Style03-BrutalistNeon
+          - Style01-Bebas3D
+          - Style02-CandyPop
+          - Style04-Glassmorphism
+          - Style05-LiquidBlobs
+          - Style06-RetroVHS
+          - Style07-SwissBold
 
 jobs:
   render-and-publish:
@@ -94,7 +94,7 @@ jobs:
           echo "  🎬 Рендерю: ${{ inputs.composition }}"
           echo "  📊 CPU рендер — займёт 15-30 минут"
           echo "═══════════════════════════════════════════"
-          node render-slides.mjs ${{ inputs.composition }} --slides-only
+          node render-slides.mjs '${{ inputs.composition }}' --slides-only
           echo ""
           echo "✅ Слайды готовы:"
           ls -lh ../out/slides/

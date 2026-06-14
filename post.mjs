@@ -14,13 +14,11 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// ── Конфиг ──────────────────────────────────────────────────────────────
 const REPO = 'cheusovn/instagram-mcp';
 const WORKFLOW_FILE = 'render-and-publish.yml';
-const COMPOSITION = 'Style03_BrutalistNeon';
+const COMPOSITION = 'Style03-BrutalistNeon';
 const BRANCH = 'main';
 
-// Расписание постов (Москва)
 const SCHEDULE = [
   { post: 'post_01', day: 1, hour: 9,  title: '10 нейросетей заменяют команду' },
   { post: 'post_02', day: 1, hour: 14, title: 'Зарабатываю 200к, работаю 3 часа' },
@@ -33,25 +31,18 @@ const SCHEDULE = [
   { post: 'post_09', day: 3, hour: 20, title: 'Как я сделал контент на неделю за 40 минут с ИИ' },
 ];
 
-// ── Читаем опубликованные посты ──────────────────────────────────────────
 function getPublished() {
   const publishedPath = path.join(__dirname, 'content', 'published.json');
   if (!fs.existsSync(publishedPath)) return [];
-  try {
-    return JSON.parse(fs.readFileSync(publishedPath, 'utf8'));
-  } catch {
-    return [];
-  }
+  try { return JSON.parse(fs.readFileSync(publishedPath, 'utf8')); } catch { return []; }
 }
 
-// ── Определяем следующий пост ────────────────────────────────────────────
 function getNextPost() {
   const published = getPublished();
   const publishedIds = published.map(p => p.post_id);
   return SCHEDULE.find(s => !publishedIds.includes(s.post));
 }
 
-// ── Запускаем GitHub Actions через gh CLI ────────────────────────────────
 function triggerWorkflow(postId) {
   const cmd = [
     'gh', 'workflow', 'run', WORKFLOW_FILE,
@@ -60,17 +51,14 @@ function triggerWorkflow(postId) {
     '--field', `post_id=${postId}`,
     '--field', `composition=${COMPOSITION}`,
   ].join(' ');
-
   console.log(`\n▶ Запускаю: ${cmd}\n`);
   execSync(cmd, { stdio: 'inherit' });
 }
 
-// ── Ждём результат workflow ──────────────────────────────────────────────
 async function waitForRun(postId) {
   console.log('\n⏳ Жду запуска workflow...');
   await sleep(8000);
 
-  // Получаем последний запуск
   const runsJson = execSync(
     `gh run list --repo ${REPO} --workflow ${WORKFLOW_FILE} --limit 1 --json databaseId,status,conclusion,createdAt`,
     { encoding: 'utf8' }
@@ -86,7 +74,6 @@ async function waitForRun(postId) {
   console.log('   Ожидаемое время рендера: 15-30 минут');
   console.log('   Нажми Ctrl+C чтобы перестать ждать (workflow продолжится)\n');
 
-  // Polling пока не завершится
   let dots = 0;
   while (true) {
     await sleep(30000);
@@ -95,7 +82,6 @@ async function waitForRun(postId) {
       { encoding: 'utf8' }
     );
     const { status, conclusion } = JSON.parse(statusJson);
-
     process.stdout.write(`\r   [${new Date().toLocaleTimeString('ru')}] ${status}${'.'.repeat(++dots % 4)}   `);
 
     if (status === 'completed') {
@@ -122,14 +108,11 @@ function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
-// ── Список всех постов ───────────────────────────────────────────────────
 function listPosts() {
   const published = getPublished();
   const publishedIds = new Set(published.map(p => p.post_id));
-
   console.log('\n📋 ПЛАН ПУБЛИКАЦИЙ — @nikolay_cheusov');
   console.log('═'.repeat(60));
-
   let currentDay = 0;
   for (const s of SCHEDULE) {
     if (s.day !== currentDay) {
@@ -143,7 +126,6 @@ function listPosts() {
   console.log('');
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────
 async function main() {
   const args = process.argv.slice(2);
 
@@ -152,7 +134,6 @@ async function main() {
     return;
   }
 
-  // Определяем какой пост публиковать
   let postId;
   const postArg = args.find(a => a.startsWith('--post'));
   if (postArg) {
@@ -169,7 +150,6 @@ async function main() {
     console.log(`   Тема: ${next.title}`);
   }
 
-  // Проверяем что контент существует
   const contentPath = path.join(__dirname, 'content', 'posts', `${postId}.json`);
   if (!fs.existsSync(contentPath)) {
     console.error(`\n❌ Файл контента не найден: ${contentPath}`);
@@ -180,7 +160,6 @@ async function main() {
   console.log(`\n🚀 Публикую ${postId} (${COMPOSITION})...`);
   listPosts();
 
-  // Проверяем gh CLI
   try {
     execSync('gh --version', { stdio: 'pipe' });
   } catch {
