@@ -1,0 +1,1499 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "package.json",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "package.json",
+      "id": "package"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "name",
+      "id": "package_name"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "version",
+      "id": "package_version"
+    },
+    {
+      "label": "description",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "description",
+      "id": "package_description"
+    },
+    {
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "scripts",
+      "id": "package_scripts"
+    },
+    {
+      "label": "render",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "render",
+      "id": "package_scripts_render"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "dependencies",
+      "id": "package_dependencies"
+    },
+    {
+      "label": "@remotion/cli",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "@remotion/cli",
+      "id": "package_dependencies_remotion_cli"
+    },
+    {
+      "label": "@remotion/renderer",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L10",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "@remotion/renderer",
+      "id": "package_dependencies_remotion_renderer"
+    },
+    {
+      "label": "remotion",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L11",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "remotion",
+      "id": "package_dependencies_remotion"
+    },
+    {
+      "label": "react",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "react",
+      "id": "package_dependencies_react"
+    },
+    {
+      "label": "react-dom",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "react-dom",
+      "id": "package_dependencies_react_dom"
+    },
+    {
+      "label": "devDependencies",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "devdependencies",
+      "id": "package_devdependencies"
+    },
+    {
+      "label": "@types/react",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "@types/react",
+      "id": "package_devdependencies_types_react"
+    },
+    {
+      "label": "typescript",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "community": 3,
+      "norm_label": "typescript",
+      "id": "package_devdependencies_typescript"
+    },
+    {
+      "label": "render.mjs",
+      "file_type": "code",
+      "source_file": "render.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 6,
+      "norm_label": "render.mjs",
+      "id": "render"
+    },
+    {
+      "label": "__dirname",
+      "file_type": "code",
+      "source_file": "render.mjs",
+      "source_location": "L8",
+      "_origin": "ast",
+      "community": 6,
+      "norm_label": "__dirname",
+      "id": "render_dirname"
+    },
+    {
+      "label": "rootSlides",
+      "file_type": "code",
+      "source_file": "render.mjs",
+      "source_location": "L13",
+      "_origin": "ast",
+      "community": 6,
+      "norm_label": "rootslides",
+      "id": "render_rootslides"
+    },
+    {
+      "label": "srcSlides",
+      "file_type": "code",
+      "source_file": "render.mjs",
+      "source_location": "L14",
+      "_origin": "ast",
+      "community": 6,
+      "norm_label": "srcslides",
+      "id": "render_srcslides"
+    },
+    {
+      "label": "inputProps",
+      "file_type": "code",
+      "source_file": "render.mjs",
+      "source_location": "L16",
+      "_origin": "ast",
+      "community": 6,
+      "norm_label": "inputprops",
+      "id": "render_inputprops"
+    },
+    {
+      "label": "duration",
+      "file_type": "code",
+      "source_file": "render.mjs",
+      "source_location": "L32",
+      "_origin": "ast",
+      "community": 6,
+      "norm_label": "duration",
+      "id": "render_duration"
+    },
+    {
+      "label": "Carousel.tsx",
+      "file_type": "code",
+      "source_file": "src/Carousel.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "carousel.tsx",
+      "id": "src_carousel"
+    },
+    {
+      "label": "CarouselProps",
+      "file_type": "code",
+      "source_file": "src/Carousel.tsx",
+      "source_location": "L4",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "carouselprops",
+      "id": "src_carousel_carouselprops"
+    },
+    {
+      "label": "Carousel()",
+      "file_type": "code",
+      "source_file": "src/Carousel.tsx",
+      "source_location": "L11",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "carousel()",
+      "id": "src_carousel_carousel"
+    },
+    {
+      "label": "Slide.tsx",
+      "file_type": "code",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "slide.tsx",
+      "id": "src_slide"
+    },
+    {
+      "label": "SlideData",
+      "file_type": "code",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L13",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "slidedata",
+      "id": "src_slide_slidedata"
+    },
+    {
+      "label": "fontHandle",
+      "file_type": "code",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L29",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "fonthandle",
+      "id": "src_slide_fonthandle"
+    },
+    {
+      "label": "loadGoogleFonts()",
+      "file_type": "code",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L31",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "loadgooglefonts()",
+      "id": "src_slide_loadgooglefonts"
+    },
+    {
+      "label": "F",
+      "file_type": "code",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L51",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "f",
+      "id": "src_slide_f"
+    },
+    {
+      "label": "Slide()",
+      "file_type": "code",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L59",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "slide()",
+      "id": "src_slide_slide"
+    },
+    {
+      "label": "Header()",
+      "file_type": "code",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L256",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "header()",
+      "id": "src_slide_header"
+    },
+    {
+      "label": "ProgressBar()",
+      "file_type": "code",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L274",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "progressbar()",
+      "id": "src_slide_progressbar"
+    },
+    {
+      "label": "NeonLine()",
+      "file_type": "code",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L280",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "neonline()",
+      "id": "src_slide_neonline"
+    },
+    {
+      "label": "index.tsx",
+      "file_type": "code",
+      "source_file": "src/index.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "index.tsx",
+      "id": "src_index"
+    },
+    {
+      "label": "defaultSlides",
+      "file_type": "code",
+      "source_file": "src/index.tsx",
+      "source_location": "L6",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "defaultslides",
+      "id": "src_index_defaultslides"
+    },
+    {
+      "label": "Root()",
+      "file_type": "code",
+      "source_file": "src/index.tsx",
+      "source_location": "L16",
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "root()",
+      "id": "src_index_root"
+    },
+    {
+      "label": "tsconfig.json",
+      "file_type": "code",
+      "source_file": "tsconfig.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "tsconfig.json",
+      "id": "tsconfig"
+    },
+    {
+      "label": "compilerOptions",
+      "file_type": "code",
+      "source_file": "tsconfig.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "compileroptions",
+      "id": "tsconfig_compileroptions"
+    },
+    {
+      "label": "target",
+      "file_type": "code",
+      "source_file": "tsconfig.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "target",
+      "id": "tsconfig_compileroptions_target"
+    },
+    {
+      "label": "lib",
+      "file_type": "code",
+      "source_file": "tsconfig.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "lib",
+      "id": "tsconfig_compileroptions_lib"
+    },
+    {
+      "label": "module",
+      "file_type": "code",
+      "source_file": "tsconfig.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "module",
+      "id": "tsconfig_compileroptions_module"
+    },
+    {
+      "label": "moduleResolution",
+      "file_type": "code",
+      "source_file": "tsconfig.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "moduleresolution",
+      "id": "tsconfig_compileroptions_moduleresolution"
+    },
+    {
+      "label": "jsx",
+      "file_type": "code",
+      "source_file": "tsconfig.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "jsx",
+      "id": "tsconfig_compileroptions_jsx"
+    },
+    {
+      "label": "strict",
+      "file_type": "code",
+      "source_file": "tsconfig.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "strict",
+      "id": "tsconfig_compileroptions_strict"
+    },
+    {
+      "label": "esModuleInterop",
+      "file_type": "code",
+      "source_file": "tsconfig.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "community": 4,
+      "norm_label": "esmoduleinterop",
+      "id": "tsconfig_compileroptions_esmoduleinterop"
+    },
+    {
+      "label": "StyleCarousel.tsx",
+      "file_type": "code",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_stylecarousel",
+      "community": 1,
+      "norm_label": "stylecarousel.tsx"
+    },
+    {
+      "label": "SlideComponent",
+      "file_type": "code",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "src_stylecarousel_slidecomponent",
+      "community": 1,
+      "norm_label": "slidecomponent"
+    },
+    {
+      "label": "StyleCarouselProps",
+      "file_type": "code",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "src_stylecarousel_stylecarouselprops",
+      "community": 1,
+      "norm_label": "stylecarouselprops"
+    },
+    {
+      "label": "StyleCarousel()",
+      "file_type": "code",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "src_stylecarousel_stylecarousel",
+      "community": 1,
+      "norm_label": "stylecarousel()"
+    },
+    {
+      "label": "carouselDuration()",
+      "file_type": "code",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "src_stylecarousel_carouselduration",
+      "community": 1,
+      "norm_label": "carouselduration()"
+    },
+    {
+      "label": "shared.tsx",
+      "file_type": "code",
+      "source_file": "src/shared.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_shared",
+      "community": 2,
+      "norm_label": "shared.tsx"
+    },
+    {
+      "label": "resolveSrc()",
+      "file_type": "code",
+      "source_file": "src/shared.tsx",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "src_shared_resolvesrc",
+      "community": 2,
+      "norm_label": "resolvesrc()"
+    },
+    {
+      "label": "VideoBackground()",
+      "file_type": "code",
+      "source_file": "src/shared.tsx",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "src_shared_videobackground",
+      "community": 2,
+      "norm_label": "videobackground()"
+    },
+    {
+      "label": "KenBurnsImage()",
+      "file_type": "code",
+      "source_file": "src/shared.tsx",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "src_shared_kenburnsimage",
+      "community": 2,
+      "norm_label": "kenburnsimage()"
+    },
+    {
+      "label": "VideoCard()",
+      "file_type": "code",
+      "source_file": "src/shared.tsx",
+      "source_location": "L55",
+      "_origin": "ast",
+      "id": "src_shared_videocard",
+      "community": 2,
+      "norm_label": "videocard()"
+    },
+    {
+      "label": "TelegramIcon()",
+      "file_type": "code",
+      "source_file": "src/shared.tsx",
+      "source_location": "L70",
+      "_origin": "ast",
+      "id": "src_shared_telegramicon",
+      "community": 2,
+      "norm_label": "telegramicon()"
+    },
+    {
+      "label": "Header()",
+      "file_type": "code",
+      "source_file": "src/shared.tsx",
+      "source_location": "L93",
+      "_origin": "ast",
+      "id": "src_shared_header",
+      "community": 2,
+      "norm_label": "header()"
+    },
+    {
+      "label": "ProgressBar()",
+      "file_type": "code",
+      "source_file": "src/shared.tsx",
+      "source_location": "L129",
+      "_origin": "ast",
+      "id": "src_shared_progressbar",
+      "community": 2,
+      "norm_label": "progressbar()"
+    },
+    {
+      "label": "InstagramProfileMockup()",
+      "file_type": "code",
+      "source_file": "src/shared.tsx",
+      "source_location": "L159",
+      "_origin": "ast",
+      "id": "src_shared_instagramprofilemockup",
+      "community": 2,
+      "norm_label": "instagramprofilemockup()"
+    },
+    {
+      "label": "Stat()",
+      "file_type": "code",
+      "source_file": "src/shared.tsx",
+      "source_location": "L222",
+      "_origin": "ast",
+      "id": "src_shared_stat",
+      "community": 2,
+      "norm_label": "stat()"
+    },
+    {
+      "label": "theme.ts",
+      "file_type": "code",
+      "source_file": "src/theme.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_theme",
+      "community": 1,
+      "norm_label": "theme.ts"
+    },
+    {
+      "label": "SlideData",
+      "file_type": "code",
+      "source_file": "src/theme.ts",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "src_theme_slidedata",
+      "community": 1,
+      "norm_label": "slidedata"
+    },
+    {
+      "label": "SlideInput",
+      "file_type": "code",
+      "source_file": "src/theme.ts",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "src_theme_slideinput",
+      "community": 1,
+      "norm_label": "slideinput"
+    },
+    {
+      "label": "loadFonts()",
+      "file_type": "code",
+      "source_file": "src/theme.ts",
+      "source_location": "L56",
+      "_origin": "ast",
+      "id": "src_theme_loadfonts",
+      "community": 1,
+      "norm_label": "loadfonts()"
+    },
+    {
+      "label": "FONTS",
+      "file_type": "code",
+      "source_file": "src/theme.ts",
+      "source_location": "L86",
+      "_origin": "ast",
+      "id": "src_theme_fonts",
+      "community": 1,
+      "norm_label": "fonts"
+    },
+    {
+      "label": "rng()",
+      "file_type": "code",
+      "source_file": "src/theme.ts",
+      "source_location": "L103",
+      "_origin": "ast",
+      "id": "src_theme_rng",
+      "community": 1,
+      "norm_label": "rng()"
+    },
+    {
+      "label": "withAlpha()",
+      "file_type": "code",
+      "source_file": "src/theme.ts",
+      "source_location": "L113",
+      "_origin": "ast",
+      "id": "src_theme_withalpha",
+      "community": 2,
+      "norm_label": "withalpha()"
+    },
+    {
+      "label": "splitWords()",
+      "file_type": "code",
+      "source_file": "src/theme.ts",
+      "source_location": "L123",
+      "_origin": "ast",
+      "id": "src_theme_splitwords",
+      "community": 1,
+      "norm_label": "splitwords()"
+    },
+    {
+      "label": "isKeyWord()",
+      "file_type": "code",
+      "source_file": "src/theme.ts",
+      "source_location": "L129",
+      "_origin": "ast",
+      "id": "src_theme_iskeyword",
+      "community": 1,
+      "norm_label": "iskeyword()"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package",
+      "target": "package_dependencies"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package",
+      "target": "package_description"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package",
+      "target": "package_devdependencies"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package",
+      "target": "package_name"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package",
+      "target": "package_scripts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package",
+      "target": "package_version"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_render"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_dependencies",
+      "target": "package_dependencies_react"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_dependencies",
+      "target": "package_dependencies_react_dom"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_dependencies",
+      "target": "package_dependencies_remotion"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_dependencies",
+      "target": "package_dependencies_remotion_cli"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_dependencies",
+      "target": "package_dependencies_remotion_renderer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_devdependencies",
+      "target": "package_devdependencies_types_react"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_devdependencies",
+      "target": "package_devdependencies_typescript"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "render.mjs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "render",
+      "target": "render_dirname"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "render.mjs",
+      "source_location": "L32",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "render",
+      "target": "render_duration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "render.mjs",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "render",
+      "target": "render_inputprops"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "render.mjs",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "render",
+      "target": "render_rootslides"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "render.mjs",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "render",
+      "target": "render_srcslides"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Carousel.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_carousel",
+      "target": "src_carousel_carousel"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Carousel.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_carousel",
+      "target": "src_carousel_carouselprops"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Carousel.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_carousel",
+      "target": "src_slide"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Carousel.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_carousel",
+      "target": "src_slide_slide"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Carousel.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_carousel",
+      "target": "src_slide_slidedata"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/index.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_index",
+      "target": "src_carousel"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/index.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_index",
+      "target": "src_carousel_carouselprops"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/index.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_index",
+      "target": "src_carousel_carousel"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L51",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_slide",
+      "target": "src_slide_f"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_slide",
+      "target": "src_slide_fonthandle"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L256",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_slide",
+      "target": "src_slide_header"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_slide",
+      "target": "src_slide_loadgooglefonts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L280",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_slide",
+      "target": "src_slide_neonline"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L274",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_slide",
+      "target": "src_slide_progressbar"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L59",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_slide",
+      "target": "src_slide_slide"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/Slide.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_slide",
+      "target": "src_slide_slidedata"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/index.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_index",
+      "target": "src_index_defaultslides"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/index.tsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_index",
+      "target": "src_index_root"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tsconfig",
+      "target": "tsconfig_compileroptions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tsconfig_compileroptions",
+      "target": "tsconfig_compileroptions_esmoduleinterop"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tsconfig_compileroptions",
+      "target": "tsconfig_compileroptions_jsx"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tsconfig_compileroptions",
+      "target": "tsconfig_compileroptions_lib"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tsconfig_compileroptions",
+      "target": "tsconfig_compileroptions_module"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tsconfig_compileroptions",
+      "target": "tsconfig_compileroptions_moduleresolution"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tsconfig_compileroptions",
+      "target": "tsconfig_compileroptions_strict"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tsconfig_compileroptions",
+      "target": "tsconfig_compileroptions_target"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "src_stylecarousel",
+      "target": "src_stylecarousel_carouselduration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_stylecarousel",
+      "target": "src_stylecarousel_slidecomponent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_stylecarousel",
+      "target": "src_stylecarousel_stylecarousel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_stylecarousel",
+      "target": "src_stylecarousel_stylecarouselprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_stylecarousel",
+      "target": "src_theme",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_stylecarousel",
+      "target": "src_theme_loadfonts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_stylecarousel",
+      "target": "src_theme_slidedata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/StyleCarousel.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_stylecarousel",
+      "target": "src_theme_slideinput",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L93",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_shared_header",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_shared_instagramprofilemockup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_shared_kenburnsimage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L129",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_shared_progressbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_shared_resolvesrc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L222",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_shared_stat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_shared_telegramicon",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_shared_videobackground",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_shared_videocard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_theme",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_theme_fonts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_shared",
+      "target": "src_theme_withalpha",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L202",
+      "weight": 1.0,
+      "source": "src_shared_instagramprofilemockup",
+      "target": "src_shared_resolvesrc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "src_shared_kenburnsimage",
+      "target": "src_shared_resolvesrc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "src_shared_videobackground",
+      "target": "src_shared_resolvesrc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared.tsx",
+      "source_location": "L62",
+      "weight": 1.0,
+      "source": "src_shared_videocard",
+      "target": "src_shared_resolvesrc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/shared.tsx",
+      "source_location": "L120",
+      "weight": 1.0,
+      "source": "src_shared_header",
+      "target": "src_theme_withalpha"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/theme.ts",
+      "source_location": "L86",
+      "weight": 1.0,
+      "source": "src_theme",
+      "target": "src_theme_fonts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/theme.ts",
+      "source_location": "L129",
+      "weight": 1.0,
+      "source": "src_theme",
+      "target": "src_theme_iskeyword",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/theme.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "source": "src_theme",
+      "target": "src_theme_loadfonts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/theme.ts",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "src_theme",
+      "target": "src_theme_rng",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/theme.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "src_theme",
+      "target": "src_theme_slidedata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/theme.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "src_theme",
+      "target": "src_theme_slideinput",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/theme.ts",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "src_theme",
+      "target": "src_theme_splitwords",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/theme.ts",
+      "source_location": "L113",
+      "weight": 1.0,
+      "source": "src_theme",
+      "target": "src_theme_withalpha",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "4e699613760d30637184f0501ed3e6390f45a37b"
+}
