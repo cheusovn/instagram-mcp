@@ -1,0 +1,218 @@
+name: 🎬 Remotion Video Carousel
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Тема карусели (например: 5 нейросетей для заработка)'
+        required: true
+        type: string
+      slides:
+        description: 'Количество слайдов (5-10)'
+        required: false
+        default: '8'
+        type: string
+      palette:
+        description: 'Цветовая схема'
+        required: false
+        default: 'dark-blue'
+        type: choice
+        options:
+          - dark-blue
+          - dark-purple
+          - dark-green
+          - dark-red
+
+jobs:
+  generate-and-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: remotion-carousel
+
+    steps:
+      - name: Checkout instagram-mcp repo
+        uses: actions/checkout@v4
+        with:
+          repository: cheusovn/instagram-mcp
+          ref: claude/festive-bohr-ni3cx5
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: remotion-carousel/package.json
+
+      - name: Install Chrome dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+            libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 \
+            libxrandr2 libgbm1 libasound2t64 libpango-1.0-0 \
+            libcairo2 libatspi2.0-0 libgtk-3-0
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Generate slide content via OpenRouter
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          TOPIC: ${{ inputs.topic }}
+          SLIDES: ${{ inputs.slides }}
+          PALETTE: ${{ inputs.palette }}
+        run: |
+          python3 << 'PYEOF'
+          import os, json, urllib.request, urllib.error
+
+          TOPIC = os.environ['TOPIC']
+          N = int(os.environ.get('SLIDES', '8'))
+          PALETTE = os.environ.get('PALETTE', 'dark-blue')
+          API_KEY = os.environ['OPENROUTER_API_KEY']
+          MODEL = 'google/gemini-flash-1.5'
+
+          PALETTES = {
+              'dark-blue': {
+                  'bg': 'linear-gradient(160deg, #0a0a1a 0%, #0d1a3a 100%)',
+                  'accent': '#00d4ff',
+                  'bg2': 'linear-gradient(160deg, #050510 0%, #0a1428 100%)',
+                  'accent2': '#4488ff',
+              },
+              'dark-purple': {
+                  'bg': 'linear-gradient(160deg, #0a0a1a 0%, #1a0a2e 100%)',
+                  'accent': '#c084fc',
+                  'bg2': 'linear-gradient(160deg, #080810 0%, #150a20 100%)',
+                  'accent2': '#a855f7',
+              },
+              'dark-green': {
+                  'bg': 'linear-gradient(160deg, #050f0a 0%, #0a1e0f 100%)',
+                  'accent': '#22c55e',
+                  'bg2': 'linear-gradient(160deg, #040a06 0%, #081508 100%)',
+                  'accent2': '#16a34a',
+              },
+              'dark-red': {
+                  'bg': 'linear-gradient(160deg, #120505 0%, #2a0a0a 100%)',
+                  'accent': '#ff4444',
+                  'bg2': 'linear-gradient(160deg, #0a0303 0%, #1e0707 100%)',
+                  'accent2': '#ef4444',
+              },
+          }
+
+          pal = PALETTES.get(PALETTE, PALETTES['dark-blue'])
+
+          fact_prompt = f"""Ты эксперт по нейросетям и ИИ-инструментам. Тема: {TOPIC}
+
+          Собери {N - 1} реальных, проверенных, интересных факта/совета по теме.
+          Каждый факт должен содержать конкретные цифры, названия или даты — НИКАКИХ выдумок.
+          Формат: JSON массив объектов [{"headline": "...", "body": "...", "emoji": "..."}]
+          - headline: цепляющий заголовок (макс 8 слов, на русском)
+          - body: 1-2 предложения с конкретными фактами/цифрами (макс 25 слов)
+          - emoji: 1 подходящий emoji
+          Отвечай ТОЛЬКО JSON, без markdown."""
+
+          def call_openrouter(prompt, model=MODEL):
+              data = json.dumps({
+                  'model': model,
+                  'messages': [{'role': 'user', 'content': prompt}],
+                  'max_tokens': 3000,
+              }).encode()
+              req = urllib.request.Request(
+                  'https://openrouter.ai/api/v1/chat/completions',
+                  data=data,
+                  headers={
+                      'Authorization': f'Bearer {API_KEY}',
+                      'Content-Type': 'application/json',
+                      'HTTP-Referer': 'https://github.com/cheusovn/instagram-mcp',
+                  }
+              )
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  return json.loads(r.read())['choices'][0]['message']['content']
+
+          print(f'🧠 Generating {N-1} facts about: {TOPIC}')
+          raw = call_openrouter(fact_prompt)
+
+          # Clean JSON from markdown if needed
+          raw = raw.strip()
+          if raw.startswith('```'):
+              raw = raw.split('```')[1]
+              if raw.startswith('json'):
+                  raw = raw[4:]
+          raw = raw.strip().rstrip('`').strip()
+
+          facts = json.loads(raw)
+
+          # Build slides array
+          slides = []
+          for i, fact in enumerate(facts[:N-1]):
+              slides.append({
+                  'headline': fact['headline'],
+                  'body': fact['body'],
+                  'emoji': fact.get('emoji', '✨'),
+                  'bgColor': pal['bg'] if i % 2 == 0 else pal['bg2'],
+                  'accentColor': pal['accent'] if i % 2 == 0 else pal['accent2'],
+              })
+
+          # Last slide — CTA
+          slides.append({
+              'headline': 'Хочешь ещё больше?',
+              'body': '• ежедневные фишки и промпты\n• разборы ИИ-инструментов\n• кейсы + шаблоны',
+              'emoji': '🔥',
+              'bgColor': 'linear-gradient(160deg, #0a0a1a 0%, #1a0a2e 50%, #0d1a3a 100%)',
+              'accentColor': pal['accent'],
+              'isLast': True,
+          })
+
+          output = {'slides': slides}
+          with open('src/slides.json', 'w', encoding='utf-8') as f:
+              json.dump(output, f, ensure_ascii=False, indent=2)
+
+          print(f'✅ Generated {len(slides)} slides ({len(slides)-1} facts + 1 CTA)')
+
+          # Also output caption
+          caption_prompt = f"""Напиши цепляющую подпись для Instagram поста о: {TOPIC}
+          Требования:
+          - Первая строка — крючок (вопрос или неожиданный факт), макс 15 слов
+          - 2-3 строки пользы
+          - 5-7 хэштегов (#нейросети #ИИ и релевантные)
+          - Последняя строка: ⬇️ Больше — в Telegram. Ссылка в шапке профиля.
+          Отвечай только текстом подписи, без пояснений."""
+
+          caption = call_openrouter(caption_prompt)
+          with open('/tmp/caption.txt', 'w', encoding='utf-8') as f:
+              f.write(caption)
+          print('📝 Caption generated')
+
+          PYEOF
+
+      - name: Render video with Remotion
+        run: |
+          echo "🎬 Starting Remotion render..."
+          node --experimental-vm-modules render.mjs ../out/carousel.mp4
+        working-directory: remotion-carousel
+
+      - name: Display caption
+        run: |
+          echo "==========================================="
+          echo "📋 INSTAGRAM CAPTION:"
+          echo "==========================================="
+          cat /tmp/caption.txt
+          echo ""
+          echo "==========================================="
+          echo "📁 Video: out/carousel.mp4"
+
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: instagram-carousel-${{ github.run_number }}
+          path: out/carousel.mp4
+          retention-days: 7
+
+      - name: Upload caption artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: caption-${{ github.run_number }}
+          path: /tmp/caption.txt
+          retention-days: 7

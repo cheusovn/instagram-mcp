@@ -1,0 +1,11 @@
+{
+  "slides": [
+    {
+      "headline": "Загрузи свои слайды через GitHub Actions",
+      "body": "Этот файл будет заменён сгенерированным контентом",
+      "emoji": "🚀",
+      "bgColor": "linear-gradient(160deg, #0a0a1a 0%, #0d1a3a 100%)",
+      "accentColor": "#00d4ff"
+    }
+  ]
+}
