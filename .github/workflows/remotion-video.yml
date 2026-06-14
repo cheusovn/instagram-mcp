@@ -189,6 +189,88 @@ jobs:
           print('📝 Caption ready')
           PYEOF
 
+      - name: Generate backgrounds via Nano Banana × OpenRouter
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          STYLE_ID: ${{ inputs.style != '' && inputs.style || '' }}
+        run: |
+          python3 << 'PYEOF'
+          import os, json, urllib.request, base64, time
+
+          API_KEY = os.environ['OPENROUTER_API_KEY']
+          STYLE_ID = os.environ.get('STYLE_ID', '')
+
+          # Только для Style03 (Brutalist Neon) генерируем AI-фоны
+          # Остальные стили используют CSS-градиенты
+          if 'Style03' not in STYLE_ID and STYLE_ID != '':
+              print(f'⏭ Стиль {STYLE_ID}: AI-фоны не нужны (CSS-градиенты)')
+              exit(0)
+
+          # Nano Banana Pro prompt templates (cyberpunk / neon / bento)
+          NANO_BANANA_PROMPTS = [
+              'cyberpunk neon grid cityscape, electric cyan and magenta neon lights, dark purple background, holographic scanlines, ultra detailed, 4K, cinematic, no text',
+              'liquid glass bento grid, purple violet dark background, neon cyan glow edges, translucent glass cards floating, premium tech aesthetic, 4K, cinematic, no text',
+              'abstract cyberpunk energy field, electric blue cyan particles, dark space background, neon grid lines, volumetric light, ultra detailed, no text',
+              'holographic data visualization, neon purple magenta cyan gradient, dark background, glowing circuit patterns, cinematic 4K quality, no text',
+          ]
+
+          slides_path = 'src/slides.json'
+          try:
+              with open(slides_path, encoding='utf-8') as f:
+                  data = json.load(f)
+          except:
+              print('⚠ slides.json not found, skipping background generation')
+              exit(0)
+
+          slides = data.get('slides', [])
+          print(f'🎨 Генерирую Nano Banana фоны для {len(slides)} слайдов...')
+
+          def generate_image(prompt):
+              payload = json.dumps({
+                  'model': 'black-forest-labs/flux-schnell',
+                  'prompt': prompt,
+                  'width': 1080,
+                  'height': 1350,
+              }).encode()
+              req = urllib.request.Request(
+                  'https://openrouter.ai/api/v1/images/generations',
+                  data=payload,
+                  headers={
+                      'Authorization': f'Bearer {API_KEY}',
+                      'Content-Type': 'application/json',
+                      'HTTP-Referer': 'https://github.com/cheusovn/instagram-mcp',
+                  }
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as r:
+                      resp = json.loads(r.read())
+                  url = resp.get('data', [{}])[0].get('url', '')
+                  return url
+              except Exception as e:
+                  print(f'  ⚠ Image gen error: {e}')
+                  return ''
+
+          updated = 0
+          for i, slide in enumerate(slides):
+              if slide.get('isLast'):
+                  continue
+              prompt = NANO_BANANA_PROMPTS[i % len(NANO_BANANA_PROMPTS)]
+              print(f'  [{i+1}/{len(slides)}] {prompt[:60]}...')
+              url = generate_image(prompt)
+              if url:
+                  slide['image'] = url
+                  updated += 1
+                  print(f'    ✅ {url[:80]}...')
+              else:
+                  print(f'    ⏭ Используем CSS-фон')
+              time.sleep(0.5)
+
+          with open(slides_path, 'w', encoding='utf-8') as f:
+              json.dump(data, f, ensure_ascii=False, indent=2)
+
+          print(f'✅ Nano Banana: {updated}/{len(slides)-1} фонов сгенерировано')
+          PYEOF
+
       - name: Render with Remotion
         env:
           COMPOSITION_ID: ${{ inputs.style != '' && inputs.style || 'Carousel' }}

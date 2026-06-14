@@ -134,7 +134,7 @@ export const Style06: React.FC<SlideData> = (props) => {
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(0,255,159,0.08) 0%, transparent 70%)', zIndex: 0 }} />
         <AbsoluteFill style={{ zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 60 }}>
           <div style={{ transform: `scale(${scaleIn})`, marginBottom: 28, filter: 'drop-shadow(0 0 24px #2AABEE)' }}>
-            <TelegramIcon size={88} color="#2AABEE" />
+            <TelegramIcon size={88} />
           </div>
           <div style={{ fontFamily: FONTS.russo, fontSize: 36, color: '#fff', textAlign: 'center', lineHeight: 1.2, marginBottom: 20, opacity: scaleIn }}>
             Больше информации —<br />
@@ -144,7 +144,7 @@ export const Style06: React.FC<SlideData> = (props) => {
             ССЫЛКА В ШАПКЕ ПРОФИЛЯ ↓
           </div>
           <div style={{ transform: `scale(${scaleIn})`, opacity: scaleIn }}>
-            <InstagramProfileMockup handle={profileHandle || BRAND} accentColor="#2AABEE" />
+            <InstagramProfileMockup handle={profileHandle || BRAND} accent="#2AABEE" />
           </div>
         </AbsoluteFill>
       </AbsoluteFill>

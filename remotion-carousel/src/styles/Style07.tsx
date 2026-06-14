@@ -95,7 +95,7 @@ export const Style07: React.FC<SlideData> = (props) => {
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', height: '100%', padding: '0 64px' }}>
             <div style={{ transform: `scale(${scaleIn})`, marginBottom: 24, filter: 'drop-shadow(0 0 16px rgba(42,171,238,0.5))' }}>
-              <TelegramIcon size={76} color="#2AABEE" />
+              <TelegramIcon size={76} />
             </div>
             <div style={{ fontFamily: FONTS.golos, fontSize: 52, fontWeight: 900, color: '#fff', lineHeight: 1.15, marginBottom: 16, opacity: scaleIn }}>
               Больше информации —
@@ -107,7 +107,7 @@ export const Style07: React.FC<SlideData> = (props) => {
               Ссылка в шапке профиля ↓
             </div>
             <div style={{ transform: `scale(${scaleIn})`, opacity: scaleIn }}>
-              <InstagramProfileMockup handle={profileHandle || BRAND} accentColor="#2AABEE" />
+              <InstagramProfileMockup handle={profileHandle || BRAND} accent="#2AABEE" />
             </div>
           </div>
         </AbsoluteFill>

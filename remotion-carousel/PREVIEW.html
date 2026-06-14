@@ -163,28 +163,87 @@
     </div>
   </div>
 
-  <!-- STYLE 03 -->
+  <!-- STYLE 03 UPGRADED -->
   <div class="card" onclick="pick(3, this)" id="c3">
-    <div class="slide s03">
-      <div class="grid-line" style="left:30px;top:0;bottom:0;width:1px"></div>
-      <div class="grid-line" style="left:0;right:0;top:30%;height:1px"></div>
-      <div class="grid-line" style="left:0;right:0;top:65%;height:1px;background:rgba(255,43,214,0.15)"></div>
-      <div class="header" style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.6)">
+    <div class="slide s03" style="position:relative;overflow:hidden">
+      <!-- Dense neon grid -->
+      <svg style="position:absolute;inset:0;opacity:0.15;pointer-events:none" width="100%" height="100%" viewBox="0 0 320 400">
+        <defs><pattern id="g" width="13" height="13" patternUnits="userSpaceOnUse"><path d="M13 0H0V13" fill="none" stroke="#00F0FF" stroke-width="0.4"/></pattern>
+        <pattern id="gb" width="80" height="80" patternUnits="userSpaceOnUse"><path d="M80 0H0V80" fill="none" stroke="#00F0FF" stroke-width="1.5"/></pattern></defs>
+        <rect width="100%" height="100%" fill="url(#g)"/>
+        <rect width="100%" height="100%" fill="url(#gb)"/>
+        <line x1="0" y1="0" x2="320" y2="400" stroke="#FF2BD6" stroke-width="0.4" opacity="0.3"/>
+        <line x1="320" y1="0" x2="0" y2="400" stroke="#FF2BD6" stroke-width="0.4" opacity="0.3"/>
+      </svg>
+      <!-- Scanline sweep -->
+      <div style="position:absolute;left:0;right:0;top:60%;height:2px;background:#00F0FF;box-shadow:0 0 12px #00F0FF;opacity:0.7;z-index:3"></div>
+      <!-- Corner markers -->
+      <div style="position:absolute;top:8px;left:8px;width:20px;height:20px;border-top:2px solid #00F0FF;border-left:2px solid #00F0FF"></div>
+      <div style="position:absolute;top:8px;right:8px;width:20px;height:20px;border-top:2px solid #FF2BD6;border-right:2px solid #FF2BD6"></div>
+      <div style="position:absolute;bottom:8px;left:8px;width:20px;height:20px;border-bottom:2px solid #FF2BD6;border-left:2px solid #FF2BD6"></div>
+      <div style="position:absolute;bottom:8px;right:8px;width:20px;height:20px;border-bottom:2px solid #00F0FF;border-right:2px solid #00F0FF"></div>
+      <!-- Energy particles -->
+      <div style="position:absolute;width:5px;height:5px;top:15%;left:20%;background:#00F0FF;border-radius:50%;box-shadow:0 0 8px #00F0FF;opacity:0.8"></div>
+      <div style="position:absolute;width:3px;height:12px;top:40%;left:82%;background:#FF2BD6;box-shadow:0 0 6px #FF2BD6;opacity:0.7"></div>
+      <div style="position:absolute;width:4px;height:4px;top:75%;left:55%;background:#FFE600;border-radius:50%;box-shadow:0 0 8px #FFE600;opacity:0.8"></div>
+      <div style="position:absolute;width:6px;height:6px;top:25%;left:65%;background:#00FF9F;border-radius:50%;box-shadow:0 0 8px #00FF9F;opacity:0.7"></div>
+      <!-- Holo shimmer -->
+      <div style="position:absolute;top:0;bottom:0;left:30%;width:60px;background:linear-gradient(90deg,transparent,rgba(0,240,255,0.04),rgba(255,43,214,0.03),transparent);transform:skewX(-15deg);pointer-events:none;z-index:2"></div>
+      <!-- Radial glow -->
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(0,240,255,0.07) 0%,transparent 60%),radial-gradient(ellipse at 80% 70%,rgba(255,43,214,0.06) 0%,transparent 50%);pointer-events:none"></div>
+
+      <div class="header" style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.6);position:relative;z-index:5">
         <span>@nikolay_cheusov</span>
         <span class="badge" style="border:1px solid #00F0FF44;color:#00F0FF">1/4</span>
       </div>
-      <div class="kicker s03">SYS://NEURAL</div>
-      <div class="headline s03">Топ-5<br><span class="acc">нейросетей</span><br>2026</div>
-      <div class="neon-box s03" style="margin-top:12px">
-        <div class="body s03">Sora, Runway, Kling — реальные кейсы с цифрами 👇</div>
+
+      <!-- Bento mono tag -->
+      <div style="position:relative;z-index:5;margin-top:10px;align-self:flex-start;background:rgba(255,43,214,0.08);border:1.5px solid #FF2BD6;border-radius:6px;padding:4px 14px;display:inline-block">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:3px;color:#FF2BD6;text-shadow:0 0 8px #FF2BD6">SYS://SLIDE_01</span>
       </div>
-      <div class="progress" style="margin-top:16px">
-        <div style="width:25%;height:4px;background:#00F0FF;border-radius:0;box-shadow:0 0 10px #00F0FF88"></div>
+
+      <!-- Emoji neon box with chroma -->
+      <div style="position:relative;z-index:5;margin-top:10px;display:inline-block">
+        <div style="position:absolute;top:0;left:3px;font-size:56px;color:#FF2020;opacity:0.5;mix-blend-mode:screen">🔥</div>
+        <div style="position:absolute;top:3px;left:-3px;font-size:56px;color:#2060FF;opacity:0.5;mix-blend-mode:screen">🔥</div>
+        <div style="font-size:56px;width:80px;height:80px;display:flex;align-items:center;justify-content:center;border:2px solid #00F0FF;box-shadow:0 0 20px #00F0FF,inset 0 0 12px rgba(0,240,255,0.3),4px 4px 0 #FF2BD6">🔥</div>
+      </div>
+
+      <!-- Headline with chroma -->
+      <div style="position:relative;z-index:5;margin-top:8px">
+        <span style="display:inline-block;font-family:'Oswald',sans-serif;font-weight:700;font-size:44px;text-transform:uppercase;color:#000;background:#00F0FF;padding:0 8px;box-shadow:0 0 20px #00F0FF,3px 3px 0 #FF2BD6;margin-right:8px;line-height:1.15">Топ-5</span>
+        <span style="display:inline-block;position:relative;font-family:'Oswald',sans-serif;font-weight:700;font-size:44px;text-transform:uppercase;color:#fff;text-shadow:2px 0 #FF2BD6,-2px 0 rgba(0,240,255,0.6);line-height:1.15">нейросетей</span>
+      </div>
+      <div style="position:relative;z-index:5;font-family:'Oswald',sans-serif;font-weight:700;font-size:44px;text-transform:uppercase;color:#fff;text-shadow:2px 0 #FF2BD6;line-height:1.15">2026</div>
+
+      <!-- Bento liquid glass body card -->
+      <div style="position:relative;z-index:5;margin-top:8px;background:rgba(255,255,255,0.06);backdrop-filter:blur(16px);border:1.5px solid #00F0FF;border-radius:8px;padding:10px 14px;box-shadow:0 0 16px rgba(0,240,255,0.3),inset 0 0 16px rgba(0,240,255,0.05)">
+        <div style="font-family:'Oswald',sans-serif;font-size:18px;color:rgba(255,255,255,0.9);border-left:2px solid #FF2BD6;padding-left:10px"><span style="color:rgba(0,240,255,0.7)">▶ </span>Sora, Runway, Kling — реальные кейсы 👇</div>
+      </div>
+
+      <!-- Bento data modules -->
+      <div style="position:relative;z-index:5;display:flex;gap:6px;margin-top:8px">
+        <div style="background:rgba(255,255,255,0.06);border:1.5px solid #00F0FF;border-radius:6px;padding:6px 10px;box-shadow:0 0 10px rgba(0,240,255,0.3)">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(0,240,255,0.8);letter-spacing:2px">СЛАЙД</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#00F0FF;text-shadow:0 0 10px #00F0FF">1/4</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.06);border:1.5px solid #FF2BD6;border-radius:6px;padding:6px 10px;box-shadow:0 0 10px rgba(255,43,214,0.3)">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,43,214,0.8);letter-spacing:2px">2026</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FF2BD6;text-shadow:0 0 10px #FF2BD6">AI↑</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.06);border:1.5px solid #FFE600;border-radius:6px;padding:6px 10px;box-shadow:0 0 10px rgba(255,230,0,0.2);display:flex;align-items:center">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#FFE600;text-shadow:0 0 8px #FFE600">@nikolay_cheusov</div>
+        </div>
+      </div>
+
+      <div style="position:relative;z-index:5;margin-top:8px">
+        <div style="width:25%;height:3px;background:#00F0FF;box-shadow:0 0 8px #00F0FF88"></div>
       </div>
     </div>
     <div class="label" style="background:#12001f">
-      <div style="font-size:18px">☠️ BRUTALIST NEON</div>
-      <div class="tag">Oswald · Циан/Маджента · Glitch + сетка</div>
+      <div style="font-size:18px">☠️ BRUTALIST NEON × NANO BANANA</div>
+      <div class="tag">Oswald · Liquid Glass Bento · Chroma · AI-фоны</div>
+      <div class="nano-badge">✦ Nano Banana Pro: AI cyberpunk backgrounds via OpenRouter</div>
     </div>
   </div>
 

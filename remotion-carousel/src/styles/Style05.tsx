@@ -125,7 +125,7 @@ export const Style05: React.FC<SlideData> = (props) => {
         <BlobLayer frame={frame} fps={fps} accent="#8B5CFF" />
         <AbsoluteFill style={{ zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 60 }}>
           <div style={{ transform: `scale(${scaleIn})`, marginBottom: 28, filter: 'drop-shadow(0 0 24px #2AABEE88)' }}>
-            <TelegramIcon size={88} color="#2AABEE" />
+            <TelegramIcon size={88} />
           </div>
           <div style={{ fontFamily: FONTS.montserrat, fontSize: 38, fontWeight: 900, color: '#fff', textAlign: 'center', lineHeight: 1.2, marginBottom: 20, transform: `translateY(${(1 - scaleIn) * 30}px)`, opacity: scaleIn }}>
             Больше информации —<br />в моём Telegram-канале
@@ -134,7 +134,7 @@ export const Style05: React.FC<SlideData> = (props) => {
             Ссылка в шапке профиля ↓
           </div>
           <div style={{ transform: `scale(${scaleIn})`, opacity: scaleIn }}>
-            <InstagramProfileMockup handle={profileHandle || BRAND} accentColor="#2AABEE" />
+            <InstagramProfileMockup handle={profileHandle || BRAND} accent="#2AABEE" />
           </div>
         </AbsoluteFill>
       </AbsoluteFill>
