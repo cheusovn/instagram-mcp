@@ -35,16 +35,17 @@ jobs:
           node --input-type=module << 'EOF'
           import fs from 'fs';
 
+          // 3×3 grid rotation: A(neon) B(glass) A C(gold) A B A C A
           const SCHEDULE = [
-            { post: 'post_01', style: 'Style03-BrutalistNeon' },
-            { post: 'post_02', style: 'Style07-SwissBold'     },
-            { post: 'post_03', style: 'Style06-RetroVHS'      },
-            { post: 'post_04', style: 'Style03-BrutalistNeon' },
-            { post: 'post_05', style: 'Style04-Glassmorphism' },
-            { post: 'post_06', style: 'Style03-BrutalistNeon' },
-            { post: 'post_07', style: 'Style01-Bebas3D'       },
-            { post: 'post_08', style: 'Style07-SwissBold'     },
-            { post: 'post_09', style: 'Style03-BrutalistNeon' },
+            { post: 'post_01', style: 'StyleA-NeonKatana'  },
+            { post: 'post_02', style: 'StyleB-GlassMinimal' },
+            { post: 'post_03', style: 'StyleA-NeonKatana'  },
+            { post: 'post_04', style: 'StyleC-GoldRush'    },
+            { post: 'post_05', style: 'StyleA-NeonKatana'  },
+            { post: 'post_06', style: 'StyleB-GlassMinimal' },
+            { post: 'post_07', style: 'StyleA-NeonKatana'  },
+            { post: 'post_08', style: 'StyleC-GoldRush'    },
+            { post: 'post_09', style: 'StyleA-NeonKatana'  },
           ];
 
           const forced = '${{ inputs.post_id }}';
@@ -87,6 +88,22 @@ jobs:
       - name: Prepare slides
         if: steps.pick.outputs.skip != 'true'
         run: node prepare-post.mjs ${{ steps.pick.outputs.post_id }}
+
+      - name: Generate AI Backgrounds
+        if: steps.pick.outputs.skip != 'true'
+        working-directory: remotion-carousel
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          COMP="${{ steps.pick.outputs.style }}"
+          case "$COMP" in
+            StyleA-NeonKatana|Style03-BrutalistNeon) BG="StyleA-NeonKatana" ;;
+            StyleB-GlassMinimal|Style04-Glassmorphism) BG="StyleB-GlassMinimal" ;;
+            StyleC-GoldRush|Style01-Bebas3D) BG="StyleC-GoldRush" ;;
+            *) BG="StyleA-NeonKatana" ;;
+          esac
+          echo "🎨 AI backgrounds: ${BG}"
+          node generate-backgrounds.mjs --style=${BG}
 
       - name: Generate SFX
         if: steps.pick.outputs.skip != 'true'

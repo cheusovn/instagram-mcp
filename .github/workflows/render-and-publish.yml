@@ -21,9 +21,12 @@ on:
       composition:
         description: 'Remotion composition'
         required: false
-        default: 'Style03-BrutalistNeon'
+        default: 'StyleA-NeonKatana'
         type: choice
         options:
+          - StyleA-NeonKatana
+          - StyleB-GlassMinimal
+          - StyleC-GoldRush
           - Style03-BrutalistNeon
           - Style01-Bebas3D
           - Style02-CandyPop
@@ -76,6 +79,30 @@ jobs:
         run: |
           echo "📋 Содержимое slides.json:"
           cat remotion-carousel/src/slides.json
+
+      - name: 📦 Prepare post slides
+        run: |
+          echo "Подготавливаю слайды для ${{ inputs.post_id }}..."
+          node prepare-post.mjs ${{ inputs.post_id }}
+
+      - name: 🖼 Generate AI backgrounds (OpenRouter)
+        working-directory: remotion-carousel
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          STYLE_ID: ${{ inputs.composition }}
+        run: |
+          # Map composition ID to background style bank
+          case "${{ inputs.composition }}" in
+            StyleA-NeonKatana) BG_STYLE="StyleA-NeonKatana" ;;
+            StyleB-GlassMinimal) BG_STYLE="StyleB-GlassMinimal" ;;
+            StyleC-GoldRush) BG_STYLE="StyleC-GoldRush" ;;
+            Style03-BrutalistNeon) BG_STYLE="StyleA-NeonKatana" ;;
+            Style04-Glassmorphism) BG_STYLE="StyleB-GlassMinimal" ;;
+            Style01-Bebas3D) BG_STYLE="StyleC-GoldRush" ;;
+            *) BG_STYLE="StyleA-NeonKatana" ;;
+          esac
+          echo "🎨 Генерирую AI-фоны для стиля: ${BG_STYLE}"
+          node generate-backgrounds.mjs --style=${BG_STYLE}
 
       - name: 🎵 Generate SFX (cyberpunk sound effects)
         working-directory: remotion-carousel

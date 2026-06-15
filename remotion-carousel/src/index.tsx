@@ -9,6 +9,9 @@ import { Style04 } from './styles/Style04';
 import { Style05 } from './styles/Style05';
 import { Style06 } from './styles/Style06';
 import { Style07 } from './styles/Style07';
+import { StyleA } from './styles/StyleA';
+import { StyleB } from './styles/StyleB';
+import { StyleC } from './styles/StyleC';
 import type { SlideInput } from './theme';
 
 const defaultSlides: CarouselProps['slides'] = [
@@ -63,6 +66,15 @@ const Style06Carousel: React.FC<SlidesOnly> = ({ slides }) => (
 const Style07Carousel: React.FC<SlidesOnly> = ({ slides }) => (
   <StyleCarousel slides={slides} Slide={Style07} bg="#f5f5f0" />
 );
+const StyleACarousel: React.FC<SlidesOnly> = ({ slides }) => (
+  <StyleCarousel slides={slides} Slide={StyleA} bg="#000000" />
+);
+const StyleBCarousel: React.FC<SlidesOnly> = ({ slides }) => (
+  <StyleCarousel slides={slides} Slide={StyleB} bg="#f0f4ff" />
+);
+const StyleCCarousel: React.FC<SlidesOnly> = ({ slides }) => (
+  <StyleCarousel slides={slides} Slide={StyleC} bg="#0D0800" />
+);
 
 const Root: React.FC = () => (
   <>
@@ -114,6 +126,24 @@ const Root: React.FC = () => (
     <Composition
       id="Style07-SwissBold"
       component={Style07Carousel}
+      defaultProps={{ slides: styleSlides }}
+      calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
+    />
+    <Composition
+      id="StyleA-NeonKatana"
+      component={StyleACarousel}
+      defaultProps={{ slides: styleSlides }}
+      calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
+    />
+    <Composition
+      id="StyleB-GlassMinimal"
+      component={StyleBCarousel}
+      defaultProps={{ slides: styleSlides }}
+      calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
+    />
+    <Composition
+      id="StyleC-GoldRush"
+      component={StyleCCarousel}
       defaultProps={{ slides: styleSlides }}
       calculateMetadata={({ props }) => ({ durationInFrames: carouselDuration(props.slides.length), fps: 30, width: 1080, height: 1350 })}
     />
