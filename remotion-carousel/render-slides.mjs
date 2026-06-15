@@ -63,20 +63,18 @@ function buildHeygenScript(slide, slideNum, total) {
 }
 
 async function renderSlide(slideIndex) {
-  const slide = slides[slideIndex];
   const slideNum = slideIndex + 1;
   const padded = String(slideNum).padStart(2, '0');
   const outPath = path.join(OUT_DIR, `slide_${padded}.mp4`);
 
   const SLIDE_DURATION = 120;
   const TRANSITION = 12;
-  const startFrame = slideIndex === 0
-    ? 0
-    : slideIndex * SLIDE_DURATION - slideIndex * TRANSITION;
-  const endFrame = startFrame + SLIDE_DURATION;
+  const startFrame = slideIndex * SLIDE_DURATION - slideIndex * TRANSITION;
+  const endFrame = startFrame + SLIDE_DURATION - 1;
 
   process.stdout.write(`  [${padded}] Рендерю кадры ${startFrame}–${endFrame}... `);
 
+  // Pass ALL slides so slideNum/total display correctly; no durationInFrames override
   const composition = await selectComposition({
     serveUrl: bundleLocation,
     id: compositionId,
@@ -84,15 +82,12 @@ async function renderSlide(slideIndex) {
   });
 
   await renderMedia({
-    composition: {
-      ...composition,
-      durationInFrames: SLIDE_DURATION,
-    },
+    composition,           // uses real durationInFrames from calculateMetadata
     serveUrl: bundleLocation,
     codec: 'h264',
     outputLocation: outPath,
     inputProps,
-    frameRange: [startFrame, endFrame - 1],
+    frameRange: [startFrame, endFrame],
     ...(useGpu ? { chromiumOptions } : {}),
     onProgress: ({ progress }) => process.stdout.write(`\r  [${padded}] ${Math.round(progress * 100)}%   `),
   });
