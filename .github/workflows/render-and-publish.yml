@@ -129,10 +129,10 @@ jobs:
       - name: 🔗 Assemble carousel with ffmpeg
         run: |
           echo "🔗 Собираю carousel..."
-          ls out/slides/slide_*.mp4 | sort | awk '{print "file \x27" $0 "\x27"}' > /tmp/concat.txt
-          cat /tmp/concat.txt
+          ls "$(pwd)/out/slides/slide_"*.mp4 | sort | awk '{print "file \x27" $0 "\x27"}' > out/concat.txt
+          cat out/concat.txt
 
-          ffmpeg -y -f concat -safe 0 -i /tmp/concat.txt \
+          ffmpeg -y -f concat -safe 0 -i out/concat.txt \
             -c:v libx264 -preset medium -crf 20 -movflags +faststart \
             -vf "scale=1080:1350" \
             out/carousel_full.mp4
