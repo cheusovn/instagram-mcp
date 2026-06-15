@@ -22,6 +22,8 @@ const compositionId = process.argv[2] || process.env.COMPOSITION_ID || 'Style03-
 const useGpu = process.argv.includes('--gpu') || process.env.USE_GPU === '1';
 const slidesOnly = process.argv.includes('--slides-only');
 const withHeygen = process.argv.includes('--heygen');
+const maxSlidesArg = process.argv.find(a => a.startsWith('--max-slides='));
+const maxSlides = maxSlidesArg ? parseInt(maxSlidesArg.split('=')[1]) : (process.env.MAX_SLIDES ? parseInt(process.env.MAX_SLIDES) : 0);
 
 const OUT_DIR = path.join(__dirname, '..', 'out', 'slides');
 fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -31,12 +33,13 @@ const rootSlides = path.join(__dirname, '..', 'slides.json');
 const srcSlides  = path.join(__dirname, 'src', 'slides.json');
 const slidesPath = fs.existsSync(rootSlides) ? rootSlides : srcSlides;
 const inputProps = JSON.parse(fs.readFileSync(slidesPath, 'utf-8'));
-const slides = inputProps.slides;
+const allSlides = inputProps.slides;
+const slides = maxSlides > 0 ? allSlides.slice(0, maxSlides) : allSlides;
 
 console.log('═'.repeat(60));
-console.log('  🎬 REMOTION — 10 Slides Individual MP4 Renderer');
+console.log('  🎬 REMOTION — Slides Individual MP4 Renderer');
 console.log(`  Композиция: ${compositionId}`);
-console.log(`  Слайдов: ${slides.length}`);
+console.log(`  Слайдов: ${slides.length}${maxSlides > 0 ? ` (тест: первые ${maxSlides})` : ''}`);
 console.log(`  GPU: ${useGpu ? 'ВКЛЮЧЁН' : 'выкл'}`);
 console.log('═'.repeat(60));
 

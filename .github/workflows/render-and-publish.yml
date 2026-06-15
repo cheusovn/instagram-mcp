@@ -34,6 +34,11 @@ on:
           - Style05-LiquidBlobs
           - Style06-RetroVHS
           - Style07-SwissBold
+      max_slides:
+        description: 'Кол-во слайдов (0 = все, 1 = тест)'
+        required: false
+        default: '0'
+        type: string
 
 jobs:
   render-and-publish:
@@ -121,7 +126,7 @@ jobs:
           echo "  🎬 Рендерю: ${{ inputs.composition }}"
           echo "  📊 CPU рендер — займёт 15-30 минут"
           echo "═══════════════════════════════════════════"
-          node render-slides.mjs '${{ inputs.composition }}' --slides-only
+          MAX_SLIDES=${{ inputs.max_slides || 0 }} node render-slides.mjs '${{ inputs.composition }}' --slides-only
           echo ""
           echo "✅ Слайды готовы:"
           ls -lh ../out/slides/
