@@ -1,8 +1,8 @@
 import { delayRender, continueRender } from 'remotion';
 
 // ── Общая длительность слайда: РОВНО 4 секунды @30fps ─────────────────────────
-export const SLIDE_DURATION = 120; // 4s
-export const TRANSITION = 12; // нахлёст переходов между слайдами
+export const SLIDE_DURATION = 90; // 3s — faster CI render
+export const TRANSITION = 9; // нахлёст переходов между слайдами
 export const FPS = 30;
 export const WIDTH = 1080;
 export const HEIGHT = 1350; // 4:5

@@ -67,8 +67,8 @@ async function renderSlide(slideIndex) {
   const padded = String(slideNum).padStart(2, '0');
   const outPath = path.join(OUT_DIR, `slide_${padded}.mp4`);
 
-  const SLIDE_DURATION = 120;
-  const TRANSITION = 12;
+  const SLIDE_DURATION = 90;
+  const TRANSITION = 9;
   const startFrame = slideIndex * SLIDE_DURATION - slideIndex * TRANSITION;
   const endFrame = startFrame + SLIDE_DURATION - 1;
 
