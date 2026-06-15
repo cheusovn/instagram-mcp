@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview + AI Backgrounds — post_01 · StyleA-NeonKatana</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#000; font-family:'Space Mono',monospace; min-height:100vh; color:#fff; }
+
+.topbar {
+  position:sticky; top:0; z-index:100;
+  background:rgba(0,0,0,0.94);
+  border-bottom:1px solid #CCFF00;
+  padding:12px 24px;
+  display:flex; align-items:center; gap:14px;
+  backdrop-filter:blur(14px);
+}
+.topbar-title { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:3px; color:#CCFF00; text-shadow:0 0 20px #CCFF00; }
+.topbar-tag { background:rgba(204,255,0,0.1); border:1px solid #CCFF00; color:#CCFF00; padding:3px 10px; font-size:10px; letter-spacing:2px; border-radius:3px; }
+.topbar-tag.cyan { color:#00FFFF; border-color:#00FFFF; background:rgba(0,255,255,0.07); }
+.topbar-note { margin-left:auto; font-size:11px; color:rgba(255,255,255,0.35); letter-spacing:1px; }
+
+.ai-badge {
+  background:linear-gradient(90deg,rgba(204,255,0,0.15),rgba(0,255,255,0.1));
+  border:1px solid rgba(204,255,0,0.4); border-radius:4px;
+  padding:4px 12px; font-size:10px; letter-spacing:1px; color:#CCFF00;
+  display:flex; align-items:center; gap:6px;
+}
+.ai-dot { width:6px; height:6px; border-radius:50%; background:#CCFF00; animation:blink 1s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1;box-shadow:0 0 6px #CCFF00} 50%{opacity:0.3;box-shadow:none} }
+
+.slides-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
+  gap:20px;
+  padding:32px 24px;
+  max-width:1400px; margin:0 auto;
+}
+
+/* Each slide */
+.slide {
+  aspect-ratio:4/5;
+  position:relative;
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:transform 0.25s, box-shadow 0.25s;
+  box-shadow:0 4px 24px rgba(0,0,0,0.7);
+}
+.slide:hover {
+  transform:translateY(-5px) scale(1.015);
+  box-shadow:0 0 40px rgba(204,255,0,0.2), 0 16px 48px rgba(0,0,0,0.85);
+}
+
+/* AI-GENERATED BACKGROUND LAYER (simulated with CSS) */
+.bg { position:absolute; inset:0; }
+
+/* Slide 1 — cyberpunk Japan street */
+.bg-1 {
+  background:
+    radial-gradient(ellipse at 80% 0%, rgba(204,255,0,0.25) 0%, transparent 40%),
+    radial-gradient(ellipse at 20% 100%, rgba(255,0,255,0.2) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,20,60,0.6) 0%, transparent 70%),
+    linear-gradient(160deg, #000000 0%, #0a001a 30%, #000d00 60%, #080000 100%);
+}
+.bg-1::after {
+  content:''; position:absolute; inset:0;
+  background:
+    linear-gradient(transparent 60%, rgba(0,0,0,0.5) 100%),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(204,255,0,0.03) 40px),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(204,255,0,0.03) 40px);
+}
+
+/* Slide 2 — liquid neon explosion */
+.bg-2 {
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(204,255,0,0.35) 0%, transparent 35%),
+    radial-gradient(ellipse at 70% 60%, rgba(255,0,255,0.3) 0%, transparent 30%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,255,255,0.1) 0%, transparent 50%),
+    linear-gradient(135deg, #000 0%, #050018 50%, #000 100%);
+}
+
+/* Slide 3 — holographic data sphere */
+.bg-3 {
+  background:
+    radial-gradient(circle at 50% 40%, rgba(0,255,255,0.3) 0%, rgba(0,100,255,0.15) 25%, transparent 50%),
+    radial-gradient(ellipse at 20% 80%, rgba(204,255,0,0.15) 0%, transparent 40%),
+    linear-gradient(160deg, #000008 0%, #000420 40%, #001800 70%, #000008 100%);
+}
+.bg-3::before {
+  content:''; position:absolute; inset:0;
+  background:
+    radial-gradient(circle at 50% 38%, transparent 14%, rgba(0,255,255,0.12) 15%, transparent 16%),
+    radial-gradient(circle at 50% 38%, transparent 22%, rgba(204,255,0,0.08) 23%, transparent 24%),
+    radial-gradient(circle at 50% 38%, transparent 30%, rgba(255,0,255,0.06) 31%, transparent 32%);
+}
+
+/* Slide 4 — brutalist neon architecture */
+.bg-4 {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(204,255,0,0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 10% 90%, rgba(255,0,255,0.15) 0%, transparent 40%),
+    linear-gradient(180deg, #020002 0%, #0a0020 20%, #001000 50%, #050005 100%);
+}
+.bg-4::after {
+  content:''; position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0px, transparent 48px, rgba(204,255,0,0.04) 49px, transparent 50px),
+    linear-gradient(to bottom, rgba(204,255,0,0.08) 0%, transparent 15%, transparent 85%, rgba(204,255,0,0.05) 100%);
+}
+
+/* Slide 5 — macro neon circuit */
+.bg-5 {
+  background:
+    radial-gradient(ellipse at 30% 50%, rgba(204,255,0,0.25) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 50%, rgba(0,255,255,0.2) 0%, transparent 35%),
+    linear-gradient(135deg, #000005 0%, #001000 40%, #000800 70%, #000005 100%);
+}
+.bg-5::before {
+  content:''; position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 7px, rgba(204,255,0,0.04) 8px),
+    repeating-linear-gradient(90deg, transparent, transparent 7px, rgba(0,255,255,0.03) 8px);
+}
+
+/* Slide 6 — cyberpunk liquid metal */
+.bg-6 {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(255,0,255,0.3) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 70%, rgba(204,255,0,0.25) 0%, transparent 40%),
+    linear-gradient(180deg, #050000 0%, #100010 30%, #001000 60%, #050000 100%);
+}
+.bg-6::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(160deg, rgba(255,255,255,0.03) 0%, transparent 30%, rgba(255,0,255,0.05) 50%, transparent 70%, rgba(204,255,0,0.04) 100%);
+}
+
+/* Slide 7 — AI neural network */
+.bg-7 {
+  background:
+    radial-gradient(circle at 25% 25%, rgba(204,255,0,0.2) 0%, transparent 25%),
+    radial-gradient(circle at 75% 25%, rgba(0,255,255,0.15) 0%, transparent 25%),
+    radial-gradient(circle at 50% 60%, rgba(255,0,255,0.18) 0%, transparent 30%),
+    radial-gradient(circle at 25% 80%, rgba(204,255,0,0.12) 0%, transparent 20%),
+    radial-gradient(circle at 75% 80%, rgba(0,255,255,0.1) 0%, transparent 20%),
+    linear-gradient(135deg, #000 0%, #050010 50%, #000 100%);
+}
+
+/* Slide 8 — katana slash energy */
+.bg-8 {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(204,255,0,0.4) 0%, rgba(204,255,0,0.1) 20%, transparent 40%),
+    radial-gradient(ellipse at 80% 50%, rgba(0,255,255,0.2) 0%, transparent 35%),
+    linear-gradient(135deg, #000 0%, #001500 40%, #000 100%);
+}
+.bg-8::before {
+  content:''; position:absolute;
+  top:40%; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, transparent 0%, rgba(204,255,0,0.6) 30%, rgba(255,255,255,0.9) 50%, rgba(204,255,0,0.6) 70%, transparent 100%);
+  box-shadow:0 0 20px rgba(204,255,0,0.8), 0 0 60px rgba(204,255,0,0.3);
+  transform:rotate(-3deg);
+}
+
+/* Slide 9 — cyberpunk megacity */
+.bg-9 {
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(204,255,0,0.15) 0%, transparent 40%),
+    radial-gradient(ellipse at 20% 70%, rgba(255,0,255,0.12) 0%, transparent 35%),
+    radial-gradient(ellipse at 80% 70%, rgba(0,255,255,0.1) 0%, transparent 30%),
+    linear-gradient(180deg, #030010 0%, #0a0025 20%, #000510 50%, #020015 100%);
+}
+.bg-9::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:40%;
+  background:linear-gradient(transparent, rgba(204,255,0,0.06));
+  background-image:
+    repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(204,255,0,0.05) 19px, transparent 20px),
+    linear-gradient(transparent, rgba(204,255,0,0.04));
+}
+
+/* Slide 10 — Telegram CTA */
+.bg-10 {
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(42,171,238,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 80%, rgba(204,255,0,0.1) 0%, transparent 40%),
+    linear-gradient(160deg, #000008 0%, #000a1a 40%, #001800 70%, #000008 100%);
+}
+
+/* Overlay: dark gradient so text is readable over bg */
+.bg-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.35) 0%,
+    rgba(0,0,0,0.2) 30%,
+    rgba(0,0,0,0.3) 70%,
+    rgba(0,0,0,0.55) 100%
+  );
+  z-index:1;
+}
+
+/* FX LAYERS */
+.neon-grid {
+  position:absolute; inset:0; z-index:2; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(204,255,0,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(204,255,0,0.05) 1px, transparent 1px);
+  background-size:40px 40px;
+}
+.scanline {
+  position:absolute; left:0; right:0; height:2px; z-index:3;
+  background:#CCFF00;
+  box-shadow:0 0 12px #CCFF00, 0 0 30px rgba(204,255,0,0.35);
+  animation:scan 2.5s linear infinite;
+  pointer-events:none;
+}
+@keyframes scan { 0%{top:-2px} 100%{top:100%} }
+
+.corner { position:absolute; width:20px; height:20px; pointer-events:none; z-index:4; }
+.c-tl { top:10px; left:10px; border-top:2px solid #CCFF00; border-left:2px solid #CCFF00; }
+.c-tr { top:10px; right:10px; border-top:2px solid #FF00FF; border-right:2px solid #FF00FF; }
+.c-bl { bottom:10px; left:10px; border-bottom:2px solid #FF00FF; border-left:2px solid #FF00FF; }
+.c-br { bottom:10px; right:10px; border-bottom:2px solid #CCFF00; border-right:2px solid #CCFF00; }
+
+/* Particles */
+.pts { position:absolute; inset:0; z-index:2; pointer-events:none; overflow:hidden; }
+.pt {
+  position:absolute; border-radius:50%;
+  animation:ptf ease-in-out infinite alternate;
+}
+@keyframes ptf {
+  0%{transform:translate(0,0); opacity:0.25}
+  100%{transform:translate(8px,-12px); opacity:0.7}
+}
+
+/* CONTENT */
+.content {
+  position:absolute; inset:0; z-index:10;
+  padding:18px 16px 12px;
+  display:flex; flex-direction:column;
+}
+.hdr {
+  display:flex; align-items:center; gap:6px;
+  margin-bottom:0;
+}
+.hdr-brand { font-family:'Space Mono',monospace; font-size:7px; letter-spacing:2px; color:rgba(255,255,255,0.5); }
+.hdr-bar { flex:1; height:1.5px; background:rgba(255,255,255,0.1); border-radius:1px; overflow:hidden; }
+.hdr-fill { height:100%; background:#CCFF00; box-shadow:0 0 6px #CCFF00; }
+.hdr-num { font-family:'Space Mono',monospace; font-size:7px; color:rgba(255,255,255,0.4); }
+
+.kicker {
+  align-self:flex-start; margin-top:10px;
+  padding:2px 9px;
+  border:1px solid var(--ac);
+  border-radius:3px;
+  font-family:'Space Mono',monospace; font-size:7px; letter-spacing:3px;
+  color:var(--ac); text-transform:uppercase;
+  text-shadow:0 0 8px var(--ac);
+  background:rgba(0,0,0,0.4);
+}
+.emoji-box {
+  align-self:flex-start; margin-top:8px;
+  width:48px; height:48px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; line-height:1;
+  border:2px solid #CCFF00;
+  box-shadow:0 0 14px #CCFF00, 3px 3px 0 #FF00FF;
+  animation:ep 3s ease-in-out infinite;
+}
+@keyframes ep {
+  0%,100%{box-shadow:0 0 14px #CCFF00, 3px 3px 0 #FF00FF}
+  50%{box-shadow:0 0 24px #CCFF00, 0 0 50px rgba(204,255,0,0.25), 3px 3px 0 #FF00FF}
+}
+
+.headline {
+  font-family:'Oswald',sans-serif; font-weight:700; font-size:20px;
+  text-transform:uppercase; color:#fff; line-height:1.15; margin-top:8px;
+  text-shadow:2px 0 #FF00FF, -2px 0 rgba(0,255,255,0.5);
+}
+.headline .kw {
+  color:#000; background:#CCFF00; padding:0 3px;
+  box-shadow:0 0 14px #CCFF00, 3px 3px 0 #FF00FF;
+  display:inline;
+}
+
+.body-card {
+  margin-top:6px; padding:7px 10px;
+  background:rgba(0,0,0,0.58);
+  border:1px solid rgba(204,255,0,0.3);
+  border-radius:5px; backdrop-filter:blur(8px);
+  box-shadow:0 0 12px rgba(204,255,0,0.12);
+}
+.body-text {
+  font-family:'Space Mono',monospace; font-size:8.5px;
+  color:rgba(255,255,255,0.9); line-height:1.65;
+  border-left:2px solid #00FFFF; padding-left:7px;
+  white-space:pre-line;
+}
+.body-prefix { color:rgba(204,255,0,0.7); }
+
+.tags { display:flex; gap:4px; margin-top:7px; }
+.tag {
+  background:rgba(0,0,0,0.55);
+  border:1px solid rgba(204,255,0,0.25);
+  border-radius:4px; padding:3px 6px;
+}
+.tag-l { font-size:5.5px; color:rgba(204,255,0,0.5); letter-spacing:1px; text-transform:uppercase; }
+.tag-v { font-family:'Bebas Neue',sans-serif; font-size:15px; color:#CCFF00; text-shadow:0 0 6px #CCFF00; }
+.tag-m { border-color:rgba(255,0,255,0.25); }
+.tag-m .tag-v { color:#FF00FF; text-shadow:0 0 6px #FF00FF; }
+.tag-m .tag-l { color:rgba(255,0,255,0.5); }
+.tag-h {
+  flex:1; background:rgba(0,0,0,0.55);
+  border:1px solid rgba(0,255,255,0.2); border-radius:4px;
+  padding:3px 7px; display:flex; align-items:center;
+}
+.tag-h span { font-family:'Space Mono',monospace; font-size:7.5px; color:#CCFF00; letter-spacing:0.5px; }
+
+.prog {
+  position:absolute; bottom:10px; left:14px; right:14px;
+  height:2px; background:rgba(255,255,255,0.07); border-radius:1px; overflow:hidden; z-index:10;
+}
+.prog-fill {
+  height:100%; border-radius:1px;
+  background:linear-gradient(90deg,#CCFF00,#FF00FF);
+  box-shadow:0 0 8px #CCFF00;
+}
+
+/* CTA slide */
+.cta-wrap {
+  position:absolute; inset:0; z-index:10;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; padding:16px;
+}
+.cta-card {
+  width:100%; background:rgba(0,20,40,0.75);
+  border:1.5px solid #00FFFF; border-radius:8px; padding:18px;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  box-shadow:0 0 24px rgba(0,255,255,0.25), inset 0 0 24px rgba(0,255,255,0.03);
+  backdrop-filter:blur(10px);
+}
+.cta-tg { width:46px; height:46px; border-radius:50%; background:#2AABEE; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 0 22px rgba(42,171,238,0.6); }
+.cta-title { font-family:'Oswald',sans-serif; font-weight:700; font-size:17px; color:#fff; text-align:center; text-transform:uppercase; line-height:1.2; }
+.cta-title span { color:#CCFF00; text-shadow:0 0 12px #CCFF00; }
+.cta-sub { font-family:'Space Mono',monospace; font-size:7px; color:rgba(255,255,255,0.35); letter-spacing:2px; text-align:center; }
+.ig-row {
+  width:100%; background:rgba(0,0,0,0.5);
+  border:1px solid rgba(204,255,0,0.18); border-radius:6px;
+  padding:8px 10px; display:flex; align-items:center; gap:8px;
+}
+.ig-av { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#CCFF00,#FF00FF); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#000; flex-shrink:0; }
+.ig-nm { font-family:'Space Mono',monospace; font-size:8px; color:#CCFF00; }
+.ig-sub { font-family:'Space Mono',monospace; font-size:6.5px; color:rgba(255,255,255,0.3); margin-top:1px; }
+.ig-btn { margin-left:auto; background:#CCFF00; color:#000; border:none; border-radius:4px; padding:4px 8px; font-family:'Space Mono',monospace; font-size:7px; font-weight:700; letter-spacing:1px; cursor:pointer; }
+
+/* Slide num badge */
+.badge {
+  position:absolute; top:36px; left:10px; z-index:12;
+  font-family:'Space Mono',monospace; font-size:7px; letter-spacing:1px;
+  color:rgba(255,255,255,0.35); padding:2px 5px;
+  background:rgba(0,0,0,0.5); border-radius:3px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+/* AI label */
+.ai-label {
+  position:absolute; top:10px; right:10px; z-index:20;
+  background:rgba(0,0,0,0.7); border:1px solid rgba(204,255,0,0.4);
+  border-radius:3px; padding:2px 6px;
+  font-family:'Space Mono',monospace; font-size:6px; letter-spacing:1px;
+  color:#CCFF00; opacity:0.7;
+}
+
+/* Katana slash hover */
+.slash {
+  position:absolute; z-index:20;
+  left:5%; right:5%; top:35%; height:2px;
+  background:linear-gradient(90deg, transparent, #CCFF00, #fff, #CCFF00, transparent);
+  box-shadow:0 0 12px #CCFF00;
+  opacity:0; transition:opacity 0.08s; transform:rotate(-2deg);
+  pointer-events:none;
+}
+.slide:hover .slash { opacity:1; }
+.slide:hover .headline { animation:glitch 0.2s infinite; }
+@keyframes glitch {
+  0%,100%{text-shadow:2px 0 #FF00FF, -2px 0 rgba(0,255,255,0.5)}
+  33%{text-shadow:-3px 0 #FF00FF, 3px 0 #CCFF00; transform:translateX(1px)}
+  66%{text-shadow:3px 0 #00FFFF, -1px 0 #FF00FF; transform:translateX(-1px)}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">PREVIEW</div>
+  <div class="topbar-tag">post_01</div>
+  <div class="topbar-tag cyan">StyleA-NeonKatana</div>
+  <div class="ai-badge">
+    <div class="ai-dot"></div>
+    google/gemini-3.1-flash-image-preview — AI Backgrounds
+  </div>
+  <div class="topbar-note">10 слайдов · 1080×1350 · Remotion 30fps</div>
+</div>
+
+<div class="slides-grid" id="grid"></div>
+
+<script>
+const slides = [
+  { headline:"10 нейросетей заменяют целую команду", body:"Сохрани — используй уже сегодня.", emoji:"🤖", kicker:"ФАКТ", kc:"#CCFF00", bgPrompt:"Futuristic Japanese cyberpunk street at night, neon yellow-green kanji signs, wet asphalt" },
+  { headline:"Раньше нужна была команда", body:"Копирайтер · Дизайнер · Монтажёр\nТаргетолог · Ассистент · Аналитик\n\nСейчас — один человек + ИИ.", emoji:"👥", kicker:"РАНЬШЕ", kc:"#FF00FF", bgPrompt:"Abstract liquid neon explosion, electric lime green and magenta plasma tendrils on pure black" },
+  { headline:"ChatGPT", body:"Пишет тексты, письма, скрипты продаж.\nЭкономит 3–4 часа каждый день.\nВ 2026 — обязательный инструмент.", emoji:"💬", kicker:"ТЕКСТЫ", kc:"#CCFF00", bgPrompt:"Holographic data sphere floating in dark space, glowing nano banana grid lines" },
+  { headline:"Midjourney", body:"Создаёт визуал за 30 секунд.\nЗаменяет дизайнера за 5–8 тыс/пост.\nОкупается с первого месяца.", emoji:"🎨", kicker:"ДИЗАЙН", kc:"#FF00FF", bgPrompt:"Brutalist neon architecture at night, massive concrete tower with electric lime green light strips" },
+  { headline:"HeyGen", body:"Видео с аватаром на любом языке.\nБез камеры. Без студии. За 10 минут.\nПодходит для курсов и рилз.", emoji:"🎭", kicker:"ВИДЕО", kc:"#CCFF00", bgPrompt:"Macro neon circuit board extreme close-up, glowing yellow-green traces on black PCB" },
+  { headline:"ElevenLabs", body:"Голос как у профи-диктора.\nАудио-курс из текста — за час.\nMidJourney для звука.", emoji:"🎙", kicker:"ГОЛОС", kc:"#FF00FF", bgPrompt:"Cyberpunk liquid metal surface with neon reflections, lime and magenta lights" },
+  { headline:"Claude + Perplexity", body:"Claude — думает и пишет код.\nPerplexity — ищет без галлюцинаций.\nВместе заменяют дорогого аналитика.", emoji:"🔍", kicker:"АНАЛИЗ", kc:"#CCFF00", bgPrompt:"Abstract AI neural network, glowing nano banana yellow nodes connected by electric threads" },
+  { headline:"Runway + Sora", body:"Видео из текста или фото.\nКачество кино — за минуты.\nКонтент-план на месяц за выходные.", emoji:"🎬", kicker:"МОНТАЖ", kc:"#FF00FF", bgPrompt:"Neon katana slash effect, electric lime green energy blade cutting through dark space" },
+  { headline:"Реальная математика", body:"Раньше: команда 6 человек → 400к/мес\nСейчас: 1 человек + ИИ → 18к/мес\nРазница: 382к чистой прибыли.", emoji:"📊", kicker:"ЦИФРЫ", kc:"#CCFF00", bgPrompt:"Cyberpunk megacity panorama from above, yellow-green neon grid streets" },
+  { headline:"Весь мой ИИ-стек — в Telegram", body:"Инструменты · Промпты · Схемы заработка\nкаждый день — без воды\nСсылка в шапке профиля ↑", emoji:"✈️", kicker:"TELEGRAM", kc:"#00FFFF", bgPrompt:"Telegram icon as holographic neon blue sphere floating in dark space", isLast:true },
+];
+
+const TOTAL = slides.length;
+
+function pts(n) {
+  const cols = ['#CCFF00','#FF00FF','#00FFFF','#fff'];
+  return Array.from({length:n}, (_,i) => {
+    const c = cols[i%4], x=5+Math.random()*90, y=5+Math.random()*90;
+    const s=1.5+Math.random()*4, dur=2+Math.random()*3, del=Math.random()*2.5;
+    return `<div class="pt" style="left:${x}%;top:${y}%;width:${s}px;height:${s}px;background:${c};box-shadow:0 0 ${s*3}px ${c};animation-duration:${dur}s;animation-delay:${del}s"></div>`;
+  }).join('');
+}
+
+const grid = document.getElementById('grid');
+
+slides.forEach((s, i) => {
+  const idx = i+1;
+  const prog = idx/TOTAL;
+  const div = document.createElement('div');
+  div.className = 'slide';
+
+  if (s.isLast) {
+    div.innerHTML = `
+      <div class="bg bg-${idx}"></div>
+      <div class="bg-overlay"></div>
+      <div class="neon-grid"></div>
+      <div class="pts">${pts(12)}</div>
+      <div class="scanline"></div>
+      <div class="corner c-tl"></div><div class="corner c-tr"></div>
+      <div class="corner c-bl"></div><div class="corner c-br"></div>
+      <div class="slash"></div>
+      <div class="ai-label">Gemini AI BG</div>
+      <div class="cta-wrap">
+        <div class="cta-card">
+          <div class="cta-tg">✈️</div>
+          <div class="cta-title">ВЕСЬ МОЙ ИИ-СТЕК —<br><span>В МОЁМ TELEGRAM</span></div>
+          <div class="cta-sub">ССЫЛКА В ШАПКЕ ПРОФИЛЯ ↓</div>
+        </div>
+        <div class="ig-row">
+          <div class="ig-av">Н</div>
+          <div>
+            <div class="ig-nm">@nikolay_cheusov</div>
+            <div class="ig-sub">Нейросети · ИИ · Заработок</div>
+          </div>
+          <button class="ig-btn">FOLLOW</button>
+        </div>
+      </div>
+      <div class="prog"><div class="prog-fill" style="width:100%"></div></div>
+    `;
+  } else {
+    const words = s.headline.split(' ');
+    const KEYS = ['нейросетей','команду','ChatGPT','Midjourney','HeyGen','ElevenLabs','Perplexity','Sora','математика','Telegram'];
+    const headHTML = words.map(w => {
+      const isK = KEYS.some(k => w.toLowerCase().includes(k.toLowerCase()));
+      return isK ? `<span class="kw">${w}</span> ` : w+' ';
+    }).join('');
+
+    div.innerHTML = `
+      <div class="bg bg-${idx}"></div>
+      <div class="bg-overlay"></div>
+      <div class="neon-grid"></div>
+      <div class="pts">${pts(16)}</div>
+      <div class="scanline"></div>
+      <div class="corner c-tl"></div><div class="corner c-tr"></div>
+      <div class="corner c-bl"></div><div class="corner c-br"></div>
+      <div class="slash"></div>
+      <div class="ai-label">Gemini AI BG</div>
+      <div class="content">
+        <div class="hdr">
+          <span class="hdr-brand">@nikolay_cheusov</span>
+          <div class="hdr-bar"><div class="hdr-fill" style="width:${prog*100}%"></div></div>
+          <span class="hdr-num">${idx}/${TOTAL}</span>
+        </div>
+        <div class="kicker" style="--ac:${s.kc}">${s.kicker}</div>
+        <div class="emoji-box">${s.emoji}</div>
+        <div class="headline">${headHTML}</div>
+        <div class="body-card">
+          <div class="body-text"><span class="body-prefix">▶ </span>${s.body}</div>
+        </div>
+        <div class="tags">
+          <div class="tag">
+            <div class="tag-l">СЛАЙД</div>
+            <div class="tag-v">${idx}/${TOTAL}</div>
+          </div>
+          <div class="tag tag-m">
+            <div class="tag-l">2026</div>
+            <div class="tag-v">AI↑</div>
+          </div>
+          <div class="tag-h">
+            <span>@nikolay_cheusov</span>
+          </div>
+        </div>
+      </div>
+      <div class="prog"><div class="prog-fill" style="width:${prog*100}%"></div></div>
+    `;
+  }
+
+  grid.appendChild(div);
+});
+</script>
+</body>
+</html>

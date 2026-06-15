@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview — post_01 · StyleA-NeonKatana</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    color: #fff;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(0,0,0,0.92);
+    border-bottom: 1px solid #CCFF00;
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 16px;
+    backdrop-filter: blur(12px);
+  }
+  .topbar-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 3px;
+    color: #CCFF00;
+    text-shadow: 0 0 20px #CCFF00;
+  }
+  .topbar-tag {
+    background: rgba(204,255,0,0.12);
+    border: 1px solid #CCFF00;
+    color: #CCFF00;
+    padding: 3px 10px;
+    font-size: 10px; letter-spacing: 2px;
+    border-radius: 3px;
+  }
+  .topbar-note {
+    margin-left: auto;
+    font-size: 11px; color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid rgba(204,255,0,0.2);
+    padding: 0 24px;
+    background: rgba(0,0,0,0.8);
+  }
+  .tab {
+    padding: 12px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 2px;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer; border: none; background: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s; text-transform: uppercase;
+  }
+  .tab.active {
+    color: #CCFF00;
+    border-bottom-color: #CCFF00;
+    text-shadow: 0 0 10px #CCFF00;
+  }
+  .tab:hover { color: rgba(204,255,0,0.7); }
+
+  /* ── PANELS ── */
+  .panel { display: none; padding: 32px 24px; }
+  .panel.active { display: block; }
+
+  /* ── INSTAGRAM PROFILE MOCKUP ── */
+  .ig-profile {
+    max-width: 480px; margin: 0 auto 32px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(204,255,0,0.2);
+    border-radius: 16px; padding: 20px 24px;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .ig-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, #CCFF00, #FF00FF);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif; font-size: 26px; color: #000; font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(204,255,0,0.5);
+  }
+  .ig-info h2 { font-family: 'Oswald', sans-serif; font-size: 18px; color: #fff; }
+  .ig-info p { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 1px; margin-top: 2px; }
+
+  /* ── FEED GRID ── */
+  .feed-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    max-width: 480px; margin: 0 auto;
+  }
+  .feed-cell {
+    aspect-ratio: 4/5;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  .feed-cell:hover .feed-overlay { opacity: 1; }
+  .feed-bg { width: 100%; height: 100%; }
+  .feed-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px; opacity: 0; transition: opacity 0.2s;
+  }
+  .feed-overlay-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+    color: #CCFF00; text-shadow: 0 0 12px #CCFF00;
+  }
+  .feed-overlay-label {
+    font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.6);
+  }
+
+  /* ── SLIDES GRID ── */
+  .slides-section-title {
+    text-align: center; margin-bottom: 24px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px; letter-spacing: 4px; color: rgba(255,255,255,0.3);
+  }
+
+  .slides-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1200px; margin: 0 auto;
+  }
+
+  /* ── SLIDE CARD ── */
+  .slide-card {
+    aspect-ratio: 4/5;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  }
+  .slide-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 0 30px rgba(204,255,0,0.25), 0 12px 40px rgba(0,0,0,0.8);
+  }
+
+  .slide-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #000000 0%, #0a0010 30%, #001200 60%, #000008 100%);
+  }
+
+  /* Matrix rain */
+  .matrix-rain {
+    position: absolute; inset: 0;
+    overflow: hidden; opacity: 0.1;
+    pointer-events: none;
+  }
+  .matrix-col {
+    position: absolute;
+    top: 0; width: 14px;
+    display: flex; flex-direction: column;
+    gap: 2px;
+    font-family: monospace; font-size: 9px;
+    color: #CCFF00;
+    animation: matrixFall linear infinite;
+  }
+  @keyframes matrixFall {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(200%); }
+  }
+
+  /* Neon grid */
+  .neon-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(204,255,0,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(204,255,0,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  /* Scanline */
+  .scanline {
+    position: absolute; left: 0; right: 0;
+    height: 2px;
+    background: #CCFF00;
+    box-shadow: 0 0 12px #CCFF00, 0 0 30px rgba(204,255,0,0.4);
+    animation: scan 2s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes scan {
+    0% { top: -2px; }
+    100% { top: 100%; }
+  }
+
+  /* Glow orbs */
+  .glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: orbFloat ease-in-out infinite alternate;
+  }
+  @keyframes orbFloat {
+    0% { transform: translate(0,0); }
+    100% { transform: translate(8px, 12px); }
+  }
+
+  /* Corner brackets */
+  .corner {
+    position: absolute; width: 18px; height: 18px;
+    pointer-events: none;
+  }
+  .corner-tl { top: 8px; left: 8px; border-top: 2px solid #CCFF00; border-left: 2px solid #CCFF00; }
+  .corner-tr { top: 8px; right: 8px; border-top: 2px solid #FF00FF; border-right: 2px solid #FF00FF; }
+  .corner-bl { bottom: 8px; left: 8px; border-bottom: 2px solid #FF00FF; border-left: 2px solid #FF00FF; }
+  .corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid #CCFF00; border-right: 2px solid #CCFF00; }
+
+  /* Header bar */
+  .slide-header {
+    position: absolute; top: 28px; left: 14px; right: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 10;
+  }
+  .slide-brand {
+    font-family: 'Space Mono', monospace;
+    font-size: 7px; letter-spacing: 2px; color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+  }
+  .slide-progress-bar {
+    height: 1.5px; flex: 1; margin: 0 8px;
+    background: rgba(255,255,255,0.1); border-radius: 1px; overflow: hidden;
+  }
+  .slide-progress-fill {
+    height: 100%; background: #CCFF00;
+    box-shadow: 0 0 6px #CCFF00;
+    border-radius: 1px;
+  }
+  .slide-counter {
+    font-family: 'Space Mono', monospace;
+    font-size: 7px; letter-spacing: 1px; color: rgba(255,255,255,0.4);
+  }
+
+  /* Content area */
+  .slide-content {
+    position: absolute; inset: 0;
+    padding: 20px 14px 14px;
+    display: flex; flex-direction: column;
+    z-index: 10;
+  }
+
+  /* Kicker */
+  .kicker {
+    align-self: flex-start;
+    padding: 2px 8px; margin-top: 36px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid #FF00FF;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 7px; letter-spacing: 3px; color: #FF00FF;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px #FF00FF;
+  }
+
+  /* Emoji box */
+  .emoji-box {
+    align-self: flex-start; margin-top: 8px;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; line-height: 1;
+    border: 2px solid #CCFF00;
+    box-shadow: 0 0 14px #CCFF00, 0 0 30px rgba(204,255,0,0.2), 3px 3px 0 #FF00FF;
+    animation: emojiPulse 3s ease-in-out infinite;
+  }
+  @keyframes emojiPulse {
+    0%, 100% { box-shadow: 0 0 14px #CCFF00, 0 0 30px rgba(204,255,0,0.2), 3px 3px 0 #FF00FF; }
+    50% { box-shadow: 0 0 20px #CCFF00, 0 0 50px rgba(204,255,0,0.3), 3px 3px 0 #FF00FF; }
+  }
+
+  /* Headline */
+  .slide-headline {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700; font-size: 18px;
+    text-transform: uppercase; color: #fff;
+    line-height: 1.15; margin-top: 8px;
+    text-shadow: 2px 0 #FF00FF, -2px 0 rgba(0,255,255,0.5);
+  }
+  .slide-headline .keyword {
+    color: #000; background: #CCFF00;
+    padding: 0 4px; display: inline;
+    box-shadow: 0 0 14px #CCFF00, 3px 3px 0 #FF00FF;
+  }
+
+  /* Body */
+  .slide-body-card {
+    margin-top: 6px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(204,255,0,0.35);
+    border-radius: 5px;
+    padding: 7px 9px;
+    box-shadow: 0 0 10px rgba(204,255,0,0.2);
+  }
+  .slide-body {
+    font-family: 'Space Mono', monospace;
+    font-size: 8.5px; color: rgba(255,255,255,0.88);
+    line-height: 1.6;
+    border-left: 2px solid #00FFFF;
+    padding-left: 6px;
+    white-space: pre-line;
+  }
+  .slide-body::before { content: '▶ '; color: rgba(204,255,0,0.7); }
+
+  /* Tags row */
+  .tags-row {
+    display: flex; gap: 4px; margin-top: 6px; flex-wrap: nowrap;
+  }
+  .tag-box {
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(204,255,0,0.3);
+    border-radius: 4px; padding: 3px 6px;
+    font-family: 'Space Mono', monospace;
+  }
+  .tag-label { font-size: 5.5px; color: rgba(204,255,0,0.5); letter-spacing: 1px; text-transform: uppercase; }
+  .tag-value { font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: #CCFF00; text-shadow: 0 0 6px #CCFF00; }
+  .tag-handle {
+    flex: 1;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(204,255,0,0.3);
+    border-radius: 4px; padding: 3px 6px;
+    display: flex; align-items: center;
+  }
+  .tag-handle span {
+    font-family: 'Space Mono', monospace;
+    font-size: 7.5px; color: #CCFF00;
+    text-shadow: 0 0 6px rgba(204,255,0,0.4);
+    letter-spacing: 0.5px;
+  }
+
+  /* Progress bar bottom */
+  .progress-bottom {
+    position: absolute; bottom: 12px; left: 14px; right: 14px;
+    height: 2px; background: rgba(255,255,255,0.08); border-radius: 1px;
+    overflow: hidden; z-index: 10;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, #CCFF00, #FF00FF);
+    box-shadow: 0 0 8px #CCFF00;
+    border-radius: 1px;
+  }
+
+  /* ── CTA SLIDE ── */
+  .slide-cta {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px; padding: 14px; z-index: 10;
+  }
+  .cta-card {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(0,255,255,0.08), rgba(0,0,0,0.7));
+    border: 1.5px solid #00FFFF;
+    border-radius: 8px; padding: 16px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+    box-shadow: 0 0 20px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.03);
+  }
+  .tg-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #2AABEE;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 20px rgba(42,171,238,0.6);
+  }
+  .cta-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700; font-size: 16px;
+    color: #fff; text-align: center;
+    text-transform: uppercase; line-height: 1.2;
+  }
+  .cta-title span { color: #CCFF00; text-shadow: 0 0 12px #CCFF00; }
+  .cta-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 7px; color: rgba(255,255,255,0.4);
+    letter-spacing: 2px; text-align: center;
+  }
+  .ig-mock {
+    width: 100%;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(204,255,0,0.2);
+    border-radius: 6px; padding: 8px 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ig-mock-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, #CCFF00, #FF00FF);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #000;
+    flex-shrink: 0;
+  }
+  .ig-mock-info { font-family: 'Space Mono', monospace; }
+  .ig-mock-handle { font-size: 8px; color: #CCFF00; letter-spacing: 1px; }
+  .ig-mock-sub { font-size: 7px; color: rgba(255,255,255,0.3); margin-top: 1px; }
+  .ig-mock-btn {
+    margin-left: auto;
+    background: #CCFF00; color: #000;
+    border: none; border-radius: 4px;
+    padding: 4px 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 7px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer;
+  }
+
+  /* ── CAPTION PANEL ── */
+  .caption-block {
+    max-width: 680px; margin: 0 auto;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(204,255,0,0.15);
+    border-radius: 12px; padding: 24px;
+  }
+  .caption-label {
+    font-size: 10px; letter-spacing: 3px; color: #CCFF00;
+    text-transform: uppercase; margin-bottom: 12px;
+    text-shadow: 0 0 8px #CCFF00;
+  }
+  .caption-text {
+    font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.7;
+    white-space: pre-wrap;
+  }
+  .hashtags-text {
+    margin-top: 12px; font-size: 12px;
+    color: #CCFF00; opacity: 0.6; line-height: 1.8;
+  }
+
+  /* Number badge */
+  .slide-num-badge {
+    position: absolute; top: 8px; left: 8px;
+    background: rgba(204,255,0,0.9);
+    color: #000; font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px; width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 20;
+  }
+
+  /* Glitch animation on hover */
+  .slide-card:hover .slide-headline {
+    animation: glitch 0.3s ease infinite;
+  }
+  @keyframes glitch {
+    0%,100% { text-shadow: 2px 0 #FF00FF, -2px 0 rgba(0,255,255,0.5); }
+    25% { text-shadow: -3px 0 #FF00FF, 3px 0 #CCFF00; transform: translateX(1px); }
+    75% { text-shadow: 3px 0 #00FFFF, -1px 0 #FF00FF; transform: translateX(-1px); }
+  }
+
+  /* Katana flash on hover */
+  .slide-card:hover .katana-slash { opacity: 1 !important; }
+  .katana-slash {
+    position: absolute; left: 5%; right: 5%; top: 35%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #CCFF00, #00FFFF, #CCFF00, transparent);
+    box-shadow: 0 0 10px #CCFF00, 0 0 30px rgba(204,255,0,0.4);
+    opacity: 0; transition: opacity 0.1s;
+    pointer-events: none; z-index: 30;
+    transform: rotate(-2deg);
+  }
+
+  /* Floating particles */
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: float ease-in-out infinite alternate;
+  }
+  @keyframes float {
+    0% { transform: translate(0, 0); opacity: 0.3; }
+    100% { transform: translate(6px, -10px); opacity: 0.7; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">PREVIEW</div>
+  <div class="topbar-tag">post_01</div>
+  <div class="topbar-tag" style="color:#00FFFF; border-color:#00FFFF; background:rgba(0,255,255,0.08)">StyleA-NeonKatana</div>
+  <div class="topbar-note">@nikolay_cheusov · 10 слайдов · 4:5</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('slides')">📋 ВСЕ СЛАЙДЫ</button>
+  <button class="tab" onclick="showTab('feed')">📱 В ЛЕНТЕ</button>
+  <button class="tab" onclick="showTab('caption')">✍️ ПОДПИСЬ</button>
+</div>
+
+<!-- SLIDES TAB -->
+<div class="panel active" id="tab-slides">
+  <p class="slides-section-title">post_01 · 10 СЛАЙДОВ · StyleA-NeonKatana</p>
+  <div class="slides-grid" id="slides-grid"></div>
+</div>
+
+<!-- FEED TAB -->
+<div class="panel" id="tab-feed">
+  <div class="ig-profile">
+    <div class="ig-avatar">Н</div>
+    <div class="ig-info">
+      <h2>nikolay_cheusov</h2>
+      <p>НЕЙРОСЕТИ · ИИ · ЗАРАБОТОК · 2026</p>
+    </div>
+  </div>
+  <div class="feed-grid" id="feed-grid"></div>
+</div>
+
+<!-- CAPTION TAB -->
+<div class="panel" id="tab-caption">
+  <div class="caption-block">
+    <div class="caption-label">📝 ПОДПИСЬ К ПОСТУ</div>
+    <div class="caption-text">Год назад мне нужна была команда из 6 человек.
+Сегодня — только ноутбук и ИИ.
+
+А всё потому что я нашёл 10 инструментов, которые делают всё то же самое — в 20 раз дешевле и в 3 раза быстрее 👇
+
+Сохрани карусель — и уже сегодня закрой хотя бы один рутинный процесс с помощью ИИ.
+
+Весь мой ИИ-стек, промпты и схемы заработка — каждый день в Telegram.
+Ссылка в шапке профиля ⚡️</div>
+    <div class="hashtags-text">#нейросети #ии #chatgpt #midjourney #heygen #искусственныйинтеллект #заработоквинтернете #aitools #нейросеть #технологии #runway #elevenlabs #sora #продуктивность #онлайнзаработок #контент #smm #chatgptрусский #нейросетидляработы</div>
+  </div>
+</div>
+
+<script>
+const slides = [
+  { headline: "10 нейросетей заменяют целую команду", body: "Сохрани — используй уже сегодня.", emoji: "🤖", kicker: "ФАКТ" },
+  { headline: "Раньше нужна была команда", body: "Копирайтер · Дизайнер · Монтажёр\nТаргетолог · Ассистент · Аналитик\n\nСейчас — один человек + ИИ.", emoji: "👥", kicker: "РАНЬШЕ" },
+  { headline: "ChatGPT", body: "Пишет тексты, письма, скрипты продаж.\nЭкономит 3–4 часа каждый день.\nВ 2026 — обязательный инструмент.", emoji: "💬", kicker: "ТЕКСТЫ" },
+  { headline: "Midjourney", body: "Создаёт визуал за 30 секунд.\nЗаменяет дизайнера за 5–8 тыс/пост.\nОкупается с первого месяца.", emoji: "🎨", kicker: "ДИЗАЙН" },
+  { headline: "HeyGen", body: "Видео с аватаром на любом языке.\nБез камеры. Без студии. За 10 минут.\nПодходит для курсов и рилз.", emoji: "🎭", kicker: "ВИДЕО" },
+  { headline: "ElevenLabs", body: "Голос как у профи-диктора.\nАудио-курс из текста — за час.\nMidJourney для звука.", emoji: "🎙", kicker: "ГОЛОС" },
+  { headline: "Claude + Perplexity", body: "Claude — думает и пишет код.\nPerplexity — ищет без галлюцинаций.\nВместе заменяют дорогого аналитика.", emoji: "🔍", kicker: "АНАЛИЗ" },
+  { headline: "Runway + Sora", body: "Видео из текста или фото.\nКачество кино — за минуты.\nКонтент-план на месяц за выходные.", emoji: "🎬", kicker: "МОНТАЖ" },
+  { headline: "Реальная математика", body: "Раньше: команда 6 человек → 400к/мес\nСейчас: 1 человек + ИИ → 18к/мес\nРазница: 382к чистой прибыли.", emoji: "📊", kicker: "ЦИФРЫ" },
+  { headline: "Весь мой ИИ-стек — в Telegram", body: "Инструменты · Промпты · Схемы заработка\nкаждый день — без воды\nСсылка в шапке профиля ↑", emoji: "✈️", kicker: "TELEGRAM", isLast: true },
+];
+
+const KEYWORDS = ['нейросетей','команду','ChatGPT','Midjourney','HeyGen','ElevenLabs','Perplexity','Sora','математика','Telegram','ИИ-стек'];
+
+function isKeyword(word) {
+  return KEYWORDS.some(k => word.toLowerCase().includes(k.toLowerCase()));
+}
+
+const PALETTE_KICKER = {
+  'ФАКТ': '#CCFF00', 'РАНЬШЕ': '#FF00FF', 'ТЕКСТЫ': '#CCFF00',
+  'ДИЗАЙН': '#FF00FF', 'ВИДЕО': '#CCFF00', 'ГОЛОС': '#FF00FF',
+  'АНАЛИЗ': '#CCFF00', 'МОНТАЖ': '#FF00FF', 'ЦИФРЫ': '#CCFF00',
+  'TELEGRAM': '#00FFFF',
+};
+
+function randomParticles(n) {
+  return Array.from({length: n}, (_, i) => {
+    const colors = ['#CCFF00','#FF00FF','#00FFFF','#ffffff'];
+    const c = colors[i % 4];
+    const x = 5 + Math.random() * 90;
+    const y = 5 + Math.random() * 90;
+    const s = 1.5 + Math.random() * 4;
+    const dur = 2 + Math.random() * 3;
+    const del = Math.random() * 2;
+    return `<div class="particle" style="left:${x}%;top:${y}%;width:${s}px;height:${s}px;background:${c};box-shadow:0 0 ${s*3}px ${c};animation-duration:${dur}s;animation-delay:${del}s"></div>`;
+  }).join('');
+}
+
+function matrixCols() {
+  return Array.from({length: 8}, (_, i) => {
+    const x = i * 12.5 + Math.random() * 5;
+    const dur = 3 + Math.random() * 4;
+    const del = Math.random() * 3;
+    const chars = Array.from({length: 10}, () => String.fromCharCode(33 + Math.floor(Math.random()*94))).join('<br>');
+    return `<div class="matrix-col" style="left:${x}%;animation-duration:${dur}s;animation-delay:-${del}s">${chars}</div>`;
+  }).join('');
+}
+
+function buildSlideHTML(slide, idx, total) {
+  const progress = (idx + 1) / total;
+  const accentKicker = PALETTE_KICKER[slide.kicker] || '#CCFF00';
+
+  if (slide.isLast) {
+    return `
+      <div class="slide-bg"></div>
+      <div class="neon-grid"></div>
+      <div class="matrix-rain">${matrixCols()}</div>
+      ${randomParticles(12)}
+      <div class="scanline"></div>
+      <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+      <div class="katana-slash"></div>
+      <div class="slide-cta">
+        <div class="cta-card">
+          <div class="tg-icon">✈️</div>
+          <div class="cta-title">ВЕСЬ МОЙ ИИ-СТЕК —<br><span>В МОЁМ TELEGRAM</span></div>
+          <div class="cta-sub">ССЫЛКА В ШАПКЕ ПРОФИЛЯ ↓</div>
+        </div>
+        <div class="ig-mock">
+          <div class="ig-mock-avatar">Н</div>
+          <div class="ig-mock-info">
+            <div class="ig-mock-handle">@nikolay_cheusov</div>
+            <div class="ig-mock-sub">Нейросети · ИИ · Заработок</div>
+          </div>
+          <button class="ig-mock-btn">ПОДПИСКА</button>
+        </div>
+      </div>
+      <div class="progress-bottom"><div class="progress-fill" style="width:100%"></div></div>
+    `;
+  }
+
+  const words = slide.headline.split(' ');
+  const headlineHTML = words.map(w => {
+    if (isKeyword(w)) return `<span class="keyword">${w}</span> `;
+    return w + ' ';
+  }).join('');
+
+  return `
+    <div class="slide-bg"></div>
+    <div class="neon-grid"></div>
+    <div class="matrix-rain">${matrixCols()}</div>
+    ${randomParticles(15)}
+    <div class="scanline"></div>
+    <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+    <div class="katana-slash"></div>
+    <div class="slide-header">
+      <span class="slide-brand">@nikolay_cheusov</span>
+      <div class="slide-progress-bar"><div class="slide-progress-fill" style="width:${progress*100}%"></div></div>
+      <span class="slide-counter">${idx+1}/${total}</span>
+    </div>
+    <div class="slide-content">
+      <div class="kicker" style="color:${accentKicker};border-color:${accentKicker};text-shadow:0 0 8px ${accentKicker}">${slide.kicker || 'SYS://SLIDE'}</div>
+      <div class="emoji-box">${slide.emoji}</div>
+      <div class="slide-headline">${headlineHTML}</div>
+      <div class="slide-body-card">
+        <div class="slide-body">${slide.body}</div>
+      </div>
+      <div class="tags-row">
+        <div class="tag-box">
+          <div class="tag-label">СЛАЙД</div>
+          <div class="tag-value">${idx+1}/${total}</div>
+        </div>
+        <div class="tag-box" style="border-color:rgba(255,0,255,0.3)">
+          <div class="tag-label" style="color:rgba(255,0,255,0.5)">2026</div>
+          <div class="tag-value" style="color:#FF00FF;text-shadow:0 0 6px #FF00FF">AI↑</div>
+        </div>
+        <div class="tag-handle" style="border-color:rgba(0,255,255,0.25)">
+          <span>@nikolay_cheusov</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-bottom"><div class="progress-fill" style="width:${progress*100}%"></div></div>
+  `;
+}
+
+function buildFeedCell(slide, idx, total) {
+  const bg = ['linear-gradient(135deg,#000 0%,#0a0010 40%,#001200 100%)',
+              'linear-gradient(160deg,#000 0%,#100020 50%,#000 100%)'];
+  return `
+    <div style="aspect-ratio:4/5;position:relative;overflow:hidden;border-radius:2px;cursor:pointer;background:${bg[idx%2]}" onclick="showTab('slides');setTimeout(()=>{document.querySelectorAll('.slide-card')[${idx}].scrollIntoView({behavior:'smooth',block:'center'})},100)">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(204,255,0,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(204,255,0,0.05) 1px,transparent 1px);background-size:20px 20px"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(204,255,0,0.12) 0%,transparent 60%)"></div>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:${idx===9?'22px':'30px'};line-height:1">${slide.emoji}</div>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:8px 6px 6px">
+        <div style="font-family:'Space Mono',monospace;font-size:6.5px;color:#CCFF00;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${slide.headline.slice(0,28)}${slide.headline.length>28?'…':''}</div>
+      </div>
+      <div style="position:absolute;top:5px;right:5px;background:rgba(204,255,0,0.85);color:#000;font-family:'Bebas Neue',sans-serif;font-size:10px;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center">${idx+1}</div>
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#CCFF00;text-shadow:0 0 10px #CCFF00">${idx+1}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.5)">СЛАЙД</div>
+      </div>
+    </div>
+  `;
+}
+
+// Build slides grid
+const grid = document.getElementById('slides-grid');
+slides.forEach((slide, i) => {
+  const card = document.createElement('div');
+  card.className = 'slide-card';
+  card.innerHTML = buildSlideHTML(slide, i, slides.length);
+  grid.appendChild(card);
+});
+
+// Build feed grid
+const feedGrid = document.getElementById('feed-grid');
+slides.forEach((slide, i) => {
+  const cell = document.createElement('div');
+  cell.innerHTML = buildFeedCell(slide, i, slides.length);
+  feedGrid.appendChild(cell.firstElementChild);
+});
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['slides','feed','caption'][i] === name);
+  });
+  document.querySelectorAll('.panel').forEach((p,i) => {
+    p.classList.toggle('active', ['slides','feed','caption'][i] === name);
+  });
+}
+</script>
+</body>
+</html>
