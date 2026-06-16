@@ -3,11 +3,10 @@ meta:
   toolchain:
     name: npm
     version: "20"
-
 build:
-  buildCommands:
+  skip: false
+  additionalCommands:
     - cd remotion-carousel && npm install --omit=dev --ignore-scripts
-
 run:
   command: node remotion-carousel/scheduler.mjs
   persistenceMount: /data
