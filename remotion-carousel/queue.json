@@ -32,6 +32,13 @@
     "published": false
   },
   {
+    "id": "StyleA-02",
+    "carousel_container": "18591806905001398",
+    "scheduled_utc": 1781618400,
+    "scheduled_msk": "2026-06-16 17:00 МСК",
+    "published": false
+  },
+  {
     "id": "StyleA-03",
     "carousel_container": "18591776662001398",
     "scheduled_utc": 1781676000,
