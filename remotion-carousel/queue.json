@@ -36,7 +36,9 @@
     "carousel_container": "18591806905001398",
     "scheduled_utc": 1781620800,
     "scheduled_msk": "2026-06-16 17:40 МСК",
-    "published": false
+    "published": true,
+    "published_at": "2026-06-16T14:37:00.000Z",
+    "media_id": "18326837215248761"
   },
   {
     "id": "StyleA-03",
