@@ -1,0 +1,17 @@
+[
+  {
+    "id": "StyleB-01",
+    "carousel_container": "18591677188001398",
+    "scheduled_utc": 1781604000,
+    "scheduled_msk": "2026-06-16 13:00 МСК",
+    "published": false
+  },
+  {
+    "id": "StyleC-01",
+    "carousel_container": "PENDING",
+    "scheduled_utc": 1781625600,
+    "scheduled_msk": "2026-06-16 19:00 МСК",
+    "published": false,
+    "note": "Создать carousel_container после загрузки C-01 слайдов"
+  }
+]
