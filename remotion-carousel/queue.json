@@ -70,5 +70,19 @@
     "published": true,
     "published_at": "2026-06-16T21:54:41.000Z",
     "media_id": "17878693347468431"
+  },
+  {
+    "id": "StyleA-04",
+    "carousel_container": "18591939154001398",
+    "scheduled_utc": 1781652600,
+    "scheduled_msk": "2026-06-17 02:30 МСК",
+    "published": false
+  },
+  {
+    "id": "StyleB-04",
+    "carousel_container": "18591940123001398",
+    "scheduled_utc": 1781676000,
+    "scheduled_msk": "2026-06-17 09:00 МСК",
+    "published": false
   }
 ]
