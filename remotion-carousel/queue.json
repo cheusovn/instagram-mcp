@@ -8,10 +8,9 @@
   },
   {
     "id": "StyleC-01",
-    "carousel_container": "PENDING",
+    "carousel_container": "18591678355001398",
     "scheduled_utc": 1781625600,
     "scheduled_msk": "2026-06-16 19:00 МСК",
-    "published": false,
-    "note": "Создать carousel_container после загрузки C-01 слайдов"
+    "published": false
   }
 ]
