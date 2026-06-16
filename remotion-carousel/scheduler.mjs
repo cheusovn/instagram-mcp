@@ -45,6 +45,15 @@ async function ghPut(path, content, sha, message) {
 
 // ── Instagram publish ─────────────────────────────────────────────────────────
 
+// Проверяет, не опубликован ли контейнер уже (защита от дублей, если queue.json
+// не успел обновиться). Возвращает status_code: PUBLISHED | IN_PROGRESS | ERROR | …
+async function igContainerStatus(containerId) {
+  const res = await fetch(`${API_BASE}/${containerId}?fields=status_code&access_token=${INSTAGRAM_TOKEN}`);
+  const data = await res.json();
+  if (data.error) throw new Error(`Instagram status: ${data.error.message}`);
+  return data.status_code;
+}
+
 async function igPublish(containerId) {
   const params = new URLSearchParams({ creation_id: containerId, access_token: INSTAGRAM_TOKEN });
   const res = await fetch(`${API_BASE}/${ACCOUNT_ID}/media_publish`, { method: 'POST', body: params });
@@ -93,6 +102,18 @@ async function checkAndPublish() {
   for (const post of due) {
     console.log(`🚀 Публикую: ${post.id} (${post.scheduled_msk})`);
     try {
+      // Идемпотентность: если контейнер уже опубликован (queue.json не успел
+      // обновиться на прошлой проверке), не публикуем повторно — только фиксируем.
+      const status = await igContainerStatus(post.carousel_container);
+      if (status === 'PUBLISHED') {
+        console.log(`↩️  ${post.id} уже опубликован в Instagram — помечаю в очереди без повтора`);
+        post.published    = true;
+        post.published_at = post.published_at || new Date().toISOString();
+        post.already_published = true;
+        changed = true;
+        continue;
+      }
+
       const mediaId = await igPublish(post.carousel_container);
       post.published    = true;
       post.published_at = new Date().toISOString();
