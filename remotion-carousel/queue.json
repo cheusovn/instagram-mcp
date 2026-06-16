@@ -16,5 +16,33 @@
     "published": true,
     "published_at": "2026-06-16T11:00:00.000Z",
     "media_id": "18105095912052623"
+  },
+  {
+    "id": "StyleB-02",
+    "carousel_container": "18591775711001398",
+    "scheduled_utc": 1781622000,
+    "scheduled_msk": "2026-06-16 18:00 МСК",
+    "published": false
+  },
+  {
+    "id": "StyleC-02",
+    "carousel_container": "18591777787001398",
+    "scheduled_utc": 1781631000,
+    "scheduled_msk": "2026-06-16 20:30 МСК",
+    "published": false
+  },
+  {
+    "id": "StyleA-03",
+    "carousel_container": "18591776662001398",
+    "scheduled_utc": 1781676000,
+    "scheduled_msk": "2026-06-17 09:00 МСК",
+    "published": false
+  },
+  {
+    "id": "StyleB-03",
+    "carousel_container": "18591778684001398",
+    "scheduled_utc": 1781690400,
+    "scheduled_msk": "2026-06-17 13:00 МСК",
+    "published": false
   }
 ]
