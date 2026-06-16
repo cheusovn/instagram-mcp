@@ -24,8 +24,8 @@ if (fs.existsSync(envPath)) {
 
 const ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 const ACCOUNT_ID   = process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID;
-const API_VERSION  = process.env.INSTAGRAM_API_VERSION || 'v22.0';
-const API_BASE     = `https://graph.facebook.com/${API_VERSION}`;
+const API_VERSION  = process.env.INSTAGRAM_API_VERSION || 'v21.0';
+const API_BASE     = `https://graph.instagram.com/${API_VERSION}`;
 
 if (!ACCESS_TOKEN || !ACCOUNT_ID) {
   console.error('❌ Нет INSTAGRAM_ACCESS_TOKEN или INSTAGRAM_BUSINESS_ACCOUNT_ID');

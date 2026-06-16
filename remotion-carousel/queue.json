@@ -4,13 +4,17 @@
     "carousel_container": "18591677188001398",
     "scheduled_utc": 1781606700,
     "scheduled_msk": "2026-06-16 13:45 МСК",
-    "published": false
+    "published": true,
+    "published_at": "2026-06-16T10:50:00.000Z",
+    "media_id": "17940396066251227"
   },
   {
     "id": "StyleC-01",
     "carousel_container": "18591678355001398",
     "scheduled_utc": 1781625600,
     "scheduled_msk": "2026-06-16 19:00 МСК",
-    "published": false
+    "published": true,
+    "published_at": "2026-06-16T11:00:00.000Z",
+    "media_id": "18105095912052623"
   }
 ]
