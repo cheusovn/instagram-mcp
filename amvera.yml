@@ -1,3 +1,4 @@
+---
 meta:
   environment: nodejs
   toolchain:
@@ -8,5 +9,5 @@ build:
   additionalCommands:
     - cd remotion-carousel && npm install --omit=dev --ignore-scripts
 run:
-  command: node remotion-carousel/scheduler.mjs
   persistenceMount: /data
+  command: node remotion-carousel/scheduler.mjs
