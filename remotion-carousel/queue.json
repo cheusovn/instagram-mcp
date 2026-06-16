@@ -61,5 +61,12 @@
     "published": true,
     "published_at": "2026-06-16T19:46:31.106Z",
     "media_id": "18108841459944157"
+  },
+  {
+    "id": "StyleC-03",
+    "carousel_container": "18591922240001398",
+    "scheduled_utc": 1781647200,
+    "scheduled_msk": "2026-06-17 01:00 МСК",
+    "published": false
   }
 ]
