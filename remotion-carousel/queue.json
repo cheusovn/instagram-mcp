@@ -22,14 +22,18 @@
     "carousel_container": "18591775711001398",
     "scheduled_utc": 1781622000,
     "scheduled_msk": "2026-06-16 18:00 МСК",
-    "published": false
+    "published": true,
+    "published_at": "2026-06-16T19:46:10.684Z",
+    "media_id": "18024266834668453"
   },
   {
     "id": "StyleC-02",
     "carousel_container": "18591777787001398",
     "scheduled_utc": 1781631000,
     "scheduled_msk": "2026-06-16 20:30 МСК",
-    "published": false
+    "published": true,
+    "published_at": "2026-06-16T19:46:17.483Z",
+    "media_id": "18339582469219357"
   },
   {
     "id": "StyleA-02",
@@ -45,13 +49,17 @@
     "carousel_container": "18591776662001398",
     "scheduled_utc": 1781676000,
     "scheduled_msk": "2026-06-17 09:00 МСК",
-    "published": false
+    "published": true,
+    "published_at": "2026-06-16T19:46:24.113Z",
+    "media_id": "17968228338087674"
   },
   {
     "id": "StyleB-03",
     "carousel_container": "18591778684001398",
     "scheduled_utc": 1781690400,
     "scheduled_msk": "2026-06-17 13:00 МСК",
-    "published": false
+    "published": true,
+    "published_at": "2026-06-16T19:46:31.106Z",
+    "media_id": "18108841459944157"
   }
 ]
