@@ -84,5 +84,40 @@
     "scheduled_utc": 1781676000,
     "scheduled_msk": "2026-06-17 09:00 МСК",
     "published": false
+  },
+  {
+    "id": "StyleC-04",
+    "carousel_container": "18591950833001398",
+    "scheduled_utc": 1781686800,
+    "scheduled_msk": "2026-06-17 12:00 МСК",
+    "published": false
+  },
+  {
+    "id": "StyleA-05",
+    "carousel_container": "18591951940001398",
+    "scheduled_utc": 1781695800,
+    "scheduled_msk": "2026-06-17 14:30 МСК",
+    "published": false
+  },
+  {
+    "id": "StyleB-05",
+    "carousel_container": "18591954763001398",
+    "scheduled_utc": 1781704800,
+    "scheduled_msk": "2026-06-17 17:00 МСК",
+    "published": false
+  },
+  {
+    "id": "StyleC-05",
+    "carousel_container": "18591956014001398",
+    "scheduled_utc": 1781713800,
+    "scheduled_msk": "2026-06-17 19:30 МСК",
+    "published": false
+  },
+  {
+    "id": "StyleA-06",
+    "carousel_container": "18591961243001398",
+    "scheduled_utc": 1781719200,
+    "scheduled_msk": "2026-06-17 21:00 МСК",
+    "published": false
   }
 ]
